@@ -1,0 +1,2 @@
+I:\CustomEmotesAPI\CustomEmotesAPI\CustomEmotesAPI\obj\Debug\CustomEmotesAPI.csprojAssemblyReference.cache
+I:\CustomEmotesAPI\CustomEmotesAPI\CustomEmotesAPI\obj\Debug\CustomEmotesAPI.csproj.CoreCompileInputs.cache
