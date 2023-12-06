@@ -75,18 +75,18 @@ namespace EmotesAPI
 
 
 
-        //TODO stuff
+        //TODO loading a base button
         //public static GameObject NakedButton = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/UI/NakedButton.prefab").WaitForCompletion();
         public static void RunAll()
         {
-            //TODO stuff
+            //TODO base button
             //UnityEngine.Object.DestroyImmediate(NakedButton.GetComponentInChildren<LanguageTextMeshController>());
             Setup();
             Yes();
         }
         private static void Setup()
         {
-            //TODO stuff
+            //TODO settings ROO
             //ModSettingsManager.SetModDescription($"Made by Metrosexual Fruitcake#6969\n\nVersion {CustomEmotesAPI.VERSION}");
             //ModSettingsManager.SetModIcon(Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/icon.png"));
         }
@@ -100,7 +100,7 @@ namespace EmotesAPI
             var basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Middle");
             for (int i = 0; i < 8; i++)
             {
-                //TODO stuff
+                //TODO menu buttons
                 //GameObject nut = GameObject.Instantiate(Settings.NakedButton);
                 //nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
                 //nut.transform.localPosition = new Vector3(-80, -20, 0);
@@ -109,7 +109,7 @@ namespace EmotesAPI
             basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Left");
             for (int i = 0; i < 8; i++)
             {
-                //TODO stuff
+                //TODO menu buttons
                 //GameObject nut = GameObject.Instantiate(Settings.NakedButton);
                 //nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
                 //nut.transform.localPosition = new Vector3(-80, -20, 0);
@@ -118,7 +118,7 @@ namespace EmotesAPI
             basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Right");
             for (int i = 0; i < 8; i++)
             {
-                //TODO stuff
+                //TODO menu buttons
                 //GameObject nut = GameObject.Instantiate(Settings.NakedButton);
                 //nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
                 //nut.transform.localPosition = new Vector3(-80, -20, 0);
@@ -191,7 +191,7 @@ namespace EmotesAPI
 
             DontTouchThis = CustomEmotesAPI.instance.Config.Bind<float>("Data", "Dont Touch This", 69420, "But like actually dont touch this");
 
-            //TODO stuff
+            //TODO settings ROO
             //ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));
             //ModSettingsManager.AddOption(new KeyBindOption(EmoteWheel));
             //ModSettingsManager.AddOption(new KeyBindOption(SetCurrentEmoteToWheel));
@@ -242,7 +242,7 @@ namespace EmotesAPI
 
         private static void EmotesVolume_SettingChanged(object sender, EventArgs e)
         {
-            //TODO stuff
+            //TODO audio settings ROO
             //AkSoundEngine.SetRTPCValue("Volume_Emotes", EmotesVolume.Value);
         }
 

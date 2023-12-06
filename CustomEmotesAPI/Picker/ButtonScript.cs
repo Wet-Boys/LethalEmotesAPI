@@ -14,7 +14,7 @@ public class ButtonScript : MonoBehaviour
 
     public void PickNewEmote()
     {
-        //TODO stuff
+        //TODO TMPUGUI
         //emoteInQuestion.GetComponentInChildren<HGTextMeshProUGUI>().text = GetComponentInChildren<HGTextMeshProUGUI>().text;
         gameObject.transform.parent.transform.parent.transform.parent.transform.parent.transform.parent.Find("Wheels").gameObject.SetActive(true);
         gameObject.transform.parent.transform.parent.transform.parent.transform.parent.gameObject.SetActive(false);
@@ -103,7 +103,7 @@ public class ButtonScript : MonoBehaviour
     }
     internal void SaveSettings()
     {
-        //TODO stuff
+        //TODO TMPUGUI (settings)
         //Settings.emote0.Value = ScrollManager.circularButtons[0].GetComponentInChildren<HGTextMeshProUGUI>().text;
         //Settings.emote1.Value = ScrollManager.circularButtons[1].GetComponentInChildren<HGTextMeshProUGUI>().text;
         //Settings.emote2.Value = ScrollManager.circularButtons[2].GetComponentInChildren<HGTextMeshProUGUI>().text;

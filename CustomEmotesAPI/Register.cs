@@ -7,7 +7,7 @@ public static class Register
 {
     public static void Init()
     {
-        //TODO stuff
+        //TODO networking
         //NetworkingAPI.RegisterMessageType<SyncAnimationToServer>();
         //NetworkingAPI.RegisterMessageType<SyncAnimationToClients>();
         //NetworkingAPI.RegisterMessageType<SyncSpotJoinedToHost>();

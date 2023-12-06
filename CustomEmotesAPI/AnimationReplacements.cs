@@ -22,7 +22,7 @@ internal static class AnimationReplacements
     internal static void RunAll()
     {
         ChangeAnims();
-        //TODO stuff
+        //TODO hud awake, adding the emote wheel
         //On.RoR2.UI.HUD.Awake += (orig, self) =>
         //{
         //    orig(self);
@@ -111,24 +111,7 @@ internal static class AnimationReplacements
     }
     internal static void ChangeAnims()
     {
-        //TODO stuff
-        //On.RoR2.SurvivorCatalog.Init += (orig) =>
-        //{
-        //    orig();
-        //    if (!setup)
-        //    {
-        //        setup = true;
 
-        //        //TODO stuff
-        //        //ApplyAnimationStuff(RoR2Content.Survivors.Mage.bodyPrefab, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/artificer.prefab");
-        //        //RoR2Content.Survivors.Mage.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
-
-
-        //        //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
-        //        //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherHurtBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
-
-        //    }
-        //};
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, string resource, int[] pos)
     {
@@ -529,7 +512,7 @@ public class BoneMapper : MonoBehaviour
                     audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                     if (!currentClip.syncronizeAudio)
                     {
-                        //TODO stuff
+                        //TODO audio
                         //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                     }
 
@@ -544,7 +527,7 @@ public class BoneMapper : MonoBehaviour
                             }
                             item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                         }
-                        //TODO stuff
+                        //TODO audio
                         //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                     }
                 }
@@ -654,7 +637,7 @@ public class BoneMapper : MonoBehaviour
                 }
                 else
                 {
-                    //TODO stuff
+                    //TODO audio
                     //AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                 }
             }
@@ -667,7 +650,7 @@ public class BoneMapper : MonoBehaviour
                 }
                 else
                 {
-                    //TODO stuff
+                    //TODO audio
                     //AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], this.gameObject);
                 }
             }
@@ -775,7 +758,7 @@ public class BoneMapper : MonoBehaviour
             }
             try
             {
-                //TODO stuff
+                //TODO preserve parent functions
                 //if (preserveParent)
                 //{
                 //    preserveParent = false;
@@ -873,47 +856,6 @@ public class BoneMapper : MonoBehaviour
             audioObjects.Add(obj);
         }
 
-        //TODO stuff
-        //foreach (var item in model.GetComponents<DynamicBone>())
-        //{
-        //    try
-        //    {
-        //        if (!item.m_Exclusions.Contains(item.m_Root))
-        //        {
-        //            ignore.Add(item.m_Root.name);
-        //        }
-        //        AddIgnore(item, item.m_Root);
-        //    }
-        //    catch (Exception)
-        //    {
-        //    }
-        //}
-        if (model.name.StartsWith("mdlLoader"))
-        {
-            Transform LClav = model.transform, RClav = model.transform;
-            foreach (var item in model.GetComponentsInChildren<Transform>())
-            {
-                if (item.name == "clavicle.l")
-                {
-                    LClav = item;
-                    ignore.Add(LClav.name);
-                }
-                if (item.name == "clavicle.r")
-                {
-                    RClav = item;
-                    ignore.Add(RClav.name);
-                }
-            }
-            foreach (var item in LClav.GetComponentsInChildren<Transform>())
-            {
-                ignore.Add(item.name);
-            }
-            foreach (var item in RClav.GetComponentsInChildren<Transform>())
-            {
-                ignore.Add(item.name);
-            }
-        }
-
         int offset = 0;
         bool nuclear = true;
         if (nuclear)
@@ -1008,12 +950,12 @@ public class BoneMapper : MonoBehaviour
         {
             NewAnimation(null);
         }
-        //TODO stuff
+        //TODO assign parent gameobject
         //if (!transform.GetComponentInParent<CharacterModel>())
         //{
         //    return;
         //}
-        //TODO stuff
+        //TODO assign parent gameobject
         //ogLocation = mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localPosition;
         ogScale = transform.parent.localScale;
         if (scaleAsBandit)
@@ -1037,7 +979,7 @@ public class BoneMapper : MonoBehaviour
         positionLock = lockPosition;
         rotationLock = lockRotation;
         scaleLock = lockScale;
-        //TODO stuff
+        //TODO assign parent gameobject
         //if (mapperBody.GetComponent<Collider>())
         //{
         //    mapperBody.GetComponent<Collider>().enabled = !disableCollider;
@@ -1091,7 +1033,7 @@ public class BoneMapper : MonoBehaviour
         if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
         {
             Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-            //TODO stuff
+            //TODO audio
             //AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
         }
         else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
@@ -1101,7 +1043,7 @@ public class BoneMapper : MonoBehaviour
             {
                 Current_MSX = CustomEmotesAPI.Actual_MSX;
             }
-            //TODO stuff
+            //TODO audio
             //AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
         }
     }
@@ -1198,7 +1140,7 @@ public class BoneMapper : MonoBehaviour
                     {
                         if (!currentClip.syncronizeAudio)
                         {
-                            //TODO stuff
+                            //TODO audio
                             //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                         }
                         audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
@@ -1209,7 +1151,7 @@ public class BoneMapper : MonoBehaviour
                             {
                                 item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                             }
-                            //TODO stuff
+                            //TODO audio
                             //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                         }
                     }
@@ -1229,7 +1171,7 @@ public class BoneMapper : MonoBehaviour
     }
     void HealthAndAutoWalk()
     {
-        //TODO stuff
+        //TODO autowalk
         //if (autoWalkSpeed != 0)
         //{
         //    CharacterModel model = transform.GetComponentInParent<CharacterModel>();
@@ -1247,14 +1189,11 @@ public class BoneMapper : MonoBehaviour
         //        }
         //    }
         //}
-        //if (h)
-        //{
-        //    if (h.health <= 0)
-        //    {
-        //        UnlockBones(enableAnimatorOnDeath);
-        //        GameObject.Destroy(gameObject);
-        //    }
-        //}
+        if (h <= 0)
+        {
+            UnlockBones(enableAnimatorOnDeath);
+            GameObject.Destroy(gameObject);
+        }
     }
     void WorldPropAndParent()
     {
@@ -1262,7 +1201,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (positionLock)
             {
-                //TODO stuff
+                //TODO position lock
                 //mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
                 //mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
                 //CharacterMotor motor = mapperBody.GetComponent<CharacterMotor>();
@@ -1278,7 +1217,7 @@ public class BoneMapper : MonoBehaviour
             }
             if (rotationLock)
             {
-                //TODO stuff
+                //TODO rotation lock
                 //CharacterDirection direction = mapperBody.GetComponent<CharacterDirection>();
                 //if (direction)
                 //{
@@ -1356,12 +1295,12 @@ public class BoneMapper : MonoBehaviour
 
         if (currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
         {
-            //TODO stuff
+            //TODO networking
             //new SyncSpotJoinedToHost(mapperBody.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.GetComponentInParent<NetworkIdentity>().netId, true, spot).Send(R2API.Networking.NetworkDestination.Server);
         }
         else
         {
-            //TODO stuff
+            //TODO networking
             //new SyncSpotJoinedToHost(mapperBody.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.parent.GetComponentInParent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, false, spot).Send(R2API.Networking.NetworkDestination.Server);
         }
     }
@@ -1433,7 +1372,7 @@ public class BoneMapper : MonoBehaviour
             {
                 if (!currentClip.syncronizeAudio)
                 {
-                    //TODO stuff
+                    //TODO audio
                     //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
@@ -1444,10 +1383,10 @@ public class BoneMapper : MonoBehaviour
                     {
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                     }
-                    //TODO stuff
+                    //TODO audio
                     //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                 }
-                //TODO stuff
+                //TODO audio
                 //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
             }
             if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])

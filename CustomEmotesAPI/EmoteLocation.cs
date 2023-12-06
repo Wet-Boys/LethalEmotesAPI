@@ -114,7 +114,7 @@ public class EmoteLocation : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        //TODO stuff
+        //TODO on trigger enter joinSpot
         //if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() != owner)
         //{
         //    BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
@@ -130,7 +130,7 @@ public class EmoteLocation : MonoBehaviour
     }
     void OnTriggerExit(Collider other)
     {
-        //TODO stuff
+        //TODO on trigger exit joinSpot
         //if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() != owner)
         //{
         //    BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();

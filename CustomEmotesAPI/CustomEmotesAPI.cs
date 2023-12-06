@@ -125,8 +125,6 @@ namespace EmotesAPI
         public void Awake()
         {
             instance = this;
-            //TODO stuff
-            //R2API.Utils.CommandHelper.AddToConsoleWhenReady();
             DebugClass.SetLogger(base.Logger);
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
@@ -160,7 +158,7 @@ namespace EmotesAPI
                 WhosSteveJobs = Settings.DontTouchThis.Value;
             }
 
-            //TODO
+            //TODO scene changed, so audio mainly
             //On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             //{
             //    orig(self, scene);
@@ -209,7 +207,7 @@ namespace EmotesAPI
             //    localMapper = null;
             //    EmoteLocation.visibile = true;
             //};
-            //TODO stuff
+            //TODO base volume slider setting the actual_msx
             //On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
             //{
             //    orig(self, newValue);
@@ -271,7 +269,7 @@ namespace EmotesAPI
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
-            //TODO stuff
+            //TODO register world prop (networking)
             //worldProp.AddComponent<NetworkIdentity>();
             //worldProp.RegisterNetworkPrefab();
             worldProp.AddComponent<BoneMapper>().worldProp = true;
@@ -280,7 +278,7 @@ namespace EmotesAPI
             BoneMapper.allWorldProps.Add(new WorldProp(worldProp, joinSpots));
             return BoneMapper.allWorldProps.Count - 1;
         }
-        //TODO stuff
+        //TODO standard shader
         //internal static Shader standardShader = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion().GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
         public static GameObject SpawnWorldProp(int propPos)
         {
@@ -411,7 +409,7 @@ namespace EmotesAPI
             rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
         }
-        //TODO stuff
+        //TODO console command
         //[ConCommand(commandName = "PlayEmote", flags = ConVarFlags.None, helpText = "Plays emote in first argument (case sensitive)")]
         //private static void SlowmoCommand(ConCommandArgs args)
         //{
@@ -432,7 +430,7 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
-            //TODO stuff
+            //TODO PlayAnimation on specific bone mapper
             //var identity = mapper.mapperBody.GetComponent<NetworkIdentity>();
             //new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
         }
@@ -460,7 +458,7 @@ namespace EmotesAPI
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
-                //TODO stuff
+                //TODO emote wheel continue playing button (TMPUGUI is the issue)
                 //EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
             }
             foreach (var item in EmoteLocation.emoteLocations)
@@ -477,7 +475,7 @@ namespace EmotesAPI
                     }
                 }
             }
-            //TODO stuff
+            //TODO recalculate stats (probably can remove?)
             //mapper.mapperBody.RecalculateStats();
             if (animChanged != null)
             {
@@ -640,7 +638,7 @@ namespace EmotesAPI
                 AudioContainer ac = CustomEmotesAPI.audioContainers[i].GetComponent<AudioContainer>();
                 if (ac.playingObjects.Count != 0)
                 {
-                    //TODO stuff
+                    //TODO audio
                     //AkPositionArray ak = new AkPositionArray((uint)ac.playingObjects.Count);
                     //foreach (var item in ac.playingObjects)
                     //{

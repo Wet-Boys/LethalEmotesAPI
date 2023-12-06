@@ -18,7 +18,7 @@ public class ScrollManager : MonoBehaviour
         gameObject.transform.parent.Find("Wheels").gameObject.SetActive(true);
 
         content = gameObject.transform.Find("Scroll View").Find("Viewport").Find("Content").gameObject;
-        //TODO stuff
+        //TODO TMPUGUI
         //foreach (var item in gameObject.transform.Find("InputField (TMP)").GetComponentsInChildren<TextMeshProUGUI>())
         //{
         //    item.font = Settings.NakedButton.GetComponentInChildren<TextMeshProUGUI>().font;
@@ -94,7 +94,7 @@ public class ScrollManager : MonoBehaviour
 
     internal void LoadSettings()
     {
-        //TODO stuff
+        //TODO TMPUGUI (settings)
         //ScrollManager.circularButtons[0].GetComponentInChildren<HGTextMeshProUGUI>().text = Settings.emote0.Value;
         //ScrollManager.circularButtons[1].GetComponentInChildren<HGTextMeshProUGUI>().text = Settings.emote1.Value;
         //ScrollManager.circularButtons[2].GetComponentInChildren<HGTextMeshProUGUI>().text = Settings.emote2.Value;
@@ -139,7 +139,7 @@ public class ScrollManager : MonoBehaviour
         {
             GameObject cum = GameObject.Instantiate(buttonTemplate);
             cum.name = item;
-            //TODO stuff
+            //TODO TMPUGUI
             //cum.GetComponentInChildren<HGTextMeshProUGUI>().text = item;
             cum.transform.SetParent(buttonTemplate.transform.parent);
             cum.transform.transform.localScale = Vector3.one;
@@ -147,7 +147,7 @@ public class ScrollManager : MonoBehaviour
         }
         foreach (var item in buttons)
         {
-            //TODO stuff
+            //TODO HGButton
             //item.GetComponentInChildren<HGButton>().onClick.AddListener(item.GetComponent<ButtonScript>().PickNewEmote);
         }
     }
@@ -183,7 +183,7 @@ public class ScrollManager : MonoBehaviour
         List<GameObject> validButtons = new List<GameObject>();
         foreach (var item in buttons)
         {
-            //TODO stuff
+            //TODO TMPUGUI
             //if (item.GetComponentInChildren<HGTextMeshProUGUI>().text.ToUpper().Contains(filter.ToUpper()))
             //{
             //    validButtons.Add(item);

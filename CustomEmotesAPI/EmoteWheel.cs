@@ -16,7 +16,7 @@ public class EmoteWheel : MonoBehaviour
     internal static GameObject dontPlayButton;
 
     internal List<GameObject> gameObjects = new List<GameObject>();
-    //TODO stuff
+    //TODO input effectively
     //internal Image joy;
 
     //internal RoR2.UI.MPInput input = GameObject.Find("MPEventSystem Player0").GetComponent<RoR2.UI.MPInput>();
@@ -39,7 +39,7 @@ public class EmoteWheel : MonoBehaviour
     {
         for (int i = 0; i < gameObjects.Count; i++)
         {
-            //TODO stuff
+            //TODO emote wheel pages (TMPUGUI)
             //middlePage[i] = ScrollManager.circularButtons[i].GetComponentInChildren<HGTextMeshProUGUI>().text;
             //leftPage[i] = ScrollManager.circularButtons[i + 8].GetComponentInChildren<HGTextMeshProUGUI>().text;
             //rightPage[i] = ScrollManager.circularButtons[i + 16].GetComponentInChildren<HGTextMeshProUGUI>().text;
@@ -48,7 +48,7 @@ public class EmoteWheel : MonoBehaviour
     bool started = false;
     void Update()
     {
-        //TODO stuff
+        //TODO emote wheel update
         //if (!started)
         //{
         //    try
@@ -112,7 +112,7 @@ public class EmoteWheel : MonoBehaviour
                 selected.GetComponent<RectTransform>().localScale = new Vector3(0.6771638f, 0.6771638f, 0.6771638f);
             }
         }
-        //TODO stuff
+        //TODO joy is not an image anymore or something
         //switch (activePage)
         //{
         //    case 0:
@@ -166,7 +166,7 @@ public class EmoteWheel : MonoBehaviour
         {
             if (transform.localPosition != v)
             {
-                //TODO stuff
+                //TODO joy again
                 //events.cursorOpenerForGamepadCount += 1;
                 //events.cursorOpenerCount += 1;
                 //CustomEmotesAPI.EmoteWheelOpened(joy.sprite);
@@ -174,12 +174,12 @@ public class EmoteWheel : MonoBehaviour
             transform.localPosition = v;
             if (CustomEmotesAPI.GetKeyPressed(Settings.SetCurrentEmoteToWheel) && selected != null && CustomEmotesAPI.allClipNames.Contains(CustomEmotesAPI.localMapper.currentClipName))
             {
-                //TODO stuff
+                //TODO TMPUGUI
                 //selected.GetComponentInChildren<TextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
                 SaveWheelFromGame(activePage, selectedNum, CustomEmotesAPI.localMapper.currentClipName);
                 int actualPage = activePage == 0 ? 1 : activePage == 1 ? 0 : 2;
                 int number = (actualPage * 8) + selectedNum;
-                //TODO stuff
+                //TODO TMPUGUI
                 //ScrollManager.circularButtons[number].GetComponentInChildren<HGTextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
                 bLock = CustomEmotesAPI.localMapper.currentClipName;
                 RefreshWheels();
@@ -199,7 +199,7 @@ public class EmoteWheel : MonoBehaviour
                     }
                     else
                     {
-                        //TODO stuff
+                        //TODO TMPUGUI
                         //if (bLock != selected.GetComponentInChildren<TextMeshProUGUI>().text && !selected.GetComponentInChildren<TextMeshProUGUI>().text.StartsWith("Continue Playing Current E"))
                         //    CustomEmotesAPI.PlayAnimation(selected.GetComponentInChildren<TextMeshProUGUI>().text);
                     }
@@ -209,7 +209,7 @@ public class EmoteWheel : MonoBehaviour
                     DebugClass.Log(e);
                 }
                 bLock = "asd";
-                //TODO stuff
+                //TODO gamepad support?
                 //if (events.cursorOpenerForGamepadCount > 0)
                 //{
                 //    events.cursorOpenerForGamepadCount -= 1;
@@ -232,7 +232,7 @@ public class EmoteWheel : MonoBehaviour
         {
             for (int i = 0; i < gameObjects.Count; i++)
             {
-                //TODO stuff
+                //TODO TMPUGUI
                 //gameObjects[i].GetComponentInChildren<TextMeshProUGUI>().text = newPage[i];
             }
             yield break;
@@ -244,7 +244,7 @@ public class EmoteWheel : MonoBehaviour
             stay = false;
             foreach (var item in gameObjects)
             {
-                //TODO stuff
+                //TODO TMPUGUI
                 //if (item.GetComponentInChildren<TextMeshProUGUI>().text.Length != 0)
                 //{
                 //    if (item.GetComponentInChildren<TextMeshProUGUI>().text.Length > longestLength)
@@ -261,7 +261,7 @@ public class EmoteWheel : MonoBehaviour
         }
         for (int i = 0; i < gameObjects.Count; i++)
         {
-            //TODO stuff
+            //TODO TMPUGUI
             //gameObjects[i].GetComponentInChildren<TextMeshProUGUI>().text = newPage[i];
         }
 
@@ -272,7 +272,7 @@ public class EmoteWheel : MonoBehaviour
     {
         if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
         {
-            //TODO stuff
+            //TODO gamepad support?
             //if (events.cursorOpenerForGamepadCount > 0)
             //{
             //    events.cursorOpenerForGamepadCount -= 1;
