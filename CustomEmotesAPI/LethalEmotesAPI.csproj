@@ -10,6 +10,7 @@
     <None Remove="customemotespackage2" />
     <None Remove="enemyskeletons" />
     <None Remove="fineilldoitmyself" />
+    <None Remove="scavbody" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +19,7 @@
     <EmbeddedResource Include="enemyskeletons" />
     <EmbeddedResource Include="fineilldoitmyself" />
     <EmbeddedResource Include="moisture_animationreplacements" />
+    <EmbeddedResource Include="scavbody" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,20 +28,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.4.19" />
-    <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="BepInEx.Core" Version="5.4.19" />
-    <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="GenericIK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\lib\GenericIK-nstrip.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
@@ -52,8 +46,12 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /y &quot;J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.0\LethalEmotesAPI.dll&quot; &quot;C:\Users\Bigma Male\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\plugins\LethalEmotesAPI.dll&quot;" />
+    <Exec Command="copy /y &quot;J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\LethalEmotesAPI.dll&quot; &quot;C:\Users\Bigma Male\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\plugins\LethalEmotesAPI.dll&quot;" />
   </Target>
 
 </Project>

@@ -10,6 +10,8 @@ using System.Collections;
 using static UnityEngine.ParticleSystem.PlaybackState;
 using GameNetcodeStuff;
 using MonoMod.RuntimeDetour;
+using System;
+using UnityEngine.UIElements;
 
 namespace EmotesAPI
 {
@@ -99,12 +101,26 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
         public static List<GameObject> activeAudioContainers = new List<GameObject>();
-
-        private void HookTest()
+        //look at the unity project, why is hidemesh being off still not showing anything?????????
+        private void HookTest(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            DebugClass.Log("test lmao");
+            DebugClass.Log($"adding bone mapper to scav");
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] {0,1,2,3});
+            orig(self);
+
         }
         private static Hook overrideHook;
+
+        private void HookTest2(Action<PlayerControllerB, int, GrabbableObject> orig, PlayerControllerB self, int slot, GrabbableObject fillSlotWithItem = null)
+        {
+            DebugClass.Log($"attempting to play animation: lmao");
+            PlayAnimation("lmao");
+
+            orig(self, slot, fillSlotWithItem);
+
+        }
+        private static Hook overrideHook2;
+
         //Vector3 prevCamPosition = Vector3.zero;
         public void Awake()
         {
@@ -115,6 +131,8 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
+            CustomEmotesAPI.LoadResource("scavbody");
+
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
             //}
@@ -122,13 +140,17 @@ namespace EmotesAPI
             Settings.RunAll();
             Register.Init();
 
-            DebugClass.Log($"------------------adding bonemapper to scavenger");
-            AnimationReplacements.RunAll();
-
-
-            var targetMethod = typeof(PlayerControllerB).GetMethod(nameof(PlayerControllerB.KillPlayer), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var targetMethod = typeof(PlayerControllerB).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HookTest), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             overrideHook = new Hook(targetMethod, destMethod, this);
+
+
+            targetMethod = typeof(PlayerControllerB).GetMethod("SwitchToItemSlot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HookTest2), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            overrideHook2 = new Hook(targetMethod, destMethod, this);
+
+
+            AnimationReplacements.RunAll();
 
 
             float WhosSteveJobs = 69420;
@@ -242,8 +264,10 @@ namespace EmotesAPI
             //        }
             //    }
             //};
-            AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: false);
+            AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: true);
             AddNonAnimatingEmote("none");
+            DebugClass.Log($"emote instance is {CustomEmotesAPI.instance}");
+
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
@@ -377,12 +401,12 @@ namespace EmotesAPI
             BoneMapper.animClips.Add(animationClip.name, clip);
         }
 
-        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int meshPos = 0, bool hideMeshes = true)
+        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
         {
             rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
         }
-        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int meshPos = 0, bool hideMeshes = true)
+        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
         {
             rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
@@ -395,7 +419,14 @@ namespace EmotesAPI
         //}
         public static void PlayAnimation(string animationName, int pos = -2)
         {
-            //TODO stuff
+            //TODO actually sync this with the server/clients
+            CustomAnimationClip clip = BoneMapper.animClips[animationName];
+            int eventNum = UnityEngine.Random.Range(0, BoneMapper.startEvents[clip.syncPos].Length);
+            DebugClass.Log($"------------------------     playing anim on {localMapper}");
+            foreach (var item in GetAllBoneMappers())
+            {
+                item.PlayAnim(animationName, pos, eventNum);
+            }
             //var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
             //new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
         }
@@ -524,6 +555,7 @@ namespace EmotesAPI
 
         void Update()
         {
+            DebugClass.Log("update");
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
@@ -535,6 +567,7 @@ namespace EmotesAPI
                 //{
                 //    PlayAnimation(allClipNames[rand], item);
                 //}
+                DebugClass.Log($"attempting to play animation: {allClipNames[rand]}");
                 PlayAnimation(allClipNames[rand]);
             }
             if (GetKeyPressed(Settings.JoinEmote))

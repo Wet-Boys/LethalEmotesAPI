@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "3Ip2JxVOp4b+oe6d3sJ5yxLXVry6tqKn56i+NW7SodcK3NYyT7s94owbn7ZCESzx6IFIgKXjxBWLFEFz76S4Ag==",
+  "dgSpecHash": "WKyyMsRz1ad/kVl8nljAMqE2dVZGTbw8RcRQV1I29b2CGtOzAueHgX6jb7YMsFDvfSSZNW1VBRLGKFSgo5Albg==",
   "success": true,
   "projectFilePath": "J:\\Custom Emotes Base\\CustomEmotesAPI\\CustomEmotesAPI\\LethalEmotesAPI.csproj",
   "expectedPackageFiles": [
@@ -40,7 +40,7 @@
     "C:\\Users\\Bigma Male\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
     "C:\\Users\\Bigma Male\\.nuget\\packages\\system.threading\\4.3.0\\system.threading.4.3.0.nupkg.sha512",
     "C:\\Users\\Bigma Male\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
-    "C:\\Users\\Bigma Male\\.nuget\\packages\\unityengine.modules\\2019.4.26\\unityengine.modules.2019.4.26.nupkg.sha512"
+    "C:\\Users\\Bigma Male\\.nuget\\packages\\unityengine.modules\\2022.3.9\\unityengine.modules.2022.3.9.nupkg.sha512"
   ],
   "logs": []
 }
