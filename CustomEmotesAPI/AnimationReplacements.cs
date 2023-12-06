@@ -860,7 +860,6 @@ public class BoneMapper : MonoBehaviour
         bool nuclear = true;
         if (nuclear)
         {
-            //TODO maybe optimize this? probably get a list of startingXPoints and then move this foreach inside of the smr1 for loop
             foreach (var smr in smr2)
             {
                 int startingXPoint = 0;
@@ -870,7 +869,7 @@ public class BoneMapper : MonoBehaviour
                     {
                         //DebugClass.Log($"comparing:    {smr1.bones[i].name}     {smr.bones[x].name}");
                         //DebugClass.Log($"--------------  {smrbone.gameObject.name}   {smr1bone.gameObject.name}      {smrbone.GetComponent<ParentConstraint>()}");
-                        if (smr1.bones[i].name == smr.bones[x].name/* + "_CustomEmotesAPIBone"*/ /*smr.bones[x].name != "head_jnt" && smr.bones[x].name != "head_jnt_end" && smr.bones[x].name != "arm_left_jnt" && smr.bones[x].name != "clavicle_right_jnt" && smr.bones[x].name != "spine_04_jnt"*/)
+                        if (smr1.bones[i].name == smr.bones[x].name)
                         {
                             startingXPoint = x;
                             //DebugClass.Log($"they are equal!");
@@ -881,7 +880,6 @@ public class BoneMapper : MonoBehaviour
                             EmoteConstraint e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
                             e.AddSource(ref smr.bones[x], ref smr1.bones[i]);
                             e.revertTransform = revertTransform;
-                            //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
                             break;
                         }
                         if (x == startingXPoint - 1)
@@ -922,13 +920,6 @@ public class BoneMapper : MonoBehaviour
 
         CustomEmotesAPI.MapperCreated(this);
         DebugClass.Log(a2.transform.parent.name);
-
-        if (a2.transform.parent.name == "mdlRocket") //put more jank here if ever needed
-        {
-            DebugClass.Log(a2.transform.parent.name);
-            StartCoroutine(FixRootOnSurvivors());
-        }
-
     }
     public GameObject parentGameObject;
     bool positionLock, rotationLock, scaleLock;
@@ -1026,7 +1017,6 @@ public class BoneMapper : MonoBehaviour
             }
         }
         SetRTPCInDimming(closestDimmingSource);
-        //////////////////////////////////////////////////////////////////////////// end of section
     }
     void SetRTPCInDimming(float closestDimmingSource)
     {

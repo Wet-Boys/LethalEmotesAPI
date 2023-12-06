@@ -114,7 +114,13 @@ namespace EmotesAPI
         private void HookTest2(Action<PlayerControllerB, int, GrabbableObject> orig, PlayerControllerB self, int slot, GrabbableObject fillSlotWithItem = null)
         {
             DebugClass.Log($"attempting to play animation: lmao");
-            PlayAnimation("lmao");
+            int rand = UnityEngine.Random.Range(0, allClipNames.Count);
+            while (blacklistedClips.Contains(rand))
+            {
+                rand = UnityEngine.Random.Range(0, allClipNames.Count);
+            }
+            DebugClass.Log($"attempting to play animation: {allClipNames[rand]}");
+            PlayAnimation(allClipNames[rand]);
 
             orig(self, slot, fillSlotWithItem);
 
@@ -262,7 +268,7 @@ namespace EmotesAPI
             //        }
             //    }
             //};
-            AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: true);
+            AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: false);
             AddNonAnimatingEmote("none");
             DebugClass.Log($"emote instance is {CustomEmotesAPI.instance}");
 
@@ -417,7 +423,7 @@ namespace EmotesAPI
         //}
         public static void PlayAnimation(string animationName, int pos = -2)
         {
-            //TODO actually sync this with the server/clients
+            //TODO actually sync this with the server/clients and make it not be on every bonemapper
             CustomAnimationClip clip = BoneMapper.animClips[animationName];
             int eventNum = UnityEngine.Random.Range(0, BoneMapper.startEvents[clip.syncPos].Length);
             DebugClass.Log($"------------------------     playing anim on {localMapper}");
