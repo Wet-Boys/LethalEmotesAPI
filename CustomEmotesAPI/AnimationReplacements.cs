@@ -743,7 +743,8 @@ public class BoneMapper : MonoBehaviour
                     //    mapperBody.gameObject.transform.position = result;
                     //    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position = result;
                     //}
-                    //parentGameObject = null;
+                    mapperBody.gameObject.transform.position += new Vector3(0, 1, 0);
+                    parentGameObject = null;
                 }
             }
             catch (Exception)
@@ -759,39 +760,40 @@ public class BoneMapper : MonoBehaviour
             }
             try
             {
-                //TODO preserve parent functions
-                //if (preserveParent)
-                //{
-                //    preserveParent = false;
-                //}
-                //else
-                //{
-                //    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
-                //    if (mapperBody.GetComponent<CharacterDirection>())
-                //    {
-                //        mapperBody.GetComponent<CharacterDirection>().enabled = true;
-                //    }
-                //    if (ogScale != new Vector3(-69, -69, -69))
-                //    {
-                //        transform.parent.localScale = ogScale;
-                //        ogScale = new Vector3(-69, -69, -69);
-                //    }
-                //    if (ogLocation != new Vector3(-69, -69, -69))
-                //    {
-                //        mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localPosition = ogLocation;
-                //        ogLocation = new Vector3(-69, -69, -69);
-                //    }
-                //    if (mapperBody.GetComponent<Collider>())
-                //    {
-                //        mapperBody.GetComponent<Collider>().enabled = true;
-                //    }
-                //    if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
-                //    {
-                //        Vector3 desired = mapperBody.gameObject.transform.position;
-                //        mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
-                //        mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
-                //    }
-                //}
+                if (preserveParent)
+                {
+                    preserveParent = false;
+                }
+                else
+                {
+                    mapperBody.gameObject.transform.localEulerAngles = new Vector3(0, mapperBody.gameObject.transform.localEulerAngles.y, 0);
+                    //TODO preserve parent functions
+                    //if (mapperBody.GetComponent<CharacterDirection>())
+                    //{
+                    //    mapperBody.GetComponent<CharacterDirection>().enabled = true;
+                    //}
+                    if (ogScale != new Vector3(-69, -69, -69))
+                    {
+                        mapperBody.transform.localScale = ogScale;
+                        ogScale = new Vector3(-69, -69, -69);
+                    }
+                    if (ogLocation != new Vector3(-69, -69, -69))
+                    {
+                        mapperBody.gameObject.transform.localPosition = ogLocation;
+                        ogLocation = new Vector3(-69, -69, -69);
+                    }
+                    if (mapperBody.GetComponent<Collider>())
+                    {
+                        mapperBody.GetComponent<Collider>().enabled = true;
+                    }
+                    //TODO preserve parent functions
+                    //if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
+                    //{
+                    //    Vector3 desired = mapperBody.gameObject.transform.position;
+                    //    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
+                    //    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
+                    //}
+                }
             }
             catch (Exception)
             {
@@ -947,35 +949,23 @@ public class BoneMapper : MonoBehaviour
         //{
         //    return;
         //}
-        //TODO assign parent gameobject
-        //ogLocation = mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localPosition;
-        ogScale = transform.parent.localScale;
+        ogLocation = mapperBody.gameObject.transform.localPosition;
+        ogScale = mapperBody.transform.localScale;
         if (scaleAsBandit)
             scaleDiff = ogScale / scale;
         else
             scaleDiff = ogScale;
 
-        //RoR2.Navigation.NodeGraph nodeGraph = SceneInfo.instance.GetNodeGraph(RoR2.Navigation.MapNodeGroup.GraphType.Ground);
-        //List<RoR2.Navigation.NodeGraph.Node> nodes = new List<RoR2.Navigation.NodeGraph.Node>(nodeGraph.nodes);
-        //nodes.Add(new RoR2.Navigation.NodeGraph.Node
-        //{
-        //    position = youAreTheFather.transform.position,
-        //    forbiddenHulls = HullMask.None,
-        //    flags = RoR2.Navigation.NodeFlags.None,
-        //});
-        //nodeGraph.nodes = nodes.ToArray();
-
         parentGameObject = youAreTheFather;
-        //parentGameObject.transform.position += new Vector3(0, 0.060072f, 0);
-        //startingPos = transform.position/* + new Vector3(0, 0.060072f, 0)*/;
         positionLock = lockPosition;
         rotationLock = lockRotation;
         scaleLock = lockScale;
+        
+        if (mapperBody.GetComponent<Collider>())
+        {
+            mapperBody.GetComponent<Collider>().enabled = !disableCollider;
+        }
         //TODO assign parent gameobject
-        //if (mapperBody.GetComponent<Collider>())
-        //{
-        //    mapperBody.GetComponent<Collider>().enabled = !disableCollider;
-        //}
         //if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>())
         //{
         //    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = !lockPosition;
@@ -1192,34 +1182,34 @@ public class BoneMapper : MonoBehaviour
         {
             if (positionLock)
             {
-                //TODO position lock
-                //mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
-                //mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
+                mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
+                mapperBody.transform.position = parentGameObject.transform.position;
+                //TODO maybe a replacement for motor and/or remove it
                 //CharacterMotor motor = mapperBody.GetComponent<CharacterMotor>();
-                //Rigidbody rigidbody = mapperBody.GetComponent<Rigidbody>();
+                Rigidbody rigidbody = mapperBody.GetComponent<Rigidbody>();
+                //TODO ^^^
                 //if (motor)
                 //{
                 //    motor.velocity = Vector3.zero;
                 //}
-                //else if (rigidbody)
-                //{
-                //    rigidbody.velocity = Vector3.zero;
-                //}
+                if (rigidbody)
+                {
+                    rigidbody.velocity = Vector3.zero;
+                }
             }
             if (rotationLock)
             {
-                //TODO rotation lock
+                //TODO maybe get rid of character direction if we don't need it
                 //CharacterDirection direction = mapperBody.GetComponent<CharacterDirection>();
                 //if (direction)
                 //{
                 //    mapperBody.GetComponent<CharacterDirection>().enabled = false;
                 //}
-                //mapperBody.GetComponent<ModelLocator>().modelBaseTransform.eulerAngles = parentGameObject.transform.eulerAngles;
+                mapperBody.transform.eulerAngles = parentGameObject.transform.eulerAngles + new Vector3(90,0,0);
             }
             if (scaleLock)
             {
-                //TODO scale lock ("works" but permanently makes you small)
-                //transform.parent.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
+                mapperBody.transform.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
             }
         }
     }
@@ -1288,11 +1278,11 @@ public class BoneMapper : MonoBehaviour
 
         if (currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
         {
-            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<NetworkObject>().NetworkObjectId, true, spot);
+            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, true, spot);
         }
         else
         {
-            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<NetworkObject>().NetworkObjectId, false, spot);
+            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, false, spot);
         }
     }
     public void RemoveProp(int propPos)

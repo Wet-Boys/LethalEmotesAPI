@@ -92,6 +92,8 @@ public class EmoteNetworker : NetworkBehaviour
     [ClientRpc]
     public void SyncJoinSpotToClientRpc(ulong playerId, ulong joinSpotId, bool worldProp, int posInArray)
     {
+        DebugClass.Log($"joining spot               1");
+
         GameObject bodyObject = GetNetworkObject(playerId).gameObject;
         GameObject spotObject = GetNetworkObject(joinSpotId).gameObject;
         if (!bodyObject)
@@ -102,10 +104,17 @@ public class EmoteNetworker : NetworkBehaviour
         {
             DebugClass.Log($"spotObject is null!!!");
         }
+        DebugClass.Log($"joining spot               2");
+
         BoneMapper joinerMapper = bodyObject.GetComponentInChildren<BoneMapper>();
+        DebugClass.Log($"joining spot               3");
 
         joinerMapper.PlayAnim("none", 0);
+        DebugClass.Log($"joining spot               4");
+
         joinerMapper.currentEmoteSpot = spotObject.GetComponentsInChildren<EmoteLocation>()[posInArray].gameObject;
+        DebugClass.Log($"joining spot               5");
+
         if (worldProp)
         {
             CustomEmotesAPI.JoinedProp(joinerMapper.currentEmoteSpot, joinerMapper, joinerMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
