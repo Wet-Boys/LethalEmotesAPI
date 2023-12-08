@@ -3,7 +3,6 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using System.Globalization;
 using BepInEx.Configuration;
 using System.Collections;
@@ -12,6 +11,10 @@ using GameNetcodeStuff;
 using MonoMod.RuntimeDetour;
 using System;
 using UnityEngine.UIElements;
+using UnityEngine.XR;
+using UnityEngine.InputSystem;
+using Unity.Netcode;
+using UnityEngine.Networking;
 
 namespace EmotesAPI
 {
@@ -102,30 +105,138 @@ namespace EmotesAPI
         public static List<GameObject> audioContainers = new List<GameObject>();
         public static List<GameObject> activeAudioContainers = new List<GameObject>();
         //look at the unity project, why is hidemesh being off still not showing anything?????????
-        private void HookTest(Action<PlayerControllerB> orig, PlayerControllerB self)
+        private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
             DebugClass.Log($"adding bone mapper to scav");
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] {0,1,2,3});
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
             orig(self);
-
-        }
-        private static Hook overrideHook;
-
-        private void HookTest2(Action<PlayerControllerB, int, GrabbableObject> orig, PlayerControllerB self, int slot, GrabbableObject fillSlotWithItem = null)
-        {
-            DebugClass.Log($"attempting to play animation: lmao");
-            int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-            while (blacklistedClips.Contains(rand))
+            if (self.IsServer && EmoteNetworker.instance == null)
             {
-                rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                GameObject networker = Instantiate<GameObject>(emoteNetworker);
+                networker.GetComponent<NetworkObject>().Spawn(true);
             }
-            DebugClass.Log($"attempting to play animation: {allClipNames[rand]}");
-            PlayAnimation(allClipNames[rand]);
-
-            orig(self, slot, fillSlotWithItem);
-
         }
-        private static Hook overrideHook2;
+        private static Hook playerControllerStartHook;
+
+        private void PlayerControllerUpdate(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            if (!(!self.isPlayerControlled || !((NetworkBehaviour)self).IsOwner))
+            {
+                if (buttonLock)
+                {
+                    if (!InputControlExtensions.IsPressed(Keyboard.current[Key.C]) && !InputControlExtensions.IsPressed(Keyboard.current[Key.G]) && !InputControlExtensions.IsPressed(Keyboard.current[Key.V]) && !InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
+                    {
+                        buttonLock = false;
+                    }
+                }
+                else
+                {
+                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
+                    {
+                        buttonLock = true;
+                        PlayAnimation("VSWORLD");
+                    }
+                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.C]))
+                    {
+                        buttonLock = true;
+                        PlayAnimation("none");
+                    }
+                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.G]))
+                    {
+                        buttonLock = true;
+                        int rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                        while (blacklistedClips.Contains(rand))
+                        {
+                            rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                        }
+                        PlayAnimation(allClipNames[rand]);
+                    }
+                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.V]))
+                    {
+                        buttonLock = true;
+                        try
+                        {
+                            if (localMapper)
+                            {
+                                if (localMapper.currentEmoteSpot || localMapper.reservedEmoteSpot)
+                                {
+                                    localMapper.JoinEmoteSpot();
+                                }
+                                else
+                                {
+                                    foreach (var mapper in BoneMapper.allMappers)
+                                    {
+                                        try
+                                        {
+                                            if (mapper != localMapper)
+                                            {
+                                                if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                                                {
+                                                    nearestMapper = mapper;
+                                                }
+                                                else if (nearestMapper)
+                                                {
+                                                    if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                                    {
+                                                        nearestMapper = mapper;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        catch (System.Exception)
+                                        {
+                                        }
+                                    }
+                                    if (nearestMapper)
+                                    {
+                                        PlayAnimation(nearestMapper.currentClip.clip[0].name);
+                                        DebugClass.Log($"{nearestMapper.currentClip.clip[0].name}");
+                                        DebugClass.Log($"{localMapper}");
+                                        DebugClass.Log($"{nearestMapper}");
+
+                                        Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
+                                    }
+                                    nearestMapper = null;
+                                }
+                            }
+                        }
+                        catch (System.Exception e)
+                        {
+                            DebugClass.Log($"had issue while attempting to join an emote as a client: {e}\nNotable info: [nearestMapper: {nearestMapper}] [localMapper: {localMapper}]");
+                            try
+                            {
+                                nearestMapper.currentClip.ToString();
+                                DebugClass.Log($"[nearestMapper.currentClip: {nearestMapper.currentClip.ToString()}] [nearestMapper.currentClip.clip[0]: {nearestMapper.currentClip.clip[0]}]");
+                            }
+                            catch (System.Exception)
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+            orig(self);
+        }
+        private static Hook playerControllerUpdateHook;
+
+        public static List<GameObject> networkedObjects = new List<GameObject>();
+        private void NetworkManagerStart(Action<GameNetworkManager> orig, GameNetworkManager self)
+        {
+            orig(self);
+            emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
+            emoteNetworker.AddComponent<EmoteNetworker>();
+            GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
+            foreach (var item in networkedObjects)
+            {
+                GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(item);
+            }
+        }
+        private static Hook networkManagerStartHook;
+        private static bool buttonLock = false;
+
+
+        private static GameObject emoteNetworker;
+
 
         //Vector3 prevCamPosition = Vector3.zero;
         public void Awake()
@@ -142,16 +253,18 @@ namespace EmotesAPI
             //}
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
-            Register.Init();
 
             var targetMethod = typeof(PlayerControllerB).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HookTest), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            overrideHook = new Hook(targetMethod, destMethod, this);
+            var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            playerControllerStartHook = new Hook(targetMethod, destMethod, this);
 
+            targetMethod = typeof(PlayerControllerB).GetMethod("Update", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerUpdate), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            playerControllerUpdateHook = new Hook(targetMethod, destMethod, this);
 
-            targetMethod = typeof(PlayerControllerB).GetMethod("SwitchToItemSlot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HookTest2), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            overrideHook2 = new Hook(targetMethod, destMethod, this);
+            targetMethod = typeof(GameNetworkManager).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(NetworkManagerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            networkManagerStartHook = new Hook(targetMethod, destMethod, this);
 
 
             AnimationReplacements.RunAll();
@@ -268,6 +381,22 @@ namespace EmotesAPI
             //        }
             //    }
             //};
+
+
+            var types = Assembly.GetExecutingAssembly().GetTypes();
+            foreach (var type in types)
+            {
+                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                foreach (var method in methods)
+                {
+                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+                    if (attributes.Length > 0)
+                    {
+                        method.Invoke(null, null);
+                    }
+                }
+            }
+
             AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: false);
             AddNonAnimatingEmote("none");
             DebugClass.Log($"emote instance is {CustomEmotesAPI.instance}");
@@ -275,9 +404,8 @@ namespace EmotesAPI
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
-            //TODO register world prop (networking)
-            //worldProp.AddComponent<NetworkIdentity>();
-            //worldProp.RegisterNetworkPrefab();
+            worldProp.AddComponent<NetworkObject>();
+            networkedObjects.Add(worldProp);
             worldProp.AddComponent<BoneMapper>().worldProp = true;
             var handler = worldProp.AddComponent<WorldPropSpawnHandler>();
             handler.propPos = BoneMapper.allWorldProps.Count;
@@ -423,22 +551,11 @@ namespace EmotesAPI
         //}
         public static void PlayAnimation(string animationName, int pos = -2)
         {
-            //TODO actually sync this with the server/clients and make it not be on every bonemapper
-            CustomAnimationClip clip = BoneMapper.animClips[animationName];
-            int eventNum = UnityEngine.Random.Range(0, BoneMapper.startEvents[clip.syncPos].Length);
-            DebugClass.Log($"------------------------     playing anim on {localMapper}");
-            foreach (var item in GetAllBoneMappers())
-            {
-                item.PlayAnim(animationName, pos, eventNum);
-            }
-            //var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-            //new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
+            EmoteNetworker.instance.SyncEmote(StartOfRound.Instance.localPlayerController.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
-            //TODO PlayAnimation on specific bone mapper
-            //var identity = mapper.mapperBody.GetComponent<NetworkIdentity>();
-            //new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
+            EmoteNetworker.instance.SyncEmote(mapper.mapperBody.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
         public static BoneMapper localMapper = null;
         static BoneMapper nearestMapper = null;
@@ -461,6 +578,7 @@ namespace EmotesAPI
         public static event AnimationChanged animChanged;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
@@ -515,19 +633,22 @@ namespace EmotesAPI
         public static event JoinedEmoteSpotBody emoteSpotJoined_Body;
         internal static void JoinedBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
-            emoteSpotJoined_Body(emoteSpot, joiner, host);
+            if (emoteSpotJoined_Body != null)
+                emoteSpotJoined_Body(emoteSpot, joiner, host);
         }
         public delegate void JoinedEmoteSpotProp(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
         public static event JoinedEmoteSpotProp emoteSpotJoined_Prop;
         internal static void JoinedProp(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
-            emoteSpotJoined_Prop(emoteSpot, joiner, host);
+            if (emoteSpotJoined_Prop != null)
+                emoteSpotJoined_Prop(emoteSpot, joiner, host);
         }
         public delegate void AnimationJoined(string joinedAnimation, BoneMapper joiner, BoneMapper host);
         public static event AnimationJoined animJoined;
         public static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
         {
-            animJoined(joinedAnimation, joiner, host);
+            if (animJoined != null)
+                animJoined(joinedAnimation, joiner, host);
         }
         public delegate void BoneMapperCreated(BoneMapper mapper);
         public static event BoneMapperCreated boneMapperCreated;
@@ -559,7 +680,6 @@ namespace EmotesAPI
 
         void Update()
         {
-            DebugClass.Log("update");
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);

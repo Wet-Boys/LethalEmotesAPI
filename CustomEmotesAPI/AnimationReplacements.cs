@@ -14,6 +14,7 @@ using GameNetcodeStuff;
 using System.IO;
 using MonoMod.RuntimeDetour;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -869,7 +870,7 @@ public class BoneMapper : MonoBehaviour
                     {
                         //DebugClass.Log($"comparing:    {smr1.bones[i].name}     {smr.bones[x].name}");
                         //DebugClass.Log($"--------------  {smrbone.gameObject.name}   {smr1bone.gameObject.name}      {smrbone.GetComponent<ParentConstraint>()}");
-                        if (smr1.bones[i].name == smr.bones[x].name)
+                        if (smr1.bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
                         {
                             startingXPoint = x;
                             //DebugClass.Log($"they are equal!");
@@ -1059,7 +1060,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (!CustomEmotesAPI.localMapper)
             {
-                if (mapperBody.IsLocalPlayer == GameNetworkManager.Instance.localPlayerController)
+                if (mapperBody == StartOfRound.Instance.localPlayerController)
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
@@ -1217,7 +1218,8 @@ public class BoneMapper : MonoBehaviour
             }
             if (scaleLock)
             {
-                transform.parent.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
+                //TODO scale lock ("works" but permanently makes you small)
+                //transform.parent.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
             }
         }
     }
@@ -1241,6 +1243,7 @@ public class BoneMapper : MonoBehaviour
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
+        DebugClass.Log("Spawning Join Spot");
         props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/JoinVisual.prefab")));
         props[props.Count - 1].transform.SetParent(transform);
         //Vector3 scal = transform.lossyScale;
@@ -1285,13 +1288,11 @@ public class BoneMapper : MonoBehaviour
 
         if (currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
         {
-            //TODO networking
-            //new SyncSpotJoinedToHost(mapperBody.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.GetComponentInParent<NetworkIdentity>().netId, true, spot).Send(R2API.Networking.NetworkDestination.Server);
+            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<NetworkObject>().NetworkObjectId, true, spot);
         }
         else
         {
-            //TODO networking
-            //new SyncSpotJoinedToHost(mapperBody.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.parent.GetComponentInParent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, false, spot).Send(R2API.Networking.NetworkDestination.Server);
+            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<NetworkObject>().NetworkObjectId, false, spot);
         }
     }
     public void RemoveProp(int propPos)
@@ -1310,20 +1311,6 @@ public class BoneMapper : MonoBehaviour
         overrideMoveSpeed = overrideBaseMovement;
         autoWalk = true;
     }
-    void FixedUpdate()
-    {
-        //if (autoWalkSpeed != 0)
-        //{
-        //    if (overrideMoveSpeed)
-        //    {
-        //        transform.GetComponentInParent<CharacterModel>().body.GetComponent<InputBankTest>().moveVector = transform.GetComponentInParent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
-        //    }
-        //    else
-        //    {
-        //        transform.GetComponentInParent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.GetComponentInParent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
-        //    }
-        //}
-    }
     internal IEnumerator waitForTwoFramesThenDisableA1()
     {
         yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
@@ -1331,18 +1318,20 @@ public class BoneMapper : MonoBehaviour
     }
     void AddAudioObject()
     {
-        CustomEmotesAPI.audioContainers[currentClip.syncPos].GetComponent<AudioContainer>().playingObjects.Add(this.gameObject);
+        //TODO audio
+        //CustomEmotesAPI.audioContainers[currentClip.syncPos].GetComponent<AudioContainer>().playingObjects.Add(this.gameObject);
     }
     void RemoveAudioObject()
     {
-        try
-        {
-            CustomEmotesAPI.audioContainers[currentClip.syncPos].GetComponent<AudioContainer>().playingObjects.Remove(this.gameObject);
-        }
-        catch (Exception e)
-        {
-            DebugClass.Log($"failed to remove object {this.gameObject} from playingObjects: {e}");
-        }
+        //TODO audio
+        //try
+        //{
+        //    CustomEmotesAPI.audioContainers[currentClip.syncPos].GetComponent<AudioContainer>().playingObjects.Remove(this.gameObject);
+        //}
+        //catch (Exception e)
+        //{
+        //    DebugClass.Log($"failed to remove object {this.gameObject} from playingObjects: {e}");
+        //}
     }
     void OnDestroy()
     {
@@ -1418,56 +1407,13 @@ public class BoneMapper : MonoBehaviour
     }
     public void LockBones()
     {
-        bool footL = false;
-        bool footR = false;
-        bool upperLegR = false;
-        bool upperLegL = false;
-        bool lowerLegR = false;
-        bool lowerLegL = false;
         foreach (var item in currentClip.soloIgnoredBones)
         {
-            if (item == HumanBodyBones.LeftFoot)
-            {
-                footL = true;
-            }
-            if (item == HumanBodyBones.RightFoot)
-            {
-                footR = true;
-            }
-            if (item == HumanBodyBones.LeftLowerLeg)
-            {
-                lowerLegL = true;
-            }
-            if (item == HumanBodyBones.LeftUpperLeg)
-            {
-                upperLegL = true;
-            }
-            if (item == HumanBodyBones.RightLowerLeg)
-            {
-                lowerLegR = true;
-            }
-            if (item == HumanBodyBones.RightUpperLeg)
-            {
-                upperLegR = true;
-            }
             if (a2.GetBoneTransform(item))
                 dontAnimateUs.Add(a2.GetBoneTransform(item).name);
         }
         foreach (var item in currentClip.rootIgnoredBones)
         {
-
-            if (item == HumanBodyBones.LeftUpperLeg || item == HumanBodyBones.Hips)
-            {
-                upperLegL = true;
-                lowerLegL = true;
-                footL = true;
-            }
-            if (item == HumanBodyBones.RightUpperLeg || item == HumanBodyBones.Hips)
-            {
-                upperLegR = true;
-                lowerLegR = true;
-                footR = true;
-            }
             if (a2.GetBoneTransform(item))
                 dontAnimateUs.Add(a2.GetBoneTransform(item).name);
             foreach (var bone in a2.GetBoneTransform(item).GetComponentsInChildren<Transform>())
@@ -1476,10 +1422,9 @@ public class BoneMapper : MonoBehaviour
                 dontAnimateUs.Add(bone.name);
             }
         }
-        bool left = upperLegL && lowerLegL && footL;
-        bool right = upperLegR && lowerLegR && footR;
         if (!jank)
         {
+            //a1.enabled = false;
             StartCoroutine(waitForTwoFramesThenDisableA1());
             foreach (var smr in smr2)
             {
@@ -1507,6 +1452,8 @@ public class BoneMapper : MonoBehaviour
         }
         else
         {
+            //a1.enabled = false;
+
             StartCoroutine(waitForTwoFramesThenDisableA1());
         }
     }
