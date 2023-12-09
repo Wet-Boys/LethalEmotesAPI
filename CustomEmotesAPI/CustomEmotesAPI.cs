@@ -15,6 +15,7 @@ using UnityEngine.XR;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine.Networking;
+using UnityEngine.Experimental.Audio;
 
 namespace EmotesAPI
 {
@@ -89,8 +90,6 @@ namespace EmotesAPI
         }
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
-        public static List<GameObject> audioContainers = new List<GameObject>();
-        public static List<GameObject> activeAudioContainers = new List<GameObject>();
         //look at the unity project, why is hidemesh being off still not showing anything?????????
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
@@ -127,6 +126,8 @@ namespace EmotesAPI
                     {
                         buttonLock = true;
                         PlayAnimation("none");
+                        var g = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
+                        g.transform.position = localMapper.transform.position;
                     }
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.G]))
                     {
@@ -394,8 +395,7 @@ namespace EmotesAPI
                     }
                 }
             }
-
-            AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: false);
+            AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             DebugClass.Log($"emote instance is {CustomEmotesAPI.instance}");
 
@@ -440,95 +440,16 @@ namespace EmotesAPI
                 animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
             if (animationClipParams.soloBonesToIgnore == null)
                 animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
-            if (animationClipParams._wwiseEventName == null)
-                animationClipParams._wwiseEventName = new string[] { "" };
-            if (animationClipParams._wwiseStopEvent == null)
-                animationClipParams._wwiseStopEvent = new string[] { "" };
+            if (animationClipParams._primaryAudioClips == null)
+                animationClipParams._primaryAudioClips = new AudioClip[] { null };
+            if (animationClipParams._secondaryAudioClips == null)
+                animationClipParams._secondaryAudioClips = new AudioClip[] { null };
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._wwiseEventName, animationClipParams._wwiseStopEvent, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync);
             if (animationClipParams.visible)
                 allClipNames.Add(animationClipParams.animationClip[0].name);
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
-        }
-        public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1, JoinSpot[] joinSpots = null)
-        {
-            if (BoneMapper.animClips.ContainsKey(animationClip[0].name))
-            {
-                Debug.Log($"EmotesError: [{animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
-                return;
-            }
-            if (!animationClip[0].isHumanMotion)
-            {
-                Debug.Log($"EmotesError: [{animationClip[0].name}] is not a humanoid animation!");
-                return;
-            }
-            if (rootBonesToIgnore == null)
-                rootBonesToIgnore = new HumanBodyBones[0];
-            if (soloBonesToIgnore == null)
-                soloBonesToIgnore = new HumanBodyBones[0];
-            if (_wwiseEventName == null)
-                _wwiseEventName = new string[] { "" };
-            if (_wwiseStopEvent == null)
-                _wwiseStopEvent = new string[] { "" };
-            if (joinSpots == null)
-                joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref, joinSpots);
-            if (visible)
-                allClipNames.Add(animationClip[0].name);
-            BoneMapper.animClips.Add(animationClip[0].name, clip);
-        }
-        public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1)
-        {
-            if (BoneMapper.animClips.ContainsKey(animationClip[0].name))
-            {
-                Debug.Log($"EmotesError: [{animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
-                return;
-            }
-            if (!animationClip[0].isHumanMotion)
-            {
-                Debug.Log($"EmotesError: [{animationClip[0].name}] is not a humanoid animation!");
-                return;
-            }
-            if (rootBonesToIgnore == null)
-                rootBonesToIgnore = new HumanBodyBones[0];
-            if (soloBonesToIgnore == null)
-                soloBonesToIgnore = new HumanBodyBones[0];
-            string[] wwiseEvents = new string[] { _wwiseEventName };
-            string[] wwiseStopEvents = new string[] { _wwiseStopEvent };
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, wwiseEvents, wwiseStopEvents, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref);
-            if (visible)
-                allClipNames.Add(animationClip[0].name);
-            BoneMapper.animClips.Add(animationClip[0].name, clip);
-        }
-        public static void AddCustomAnimation(AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false)
-        {
-            if (BoneMapper.animClips.ContainsKey(animationClip.name))
-            {
-                Debug.Log($"EmotesError: [{animationClip.name}] is already defined as a custom emote but is trying to be added. Skipping");
-                return;
-            }
-            if (!animationClip.isHumanMotion)
-            {
-                Debug.Log($"EmotesError: [{animationClip.name}] is not a humanoid animation!");
-                return;
-            }
-            if (rootBonesToIgnore == null)
-                rootBonesToIgnore = new HumanBodyBones[0];
-            if (soloBonesToIgnore == null)
-                soloBonesToIgnore = new HumanBodyBones[0];
-            AnimationClip[] animationClips = new AnimationClip[] { animationClip };
-            AnimationClip[] secondaryClips = null;
-            if (secondaryAnimation)
-            {
-                secondaryClips = new AnimationClip[] { secondaryAnimation };
-            }
-            string[] wwiseEvents = new string[] { _wwiseEventName };
-            string[] wwiseStopEvents = new string[] { _wwiseStopEvent };
-            CustomAnimationClip clip = new CustomAnimationClip(animationClips, looping, wwiseEvents, wwiseStopEvents, rootBonesToIgnore, soloBonesToIgnore, secondaryClips, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
-            if (visible)
-                allClipNames.Add(animationClip.name);
-            BoneMapper.animClips.Add(animationClip.name, clip);
         }
 
         public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
@@ -756,20 +677,21 @@ namespace EmotesAPI
         }
         public static void AudioFunctions()
         {
-            for (int i = 0; i < CustomEmotesAPI.audioContainers.Count; i++)
-            {
-                AudioContainer ac = CustomEmotesAPI.audioContainers[i].GetComponent<AudioContainer>();
-                if (ac.playingObjects.Count != 0)
-                {
-                    //TODO audio
-                    //AkPositionArray ak = new AkPositionArray((uint)ac.playingObjects.Count);
-                    //foreach (var item in ac.playingObjects)
-                    //{
-                    //    ak.Add(item.transform.position, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-                    //}
-                    //AkSoundEngine.SetMultiplePositions(CustomEmotesAPI.audioContainers[i], ak, (ushort)ak.Count, AkMultiPositionType.MultiPositionType_MultiDirections);
-                }
-            }
+            //for (int i = 0; i < CustomEmotesAPI.audioContainers.Count; i++)
+            //{
+            //    //TODO AUDIO
+            //    AudioContainer ac = CustomEmotesAPI.audioContainers[i].GetComponent<AudioContainer>();
+            //    if (ac.playingObjects.Count != 0)
+            //    {
+
+            //        AkPositionArray ak = new AkPositionArray((uint)ac.playingObjects.Count);
+            //        foreach (var item in ac.playingObjects)
+            //        {
+            //            ak.Add(item.transform.position, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+            //        }
+            //        AkSoundEngine.SetMultiplePositions(CustomEmotesAPI.audioContainers[i], ak, (ushort)ak.Count, AkMultiPositionType.MultiPositionType_MultiDirections);
+            //    }
+            //}
             for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
             {
                 if (CustomAnimationClip.syncPlayerCount[i] != 0)

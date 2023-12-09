@@ -9,8 +9,8 @@ namespace EmotesAPI
     {
         public AnimationClip[] animationClip;
         public bool looping;
-        public string[] _wwiseEventName = null;
-        public string[] _wwiseStopEvent = null;
+        public AudioClip[] _primaryAudioClips = null;
+        public AudioClip[] _secondaryAudioClips = null;
         public HumanBodyBones[] rootBonesToIgnore = null;
         public HumanBodyBones[] soloBonesToIgnore = null;
         public AnimationClip[] secondaryAnimation = null;
