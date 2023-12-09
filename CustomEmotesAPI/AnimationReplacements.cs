@@ -856,6 +856,8 @@ public class BoneMapper : MonoBehaviour
             }
             obj.transform.SetParent(transform);
             obj.transform.localPosition = new Vector3(0, -10000, 0);
+            //TODO audio
+            obj.AddComponent<AudioSource>();
             audioObjects.Add(obj);
         }
 
@@ -1187,15 +1189,15 @@ public class BoneMapper : MonoBehaviour
                 //TODO maybe a replacement for motor and/or remove it
                 //CharacterMotor motor = mapperBody.GetComponent<CharacterMotor>();
                 Rigidbody rigidbody = mapperBody.GetComponent<Rigidbody>();
-                //TODO ^^^
+                //TODO ^^^ and rigidbody
                 //if (motor)
                 //{
                 //    motor.velocity = Vector3.zero;
                 //}
-                if (rigidbody)
-                {
-                    rigidbody.velocity = Vector3.zero;
-                }
+                //if (rigidbody)
+                //{
+                //    rigidbody.velocity = Vector3.zero;
+                //}
             }
             if (rotationLock)
             {

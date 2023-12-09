@@ -46,19 +46,6 @@ namespace EmotesAPI
         }
         void CreateBaseNameTokenPairs()
         {
-            CreateNameTokenSpritePair("CAPTAIN_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/captain.png"));
-            CreateNameTokenSpritePair("COMMANDO_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/commando.png"));
-            CreateNameTokenSpritePair("MERC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/merc.png"));
-            CreateNameTokenSpritePair("ENGI_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/engi.png"));
-            CreateNameTokenSpritePair("HUNTRESS_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/huntress.png"));
-            CreateNameTokenSpritePair("MAGE_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/artificer.png"));
-            CreateNameTokenSpritePair("TOOLBOT_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/mult.png"));
-            CreateNameTokenSpritePair("TREEBOT_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/rex.png"));
-            CreateNameTokenSpritePair("LOADER_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/loader.png"));
-            CreateNameTokenSpritePair("CROCO_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/acrid.png"));
-            CreateNameTokenSpritePair("BANDIT2_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/bandit.png"));
-            CreateNameTokenSpritePair("VOIDSURVIVOR_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/voidfiend.png"));
-            CreateNameTokenSpritePair("RAILGUNNER_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/railgunner.png"));
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
         public static List<string> allClipNames = new List<string>();
@@ -232,6 +219,13 @@ namespace EmotesAPI
             }
         }
         private static Hook networkManagerStartHook;
+        private void StartOfRoundUpdate(Action<StartOfRound> orig, StartOfRound self)
+        {
+            orig(self);
+            AudioFunctions();
+        }
+        private static Hook startOfRoundUpdateHook;
+
         private static bool buttonLock = false;
 
 
@@ -265,6 +259,10 @@ namespace EmotesAPI
             targetMethod = typeof(GameNetworkManager).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(NetworkManagerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             networkManagerStartHook = new Hook(targetMethod, destMethod, this);
+
+            targetMethod = typeof(StartOfRound).GetMethod("Update", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(StartOfRoundUpdate), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            startOfRoundUpdateHook = new Hook(targetMethod, destMethod, this);
 
 
             AnimationReplacements.RunAll();
@@ -751,13 +749,12 @@ namespace EmotesAPI
                     }
                 }
             }
-            AudioFunctions();
         }
         public static void ReserveJoinSpot(GameObject joinSpot, BoneMapper mapper)
         {
             mapper.reservedEmoteSpot = joinSpot;
         }
-        void AudioFunctions()
+        public static void AudioFunctions()
         {
             for (int i = 0; i < CustomEmotesAPI.audioContainers.Count; i++)
             {
