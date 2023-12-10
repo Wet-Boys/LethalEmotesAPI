@@ -45,3 +45,7 @@ J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\U
 J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\obj\Debug\netstandard2.1\LethalEmotesAPI.csproj.CopyComplete
 J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\obj\Debug\netstandard2.1\LethalEmotesAPI.dll
 J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\obj\Debug\netstandard2.1\LethalEmotesAPI.pdb
+J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\UnityEngine.ARModule.dll
+J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\Unity.Multiplayer.Tools.NetStatsMonitor.Component.dll
+J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.dll
+J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\Unity.Multiplayer.Tools.NetStatsMonitor.Implementation.dll

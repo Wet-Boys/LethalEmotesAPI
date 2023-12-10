@@ -24,10 +24,13 @@ public class EmoteConstraint : MonoBehaviour
     }
     public void ActivateConstraints()
     {
-        originalPosition = originalBone.localPosition;
-        originalRotation = originalBone.localRotation;
-        hasEverActivatedConstraints = true;
-        constraintActive = true;
+        if (!constraintActive)
+        {
+            originalPosition = originalBone.localPosition;
+            originalRotation = originalBone.localRotation;
+            hasEverActivatedConstraints = true;
+            constraintActive = true;
+        }
     }
     public void DeactivateConstraints()
     {
@@ -48,3 +51,7 @@ public class EmoteConstraint : MonoBehaviour
         this.emoteBone = emoteBone;
     }
 }
+
+
+
+//PLAYING MORE THAN ONE EMOTE WITHOUT GOING TO "none" FIRST CAUSES THE ARMS TO BREAK, LOOK INTO IT?

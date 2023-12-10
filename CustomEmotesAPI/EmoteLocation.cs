@@ -114,39 +114,36 @@ public class EmoteLocation : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        //TODO on trigger enter joinSpot
-        //if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() != owner)
-        //{
-        //    BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
-        //    if (mapper)
-        //    {
-        //        validPlayers++;
-        //        SetColor();
-        //        //new SyncCurrentEmoteSpot(other.GetComponent<NetworkIdentity>().netId, gameObject.GetComponent<NetworkIdentity>().netId).Send(R2API.Networking.NetworkDestination.Clients);
-        //        mapper.currentEmoteSpot = this.gameObject;
-        //        CustomEmotesAPI.JoinSpotEntered(mapper, owner);
-        //    }
-        //}
+        if (other.GetComponentInChildren<BoneMapper>() && other.GetComponentInChildren<BoneMapper>() != owner)
+        {
+            BoneMapper mapper = other.GetComponentInChildren<BoneMapper>();
+            if (mapper)
+            {
+                validPlayers++;
+                SetColor();
+                mapper.currentEmoteSpot = this.gameObject;
+                CustomEmotesAPI.JoinSpotEntered(mapper, owner);
+            }
+        }
     }
     void OnTriggerExit(Collider other)
     {
-        //TODO on trigger exit joinSpot
-        //if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() != owner)
-        //{
-        //    BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
-        //    if (mapper)
-        //    {
-        //        if (validPlayers != 0)
-        //        {
-        //            validPlayers--;
-        //        }
-        //        SetColor();
-        //        if (mapper.currentEmoteSpot == this.gameObject)
-        //        {
-        //            mapper.currentEmoteSpot = null;
-        //        }
-        //    }
-        //}
+        if (other.GetComponentInChildren<BoneMapper>() && other.GetComponentInChildren<BoneMapper>() != owner)
+        {
+            BoneMapper mapper = other.GetComponentInChildren<BoneMapper>();
+            if (mapper)
+            {
+                if (validPlayers != 0)
+                {
+                    validPlayers--;
+                }
+                SetColor();
+                if (mapper.currentEmoteSpot == this.gameObject)
+                {
+                    mapper.currentEmoteSpot = null;
+                }
+            }
+        }
     }
     internal void SetColor()
     {

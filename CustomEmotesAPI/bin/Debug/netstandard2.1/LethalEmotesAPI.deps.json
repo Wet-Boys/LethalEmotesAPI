@@ -13,7 +13,26 @@
           "BepInEx.Core": "5.4.19",
           "UnityEngine.Modules": "2022.3.9",
           "Assembly-CSharp": "0.0.0.0",
-          "Unity.Netcode.Runtime": "0.0.0.0"
+          "Facepunch Transport for Netcode for GameObjects": "0.0.0.0",
+          "Unity.InputSystem": "1.7.0.0",
+          "Unity.Multiplayer.Tools.Common": "0.0.0.0",
+          "Unity.Multiplayer.Tools.MetricTypes": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetStats": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetStatsMonitor.Component": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetStatsMonitor.Configuration": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetStatsMonitor.Implementation": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetStatsReporting": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetworkProfiler.Runtime": "0.0.0.0",
+          "Unity.Multiplayer.Tools.NetworkSolutionInterface": "0.0.0.0",
+          "Unity.Multiplayer.Tools.Util": "0.0.0.0",
+          "Unity.Netcode.Components": "0.0.0.0",
+          "Unity.Netcode.Runtime": "0.0.0.0",
+          "Unity.Networking.Transport": "0.0.0.0",
+          "UnityEngine.ARModule": "0.0.0.0",
+          "UnityEngine.NVIDIAModule": "0.0.0.0",
+          "UnityEngine.UI": "1.0.0.0",
+          "UnityEngine.UIElementsNativeModule": "0.0.0.0",
+          "UnityEngine.UNETModule": "0.0.0.0"
         },
         "runtime": {
           "LethalEmotesAPI.dll": {}
@@ -627,9 +646,161 @@
           }
         }
       },
+      "Facepunch Transport for Netcode for GameObjects/0.0.0.0": {
+        "runtime": {
+          "Facepunch Transport for Netcode for GameObjects.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.InputSystem/1.7.0.0": {
+        "runtime": {
+          "Unity.InputSystem.dll": {
+            "assemblyVersion": "1.7.0.0",
+            "fileVersion": "1.7.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.Common/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.Common.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.MetricTypes/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.MetricTypes.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetStats/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetStats.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetStatsMonitor.Component/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetStatsMonitor.Component.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetStatsMonitor.Configuration/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetStatsMonitor.Implementation/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetStatsMonitor.Implementation.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetStatsReporting/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetStatsReporting.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetworkProfiler.Runtime/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetworkProfiler.Runtime.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.NetworkSolutionInterface/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.NetworkSolutionInterface.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Multiplayer.Tools.Util/0.0.0.0": {
+        "runtime": {
+          "Unity.Multiplayer.Tools.Util.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Netcode.Components/0.0.0.0": {
+        "runtime": {
+          "Unity.Netcode.Components.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "Unity.Netcode.Runtime/0.0.0.0": {
         "runtime": {
           "Unity.Netcode.Runtime.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.Networking.Transport/0.0.0.0": {
+        "runtime": {
+          "Unity.Networking.Transport.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "UnityEngine.ARModule/0.0.0.0": {
+        "runtime": {
+          "UnityEngine.ARModule.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "UnityEngine.NVIDIAModule/0.0.0.0": {
+        "runtime": {
+          "UnityEngine.NVIDIAModule.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "UnityEngine.UI/1.0.0.0": {
+        "runtime": {
+          "UnityEngine.UI.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "UnityEngine.UIElementsNativeModule/0.0.0.0": {
+        "runtime": {
+          "UnityEngine.UIElementsNativeModule.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "UnityEngine.UNETModule/0.0.0.0": {
+        "runtime": {
+          "UnityEngine.UNETModule.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -651,27 +822,11 @@
           }
         }
       },
-      "Unity.InputSystem/1.7.0.0": {
-        "runtime": {
-          "Unity.InputSystem.dll": {
-            "assemblyVersion": "1.7.0.0",
-            "fileVersion": "1.7.0.0"
-          }
-        }
-      },
       "Unity.RenderPipelines.HighDefinition.Runtime/0.0.0.0": {
         "runtime": {
           "Unity.RenderPipelines.HighDefinition.Runtime.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "UnityEngine.UI/1.0.0.0": {
-        "runtime": {
-          "UnityEngine.UI.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
           }
         }
       },
@@ -694,22 +849,6 @@
       "DissonanceVoip/0.0.0.0": {
         "runtime": {
           "DissonanceVoip.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Facepunch Transport for Netcode for GameObjects/0.0.0.0": {
-        "runtime": {
-          "Facepunch Transport for Netcode for GameObjects.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Netcode.Components/0.0.0.0": {
-        "runtime": {
-          "Unity.Netcode.Components.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -747,49 +886,9 @@
           }
         }
       },
-      "Unity.Multiplayer.Tools.NetStats/0.0.0.0": {
+      "Unity.Profiling.Core/0.0.0.0": {
         "runtime": {
-          "Unity.Multiplayer.Tools.NetStats.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Multiplayer.Tools.MetricTypes/0.0.0.0": {
-        "runtime": {
-          "Unity.Multiplayer.Tools.MetricTypes.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Multiplayer.Tools.NetworkSolutionInterface/0.0.0.0": {
-        "runtime": {
-          "Unity.Multiplayer.Tools.NetworkSolutionInterface.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Networking.Transport/0.0.0.0": {
-        "runtime": {
-          "Unity.Networking.Transport.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Burst/0.0.0.0": {
-        "runtime": {
-          "Unity.Burst.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Multiplayer.Tools.NetStatsReporting/0.0.0.0": {
-        "runtime": {
-          "Unity.Multiplayer.Tools.NetStatsReporting.dll": {
+          "Unity.Profiling.Core.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -803,17 +902,25 @@
           }
         }
       },
-      "Unity.VisualEffectGraph.Runtime/0.0.0.0": {
+      "Unity.Burst/0.0.0.0": {
         "runtime": {
-          "Unity.VisualEffectGraph.Runtime.dll": {
+          "Unity.Burst.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
         }
       },
-      "UnityEngine.NVIDIAModule/0.0.0.0": {
+      "Unity.Services.Relay/0.0.0.0": {
         "runtime": {
-          "UnityEngine.NVIDIAModule.dll": {
+          "Unity.Services.Relay.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Unity.VisualEffectGraph.Runtime/0.0.0.0": {
+        "runtime": {
+          "Unity.VisualEffectGraph.Runtime.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -835,43 +942,11 @@
           }
         }
       },
-      "Unity.Multiplayer.Tools.Common/0.0.0.0": {
-        "runtime": {
-          "Unity.Multiplayer.Tools.Common.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Services.Relay/0.0.0.0": {
-        "runtime": {
-          "Unity.Services.Relay.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
       "Unity.Burst.Unsafe/4.0.5.0": {
         "runtime": {
           "Unity.Burst.Unsafe.dll": {
             "assemblyVersion": "4.0.5.0",
             "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Multiplayer.Tools.NetworkProfiler.Runtime/0.0.0.0": {
-        "runtime": {
-          "Unity.Multiplayer.Tools.NetworkProfiler.Runtime.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Unity.Timeline/1.0.0.0": {
-        "runtime": {
-          "Unity.Timeline.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
           }
         }
       },
@@ -899,11 +974,11 @@
           }
         }
       },
-      "Unity.Profiling.Core/0.0.0.0": {
+      "Unity.Timeline/1.0.0.0": {
         "runtime": {
-          "Unity.Profiling.Core.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
+          "Unity.Timeline.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       }
@@ -1179,7 +1254,102 @@
       "serviceable": false,
       "sha512": ""
     },
+    "Facepunch Transport for Netcode for GameObjects/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.InputSystem/1.7.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.Common/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.MetricTypes/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetStats/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetStatsMonitor.Component/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetStatsMonitor.Configuration/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetStatsMonitor.Implementation/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetStatsReporting/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetworkProfiler.Runtime/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.NetworkSolutionInterface/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Multiplayer.Tools.Util/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Netcode.Components/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
     "Unity.Netcode.Runtime/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Networking.Transport/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnityEngine.ARModule/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnityEngine.NVIDIAModule/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnityEngine.UI/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnityEngine.UIElementsNativeModule/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnityEngine.UNETModule/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1194,17 +1364,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.InputSystem/1.7.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
     "Unity.RenderPipelines.HighDefinition.Runtime/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine.UI/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1220,16 +1380,6 @@
       "sha512": ""
     },
     "DissonanceVoip/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Facepunch Transport for Netcode for GameObjects/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Netcode.Components/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1254,32 +1404,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.Multiplayer.Tools.NetStats/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Multiplayer.Tools.MetricTypes/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Multiplayer.Tools.NetworkSolutionInterface/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Networking.Transport/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Burst/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Multiplayer.Tools.NetStatsReporting/0.0.0.0": {
+    "Unity.Profiling.Core/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1289,12 +1414,17 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.VisualEffectGraph.Runtime/0.0.0.0": {
+    "Unity.Burst/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "UnityEngine.NVIDIAModule/0.0.0.0": {
+    "Unity.Services.Relay/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.VisualEffectGraph.Runtime/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1309,27 +1439,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.Multiplayer.Tools.Common/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Services.Relay/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
     "Unity.Burst.Unsafe/4.0.5.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Multiplayer.Tools.NetworkProfiler.Runtime/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Unity.Timeline/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1349,7 +1459,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.Profiling.Core/0.0.0.0": {
+    "Unity.Timeline/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
