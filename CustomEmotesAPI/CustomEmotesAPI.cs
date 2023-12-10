@@ -26,7 +26,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.2.5";
+        public const string VERSION = "1.0.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -90,7 +90,6 @@ namespace EmotesAPI
         }
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
-        //look at the unity project, why is hidemesh being off still not showing anything?????????
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
             DebugClass.Log($"adding bone mapper to scav");
@@ -125,9 +124,7 @@ namespace EmotesAPI
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.C]))
                     {
                         buttonLock = true;
-                        PlayAnimation("none");
-                        var g = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
-                        g.transform.position = localMapper.transform.position;
+                        PlayAnimation("none"); 
                     }
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.G]))
                     {
@@ -212,6 +209,7 @@ namespace EmotesAPI
         {
             orig(self);
             emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
+            emoteNetworker.AddComponent<NetworkObject>();
             emoteNetworker.AddComponent<EmoteNetworker>();
             GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
             foreach (var item in networkedObjects)
@@ -677,21 +675,6 @@ namespace EmotesAPI
         }
         public static void AudioFunctions()
         {
-            //for (int i = 0; i < CustomEmotesAPI.audioContainers.Count; i++)
-            //{
-            //    //TODO AUDIO
-            //    AudioContainer ac = CustomEmotesAPI.audioContainers[i].GetComponent<AudioContainer>();
-            //    if (ac.playingObjects.Count != 0)
-            //    {
-
-            //        AkPositionArray ak = new AkPositionArray((uint)ac.playingObjects.Count);
-            //        foreach (var item in ac.playingObjects)
-            //        {
-            //            ak.Add(item.transform.position, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-            //        }
-            //        AkSoundEngine.SetMultiplePositions(CustomEmotesAPI.audioContainers[i], ak, (ushort)ak.Count, AkMultiPositionType.MultiPositionType_MultiDirections);
-            //    }
-            //}
             for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
             {
                 if (CustomAnimationClip.syncPlayerCount[i] != 0)

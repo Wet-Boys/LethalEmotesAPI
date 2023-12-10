@@ -10,11 +10,11 @@ namespace LethalEmotesAPI
         //I miss wwise :(
         public AudioClip primaryAudioClip;
         public AudioClip secondaryAudioClip;
+        public AudioSource audioSource;
         public bool primaryIsCurrent = true;
-        public AudioManager(AudioClip primaryClip, AudioClip secondaryClip)
+        public AudioManager(AudioSource source)
         {
-            primaryAudioClip = primaryClip;
-            secondaryAudioClip = secondaryClip;
+            audioSource = source;
         }
 
         private void Start()
@@ -25,7 +25,7 @@ namespace LethalEmotesAPI
         {
 
         }
-        public void Play()
+        public void Play(int syncPos, int currEvent, bool looping)
         {
             if (primaryIsCurrent)
             {

@@ -16,6 +16,7 @@ using MonoMod.RuntimeDetour;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using LethalEmotesAPI;
+using UnityEngine.Audio;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -405,7 +406,7 @@ public class BoneMapper : MonoBehaviour
 {
     public static List<AudioClip[]> primaryAudioClips = new List<AudioClip[]>();
     public static List<AudioClip[]> secondaryAudioClips = new List<AudioClip[]>();
-    internal List<GameObject> audioObjects = new List<GameObject>();
+    public List<GameObject> audioObjects = new List<GameObject>();
     public SkinnedMeshRenderer smr1;
     public SkinnedMeshRenderer[] smr2;
     public Animator a1, a2;
@@ -491,7 +492,6 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                 }
-                //TODO AUDIO
                 if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                 {
                     audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
@@ -522,7 +522,6 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                //TODO AUDIO
                 DebugClass.Log($"had issue turning off audio before new audio played: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
             }
         }
@@ -602,7 +601,6 @@ public class BoneMapper : MonoBehaviour
         {
             CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
         }
-        //TODO AUDIO
         if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
         {
             if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1 && currentClip.syncronizeAudio)
@@ -833,15 +831,16 @@ public class BoneMapper : MonoBehaviour
 
         foreach (var item in primaryAudioClips)
         {
-            GameObject obj = new GameObject();
+            GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
             if (item[0] != null)
             {
                 obj.name = $"{item[0]}_AudioObject";
             }
             obj.transform.SetParent(transform);
             obj.transform.localPosition = new Vector3(0, -10000, 0);
-            //TODO audio
-            obj.AddComponent<AudioSource>();
+            var source = obj.GetComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.volume = .3f; //TODO replace this with emotes volume config later
             audioObjects.Add(obj);
         }
 
@@ -1102,7 +1101,6 @@ public class BoneMapper : MonoBehaviour
                     {
                         CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                     }
-                    //TODO AUDIO
                     if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                     {
                         if (!currentClip.syncronizeAudio)
@@ -1303,7 +1301,6 @@ public class BoneMapper : MonoBehaviour
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                 }
             }
-            //TODO AUDIO
             if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
             {
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
