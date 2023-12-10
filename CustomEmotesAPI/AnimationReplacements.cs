@@ -839,6 +839,7 @@ public class BoneMapper : MonoBehaviour
             obj.transform.SetParent(transform);
             obj.transform.localPosition = new Vector3(0, -10000, 0);
             var source = obj.GetComponent<AudioSource>();
+            obj.AddComponent<AudioManager>().Setup(source);
             source.playOnAwake = false;
             source.volume = .3f; //TODO replace this with emotes volume config later
             audioObjects.Add(obj);
