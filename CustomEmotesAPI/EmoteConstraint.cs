@@ -50,6 +50,11 @@ public class EmoteConstraint : MonoBehaviour
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
     }
+    internal void AddSource(Transform originalBone, Transform emoteBone)
+    {
+        this.originalBone = originalBone;
+        this.emoteBone = emoteBone;
+    }
 }
 
 

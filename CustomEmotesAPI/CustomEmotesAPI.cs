@@ -16,6 +16,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine.Networking;
 using UnityEngine.Experimental.Audio;
+using HarmonyLib;
 
 namespace EmotesAPI
 {
@@ -105,6 +106,7 @@ namespace EmotesAPI
 
         private void PlayerControllerUpdate(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
+            orig(self);
             if (!(!self.isPlayerControlled || !((NetworkBehaviour)self).IsOwner))
             {
                 if (buttonLock)
@@ -119,7 +121,7 @@ namespace EmotesAPI
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
                     {
                         buttonLock = true;
-                        PlayAnimation("GalaxyObservatory");
+                        PlayAnimation("VirtualInsanity");
                     }
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.C]))
                     {
@@ -200,7 +202,8 @@ namespace EmotesAPI
                     }
                 }
             }
-            orig(self);
+            DebugClass.Log($"end of update inputdir: {self.moveInputVector}");
+            
         }
         private static Hook playerControllerUpdateHook;
 
@@ -232,10 +235,26 @@ namespace EmotesAPI
 
 
         //Vector3 prevCamPosition = Vector3.zero;
+        internal static void AutoWalking(PlayerControllerB player)
+        {
+            DebugClass.Log($"{localMapper == player.GetComponentInChildren<BoneMapper>()}    {localMapper}    {player.GetComponentInChildren<BoneMapper>()}");
+            if (localMapper == player.GetComponentInChildren<BoneMapper>())
+            {
+                DebugClass.Log($"{localMapper.autoWalkSpeed}");
+                if (localMapper.autoWalkSpeed != 0)
+                {
+                    DebugClass.Log($"after {player.moveInputVector}");
+                    player.moveInputVector = new Vector2(localMapper.autoWalkSpeed, 0);
+                    DebugClass.Log($"before {player.moveInputVector}");
+                }
+            }
+        }
         public void Awake()
         {
             instance = this;
             DebugClass.SetLogger(base.Logger);
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginGUID);
+
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
@@ -444,20 +463,29 @@ namespace EmotesAPI
                 animationClipParams._secondaryAudioClips = new AudioClip[] { null };
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockFPSHead);
             if (animationClipParams.visible)
                 allClipNames.Add(animationClipParams.animationClip[0].name);
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
         }
 
+        public static GameObject animationControllerHolder;
         public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
         {
-            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+            if (!animationControllerHolder)
+            {
+                animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+            }
+            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
         }
         public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
         {
-            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+            if (!animationControllerHolder)
+            {
+                animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+            }
+            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
         }
         //TODO console command
