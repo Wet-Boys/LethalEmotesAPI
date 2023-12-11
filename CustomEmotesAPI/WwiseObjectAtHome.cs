@@ -9,7 +9,7 @@ namespace LethalEmotesAPI
     {
         //I miss wwise :(
         public AudioSource audioSource;
-        public bool needToContinueOnFinish = true;
+        public bool needToContinueOnFinish = false;
         int syncPos, currEvent;
         internal void Setup(AudioSource source)
         {
@@ -23,7 +23,8 @@ namespace LethalEmotesAPI
         {
             if (!audioSource.isPlaying && needToContinueOnFinish)
             {
-                audioSource.PlayOneShot(BoneMapper.secondaryAudioClips[syncPos][currEvent]);
+                audioSource.clip = BoneMapper.secondaryAudioClips[syncPos][currEvent];
+                audioSource.Play();
                 needToContinueOnFinish = false;
                 audioSource.loop = true;
             }
@@ -32,15 +33,23 @@ namespace LethalEmotesAPI
         {
             this.syncPos = syncPos;
             this.currEvent = currEvent;
-            audioSource.PlayOneShot(BoneMapper.primaryAudioClips[syncPos][currEvent]);
-            if (BoneMapper.secondaryAudioClips[syncPos][currEvent] != null)
+            try
             {
-                needToContinueOnFinish = true;
+                audioSource.clip = BoneMapper.primaryAudioClips[syncPos][currEvent];
+                audioSource.Play();
+                if (BoneMapper.secondaryAudioClips[syncPos][currEvent] != null)
+                {
+                    needToContinueOnFinish = true;
+                }
+                else
+                {
+                    audioSource.loop = looping;
+                    needToContinueOnFinish = false;
+                }
             }
-            else
+            catch (Exception)
             {
-                audioSource.loop = looping;
-                needToContinueOnFinish = false;
+                DebugClass.Log($"{syncPos}  {BoneMapper.primaryAudioClips[syncPos]}  {BoneMapper.primaryAudioClips[syncPos].Length}           {BoneMapper.secondaryAudioClips[syncPos]}   {BoneMapper.secondaryAudioClips[syncPos].Length}");
             }
         }
         public void Stop()
