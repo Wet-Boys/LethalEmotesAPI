@@ -24,15 +24,12 @@
           "Unity.Multiplayer.Tools.NetStatsReporting": "0.0.0.0",
           "Unity.Multiplayer.Tools.NetworkProfiler.Runtime": "0.0.0.0",
           "Unity.Multiplayer.Tools.NetworkSolutionInterface": "0.0.0.0",
-          "Unity.Multiplayer.Tools.Util": "0.0.0.0",
           "Unity.Netcode.Components": "0.0.0.0",
           "Unity.Netcode.Runtime": "0.0.0.0",
           "Unity.Networking.Transport": "0.0.0.0",
           "UnityEngine.ARModule": "0.0.0.0",
           "UnityEngine.NVIDIAModule": "0.0.0.0",
-          "UnityEngine.UI": "1.0.0.0",
-          "UnityEngine.UIElementsNativeModule": "0.0.0.0",
-          "UnityEngine.UNETModule": "0.0.0.0"
+          "UnityEngine.UI": "1.0.0.0"
         },
         "runtime": {
           "LethalEmotesAPI.dll": {}
@@ -734,14 +731,6 @@
           }
         }
       },
-      "Unity.Multiplayer.Tools.Util/0.0.0.0": {
-        "runtime": {
-          "Unity.Multiplayer.Tools.Util.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
       "Unity.Netcode.Components/0.0.0.0": {
         "runtime": {
           "Unity.Netcode.Components.dll": {
@@ -787,22 +776,6 @@
           "UnityEngine.UI.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "UnityEngine.UIElementsNativeModule/0.0.0.0": {
-        "runtime": {
-          "UnityEngine.UIElementsNativeModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "UnityEngine.UNETModule/0.0.0.0": {
-        "runtime": {
-          "UnityEngine.UNETModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
           }
         }
       },
@@ -854,6 +827,14 @@
           }
         }
       },
+      "Assembly-CSharp-firstpass/0.0.0.0": {
+        "runtime": {
+          "Assembly-CSharp-firstpass.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "Unity.AI.Navigation/0.0.0.0": {
         "runtime": {
           "Unity.AI.Navigation.dll": {
@@ -865,14 +846,6 @@
       "Unity.Collections/0.0.0.0": {
         "runtime": {
           "Unity.Collections.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Assembly-CSharp-firstpass/0.0.0.0": {
-        "runtime": {
-          "Assembly-CSharp-firstpass.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -1309,11 +1282,6 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.Multiplayer.Tools.Util/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
     "Unity.Netcode.Components/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
@@ -1340,16 +1308,6 @@
       "sha512": ""
     },
     "UnityEngine.UI/1.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine.UIElementsNativeModule/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine.UNETModule/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -1384,17 +1342,17 @@
       "serviceable": false,
       "sha512": ""
     },
+    "Assembly-CSharp-firstpass/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
     "Unity.AI.Navigation/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
     "Unity.Collections/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Assembly-CSharp-firstpass/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

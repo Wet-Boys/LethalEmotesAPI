@@ -119,7 +119,7 @@ namespace EmotesAPI
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
                     {
                         buttonLock = true;
-                        PlayAnimation("VSWORLD");
+                        PlayAnimation("GalaxyObservatory");
                     }
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.C]))
                     {

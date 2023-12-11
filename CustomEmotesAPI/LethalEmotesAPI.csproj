@@ -303,6 +303,8 @@
     <Exec Command="G:\networkpatcher\NetcodePatcher.dll &quot;J:/Custom Emotes Base/CustomEmotesAPI/CustomEmotesAPI/bin/Debug/netstandard2.1/&quot; G:/networkpatcher/deps/" />
     <Exec Command="copy /y &quot;J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\LethalEmotesAPI.dll&quot; &quot;C:\Users\Bigma Male\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\plugins\LethalEmotesAPI.dll&quot;" />
     <Exec Command="copy /y &quot;J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\LethalEmotesAPI.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\plugins\LethalEmotesAPI.dll&quot;" />
+    <Exec Command="copy /y &quot;J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\LethalEmotesAPI.pdb&quot; &quot;C:\Users\Bigma Male\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\plugins\LethalEmotesAPI.pdb&quot;" />
+    <Exec Command="copy /y &quot;J:\Custom Emotes Base\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.1\LethalEmotesAPI.pdb&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\plugins\LethalEmotesAPI.pdb&quot;" />
   </Target>
 
 </Project>
