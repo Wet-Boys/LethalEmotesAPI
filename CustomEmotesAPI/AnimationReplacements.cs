@@ -379,9 +379,8 @@ public class CustomAnimationClip : MonoBehaviour
         joinSpots = _joinSpots;
         this.useSafePositionReset = safePositionReset;
         this.customName = customName;
+        BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
 
-
-        //TODO preload
         if (!audioLoader)
         {
             DebugClass.Log($"preloading audio, this can take up to 30 seconds unfortunately but prevents microstutters when actually playing.");
@@ -439,7 +438,7 @@ public class BoneMapper : MonoBehaviour
 {
     public static List<AudioClip[]> primaryAudioClips = new List<AudioClip[]>();
     public static List<AudioClip[]> secondaryAudioClips = new List<AudioClip[]>();
-    public List<GameObject> audioObjects = new List<GameObject>();
+    public GameObject audioObject;
     public SkinnedMeshRenderer smr1;
     public SkinnedMeshRenderer[] smr2;
     public Animator a1, a2;
@@ -484,12 +483,10 @@ public class BoneMapper : MonoBehaviour
     public bool oneFrameAnimatorLeeWay = false;
     public PlayerControllerB mapperBody;
     public static bool firstMapperSpawn = true;
+    public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
-        if (mapperBody.name == "Player")
-        {
-        }
         desiredEvent = eventNum;
         PlayAnim(s, pos);
     }
@@ -526,27 +523,10 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                 }
-                if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
+                audioObject.GetComponent<AudioManager>().Stop();
+                if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
                 {
-                    audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-                    if (!currentClip.syncronizeAudio)
-                    {
-                        audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
-                    }
-
-                    if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
-                    {
-                        foreach (var item in allMappers)
-                        {
-                            if (!item.audioObjects[currentClip.syncPos])
-                            {
-                                DebugClass.Log($"The audioObject was null????????");
-                            }
-                            item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-                            item.audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
-
-                        }
-                    }
+                    listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
                 }
                 if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
                 {
@@ -651,13 +631,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     currentClip.customPostEventCodeSync.Invoke(this);
                 }
-                else
-                {
-                    foreach (var mapper in BoneMapper.allMappers)
-                    {
-                        mapper.audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
-                    }
-                }
+                //audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
             }
             else if (!currentClip.syncronizeAudio)
             {
@@ -666,12 +640,13 @@ public class BoneMapper : MonoBehaviour
                 {
                     currentClip.customPostEventCodeNoSync.Invoke(this);
                 }
-                else
-                {
-                    audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
-                }
+                //audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
             }
-            audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
+            audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio);
+            if (currentClip.syncronizeAudio && primaryAudioClips[currentClip.syncPos][currEvent] != null)
+            {
+                listOfCurrentEmoteAudio[currentClip.syncPos].Add(audioObject.GetComponent<AudioSource>());
+            }
         }
         SetAnimationSpeed(1);
         if (currentClip.secondaryClip != null && currentClip.secondaryClip.Length != 0)
@@ -863,21 +838,15 @@ public class BoneMapper : MonoBehaviour
         mapperBody = transform.parent.parent.parent.GetComponent<PlayerControllerB>();
         allMappers.Add(this);
 
-        foreach (var item in primaryAudioClips)
-        {
-            GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
-            if (item[0] != null)
-            {
-                obj.name = $"{item[0]}_AudioObject";
-            }
-            obj.transform.SetParent(transform);
-            obj.transform.localPosition = new Vector3(0, -10000, 0);
-            var source = obj.GetComponent<AudioSource>();
-            obj.AddComponent<AudioManager>().Setup(source);
-            source.playOnAwake = false;
-            source.volume = .3f; //TODO replace this with emotes volume config later
-            audioObjects.Add(obj);
-        }
+        GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
+        obj.name = $"{name}_AudioObject";
+        obj.transform.SetParent(transform);
+        obj.transform.localPosition = Vector3.zero;
+        var source = obj.GetComponent<AudioSource>();
+        obj.AddComponent<AudioManager>().Setup(source);
+        source.playOnAwake = false;
+        source.volume = .3f; //TODO replace this with emotes volume config later
+        audioObject = obj;
 
         int offset = 0;
         bool nuclear = true;
@@ -973,11 +942,6 @@ public class BoneMapper : MonoBehaviour
         {
             mapperBody.GetComponent<Collider>().enabled = !disableCollider;
         }
-        //TODO assign parent gameobject
-        //if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>())
-        //{
-        //    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = !lockPosition;
-        //}
         if (disableCollider && currentEmoteSpot)
         {
             if (currentEmoteSpot.GetComponent<EmoteLocation>().validPlayers != 0)
@@ -1104,19 +1068,10 @@ public class BoneMapper : MonoBehaviour
                     }
                     if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                     {
-                        if (!currentClip.syncronizeAudio)
+                        audioObject.GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
+                        if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
                         {
-                            audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
-                        }
-                        audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-
-                        if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
-                        {
-                            foreach (var item in allMappers)
-                            {
-                                item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-                                item.audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
-                            }
+                            listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
                         }
                     }
                     prevClip = currentClip;
@@ -1304,17 +1259,11 @@ public class BoneMapper : MonoBehaviour
             }
             if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
             {
-                audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-
-                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
+                audioObject.GetComponent<AudioManager>().Stop();
+                if (currentClip.syncronizeAudio)
                 {
-                    foreach (var item in allMappers)
-                    {
-                        item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-                        item.audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
-                    }
+                    listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
                 }
-                audioObjects[currentClip.syncPos].GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
             }
             if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
             {

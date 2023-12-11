@@ -29,36 +29,98 @@ namespace LethalEmotesAPI
                 audioSource.loop = true;
             }
         }
-        public void Play(int syncPos, int currEvent, bool looping)
+        public void Play(int syncPos, int currEvent, bool looping, bool sync)
         {
+            //emotes with multiple song choices are causing errors
             this.syncPos = syncPos;
             this.currEvent = currEvent;
-            try
+            if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0 && sync)
             {
-                audioSource.clip = BoneMapper.primaryAudioClips[syncPos][currEvent];
-                audioSource.Play();
-                if (BoneMapper.secondaryAudioClips[syncPos][currEvent] != null)
+                this.currEvent = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].gameObject.transform.parent.GetComponent<BoneMapper>().currEvent;
+            }
+
+            if (BoneMapper.secondaryAudioClips[syncPos].Length > currEvent && BoneMapper.secondaryAudioClips[syncPos][currEvent] != null)
+            {
+                if (CustomAnimationClip.syncTimer[syncPos] > BoneMapper.primaryAudioClips[syncPos][currEvent].length)
                 {
-                    needToContinueOnFinish = true;
+                    SetAndPlayAudio(BoneMapper.secondaryAudioClips[syncPos][currEvent]);
+                    SampleCheck();
+                    needToContinueOnFinish = false;
+                    audioSource.loop = true;
                 }
                 else
                 {
-                    audioSource.loop = looping;
-                    needToContinueOnFinish = false;
+                    SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                    SampleCheck();
+                    needToContinueOnFinish = true;
+                    audioSource.loop = false;
                 }
             }
-            catch (Exception)
+            else if (looping)
             {
-                DebugClass.Log($"{syncPos}  {BoneMapper.primaryAudioClips[syncPos]}  {BoneMapper.primaryAudioClips[syncPos].Length}           {BoneMapper.secondaryAudioClips[syncPos]}   {BoneMapper.secondaryAudioClips[syncPos].Length}");
+                SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                SampleCheck();
+                needToContinueOnFinish = false;
+                audioSource.loop = true;
+            }
+            else
+            {
+                SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                SampleCheck();
+                needToContinueOnFinish = false;
+                audioSource.loop = false;
             }
         }
         public void Stop()
         {
             audioSource.Stop();
+            needToContinueOnFinish = false;
         }
-        //public void Pause()
-        //{
+        public void SetAndPlayAudio(AudioClip a)
+        {
+            audioSource.clip = a;
+            audioSource.Play();
+        }
+        public void SampleCheck()
+        {
+            if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0)
+            {
+                audioSource.timeSamples = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].timeSamples;
+                var theBusStopProblem = gameObject.AddComponent<BusStop>();
+                theBusStopProblem.desiredSampler = BoneMapper.listOfCurrentEmoteAudio[syncPos][0];
+                theBusStopProblem.receiverSampler = audioSource;
+            }
+            else
+            {
+                audioSource.timeSamples = 0;
+            }
+        }
+    }
 
-        //}
+    public class BusStop : MonoBehaviour
+    {
+        public AudioSource desiredSampler;
+        public AudioSource receiverSampler;
+        int success = 0;
+        private void Update()
+        {
+            if (!desiredSampler)
+            {
+                DestroyImmediate(this);
+            }
+            if (desiredSampler.timeSamples != receiverSampler.timeSamples)
+            {
+                receiverSampler.timeSamples = desiredSampler.timeSamples;
+                success = 0;
+            }
+            else
+            {
+                success++;
+                if (success == 2)
+                {
+                    DestroyImmediate(this);
+                }
+            }
+        }
     }
 }
