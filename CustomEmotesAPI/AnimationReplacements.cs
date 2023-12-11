@@ -248,7 +248,7 @@ internal static class AnimationReplacements
         }
         try
         {
-            var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+            var nuts = Assets.Load<GameObject>("assets/customstuff/scavEmoteSkeleton.prefab");
             float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             test.scale = currScale / banditScale;
@@ -311,8 +311,9 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<int> syncPlayerCount = new List<int>();
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
     public bool vulnerableEmote = false;
+    public bool lockCameraByDefault = false;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, bool lockCameraByDefault = false)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -410,6 +411,8 @@ public class CustomAnimationClip : MonoBehaviour
                 }
             }
         }
+
+        this.lockCameraByDefault = lockCameraByDefault;
     }
     private static GameObject audioLoader;
 }
@@ -484,6 +487,8 @@ public class BoneMapper : MonoBehaviour
     public PlayerControllerB mapperBody;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
+    public EmoteConstraint cameraConstraint;
+
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
@@ -886,7 +891,13 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-
+        Camera c = mapperBody.GetComponentInChildren<Camera>();
+        if (c)
+        {
+            cameraConstraint = c.transform.parent.gameObject.AddComponent<EmoteConstraint>();
+            cameraConstraint.AddSource(c.transform.parent, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head));
+            cameraConstraint.revertTransform = revertTransform;
+        }
         if (jank)
         {
             foreach (var smr in smr2)
@@ -1090,23 +1101,27 @@ public class BoneMapper : MonoBehaviour
     }
     void HealthAndAutoWalk()
     {
-        //TODO autowalk
         //if (autoWalkSpeed != 0)
         //{
-        //    CharacterModel model = transform.GetComponentInParent<CharacterModel>();
-        //    if (model)
-        //    {
-        //        if (overrideMoveSpeed)
-        //        {
-        //            model.body.moveSpeed = autoWalkSpeed;
-        //        }
-        //        CharacterMotor motor = model.body.GetComponent<CharacterMotor>();
-        //        CharacterDirection direction = model.body.GetComponent<CharacterDirection>();
-        //        if (autoWalk && motor && direction)
-        //        {
-        //            motor.moveDirection = direction.forward * autoWalkSpeed;
-        //        }
-        //    }
+        //    mapperBody.moveInputVector = Vector2.zero;
+        //    Vector3 moveDir = autoWalkSpeed * mapperBody.transform.forward * Time.deltaTime;
+        //    moveDir.y = 0;
+        //    mapperBody.thisController.Move(moveDir);
+        //    //TODO maybe look at auto walk speed again, but I think it's fine?
+        //    //CharacterModel model = transform.GetComponentInParent<CharacterModel>();
+        //    //if (model)
+        //    //{
+        //    //    if (overrideMoveSpeed)
+        //    //    {
+        //    //        model.body.moveSpeed = autoWalkSpeed;
+        //    //    }
+        //    //    CharacterMotor motor = model.body.GetComponent<CharacterMotor>();
+        //    //    CharacterDirection direction = model.body.GetComponent<CharacterDirection>();
+        //    //    if (autoWalk && motor && direction)
+        //    //    {
+        //    //        motor.moveDirection = direction.forward * autoWalkSpeed;
+        //    //    }
+        //    //}
         //}
         if (h <= 0)
         {
@@ -1300,6 +1315,7 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
+        cameraConstraint.DeactivateConstraints();
         a1.enabled = animatorEnabled;
     }
     public void LockBones()
@@ -1345,6 +1361,14 @@ public class BoneMapper : MonoBehaviour
                         DebugClass.Log($"{e}");
                     }
                 }
+            }
+            if (/*(*/currentClip.lockCameraByDefault /*TODO || settings all lock on) && settings all off == false*/)
+            {
+                cameraConstraint.ActivateConstraints();
+            }
+            else
+            {
+                cameraConstraint.DeactivateConstraints();
             }
         }
         else
