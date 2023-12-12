@@ -17,16 +17,26 @@ namespace LethalEmotesAPI.Patches
             {
                 var matcher = new CodeMatcher(instructions);
 
+                //new CodeMatch(code => code.Calls(AccessTools.Method(typeof(IngamePlayerSettings), "get_Instance"))),
+                //    new CodeMatch(code => code.LoadsField(AccessTools.Field(typeof(IngamePlayerSettings), "playerInput"))),
                 matcher.MatchForward(true,
-                    new CodeMatch(code => code.IsLdarg(0)),
-                    new CodeMatch(code => code.Calls(AccessTools.Method(typeof(IngamePlayerSettings), "get_Instance"))),
-                    new CodeMatch(code => code.LoadsField(AccessTools.Field(typeof(IngamePlayerSettings), "playerInput"))),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldarg_0),
+                    new CodeMatch(code => code.opcode == OpCodes.Call),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldfld),
                     new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                     new CodeMatch(code => code.opcode == OpCodes.Ldstr),
                     new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
                     new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                     new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                    new CodeMatch(code => code.opcode == OpCodes.Stfld)
+                    new CodeMatch(code => code.opcode == OpCodes.Stfld),
+                    new CodeMatch(code => code.opcode == OpCodes.Call),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                    new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldstr),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
+                    new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                    new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                    new CodeMatch(code => code.opcode == OpCodes.Stloc_0)
                     );
 
                 matcher

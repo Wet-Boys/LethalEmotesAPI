@@ -380,6 +380,10 @@ public class CustomAnimationClip : MonoBehaviour
         joinSpots = _joinSpots;
         this.useSafePositionReset = safePositionReset;
         this.customName = customName;
+        if (customName != "NO_CUSTOM_NAME")
+        {
+            BoneMapper.customNamePairs.Add(customName, _clip[0].name);
+        }
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
 
         if (!audioLoader)
@@ -488,16 +492,24 @@ public class BoneMapper : MonoBehaviour
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
     public EmoteConstraint cameraConstraint;
+    public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
 
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
         desiredEvent = eventNum;
+        if (customNamePairs.ContainsKey(s))
+        {
+            s = customNamePairs[s];
+        }
         PlayAnim(s, pos);
     }
     public void PlayAnim(string s, int pos)
     {
-
+        if (customNamePairs.ContainsKey(s))
+        {
+            s = customNamePairs[s];
+        }
         prevClipName = currentClipName;
         if (s != "none")
         {
@@ -714,32 +726,6 @@ public class BoneMapper : MonoBehaviour
                 overrideMoveSpeed = false;
                 if (parentGameObject && !preserveParent)
                 {
-                    //TODO figure out a solution for teleporting players to safe spots
-                    //Vector3 OHYEAHHHHHH = mapperBody.gameObject.transform.position;
-                    //OHYEAHHHHHH = (TeleportHelper.FindSafeTeleportDestination(mapperBody.gameObject.transform.position, mapperBody, RoR2Application.rng)) ?? OHYEAHHHHHH;
-                    //Vector3 result = OHYEAHHHHHH;
-                    //RaycastHit raycastHit = default(RaycastHit);
-                    //Ray ray = new Ray(OHYEAHHHHHH + Vector3.up * 2f, Vector3.down);
-                    //float maxDistance = 4f;
-                    //if (Physics.SphereCast(ray, mapperBody.radius, out raycastHit, maxDistance, LayerIndex.world.mask))
-                    //{
-                    //    result.y = ray.origin.y - raycastHit.distance;
-                    //}
-                    //float bodyPrefabFootOffset = Util.GetBodyPrefabFootOffset(bodyPrefab);
-                    //result.y += bodyPrefabFootOffset;
-                    //if (!useSafePositionReset)
-                    //{
-                    //    Rigidbody rigidbody = mapperBody.gameObject.GetComponent<Rigidbody>();
-                    //    rigidbody.AddForce(new Vector3(0, 1, 0), ForceMode.VelocityChange);
-                    //    mapperBody.gameObject.transform.position += new Vector3(.1f, 2, .1f);
-                    //    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position += new Vector3(0, 10, 0);
-                    //}
-                    //else
-                    //{
-                    //    mapperBody.gameObject.transform.position = result;
-                    //    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position = result;
-                    //}
-                    mapperBody.gameObject.transform.position += new Vector3(0, 1, 0);
                     parentGameObject = null;
                 }
             }
@@ -763,32 +749,19 @@ public class BoneMapper : MonoBehaviour
                 else
                 {
                     mapperBody.gameObject.transform.localEulerAngles = new Vector3(0, mapperBody.gameObject.transform.localEulerAngles.y, 0);
-                    //TODO preserve parent functions
-                    //if (mapperBody.GetComponent<CharacterDirection>())
-                    //{
-                    //    mapperBody.GetComponent<CharacterDirection>().enabled = true;
-                    //}
                     if (ogScale != new Vector3(-69, -69, -69))
                     {
                         mapperBody.transform.localScale = ogScale;
                         ogScale = new Vector3(-69, -69, -69);
                     }
-                    if (ogLocation != new Vector3(-69, -69, -69))
+                    foreach (var item in mapperBody.GetComponentsInChildren<Collider>())
                     {
-                        mapperBody.gameObject.transform.localPosition = ogLocation;
-                        ogLocation = new Vector3(-69, -69, -69);
+                        item.enabled = true;
                     }
-                    if (mapperBody.GetComponent<Collider>())
+                    if (mapperBody.GetComponent<CharacterController>())
                     {
-                        mapperBody.GetComponent<Collider>().enabled = true;
+                        mapperBody.GetComponent<CharacterController>().enabled = true;
                     }
-                    //TODO preserve parent functions
-                    //if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
-                    //{
-                    //    Vector3 desired = mapperBody.gameObject.transform.position;
-                    //    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
-                    //    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
-                    //}
                 }
             }
             catch (Exception)
@@ -848,9 +821,9 @@ public class BoneMapper : MonoBehaviour
         obj.transform.SetParent(transform);
         obj.transform.localPosition = Vector3.zero;
         var source = obj.GetComponent<AudioSource>();
-        obj.AddComponent<AudioManager>().Setup(source);
+        obj.AddComponent<AudioManager>().Setup(source, this);
         source.playOnAwake = false;
-        source.volume = .3f; //TODO replace this with emotes volume config later
+        source.volume = Settings.EmotesVolume.Value / 100f;
         audioObject = obj;
 
         int offset = 0;
@@ -932,12 +905,6 @@ public class BoneMapper : MonoBehaviour
         {
             NewAnimation(null);
         }
-        //TODO assign parent gameobject
-        //if (!transform.GetComponentInParent<CharacterModel>())
-        //{
-        //    return;
-        //}
-        ogLocation = mapperBody.gameObject.transform.localPosition;
         ogScale = mapperBody.transform.localScale;
         if (scaleAsBandit)
             scaleDiff = ogScale / scale;
@@ -949,9 +916,13 @@ public class BoneMapper : MonoBehaviour
         rotationLock = lockRotation;
         scaleLock = lockScale;
 
-        if (mapperBody.GetComponent<Collider>())
+        foreach (var item in mapperBody.GetComponentsInChildren<Collider>())
         {
-            mapperBody.GetComponent<Collider>().enabled = !disableCollider;
+            item.enabled = !disableCollider;
+        }
+        if (mapperBody.GetComponent<CharacterController>())
+        {
+            mapperBody.GetComponent<CharacterController>().enabled = !disableCollider;
         }
         if (disableCollider && currentEmoteSpot)
         {
@@ -963,58 +934,11 @@ public class BoneMapper : MonoBehaviour
             currentEmoteSpot = null;
         }
     }
-    float interval = 0;
     Vector3 ogScale = new Vector3(-69, -69, -69);
-    Vector3 ogLocation = new Vector3(-69, -69, -69);
     Vector3 scaleDiff = Vector3.one;
-    float rtpcUpdateTimer = 0;
-    void DimmingChecks()
-    {
-        float closestDimmingSource = 20f;
-        foreach (var item in allMappers)// With the 20 Larva moon2 test https://cdn.discordapp.com/attachments/483371638340059156/1100077546256740412/Risk_of_Rain_2_7BN1yOoLBo.jpg
-        {                               // this section consumes about 7 of the 60 fps that I lose when they play an emote. Not great, but not terrible either, I will look elsewhere for optimization
-            try
-            {
-                if (item)
-                {
-                    if (item.a2.enabled && item.currentClip.dimAudioWhenClose)
-                    {
-                        if (Vector3.Distance(item.transform.parent.position, transform.position) < closestDimmingSource)
-                        {
-                            closestDimmingSource = Vector3.Distance(item.transform.position, transform.position);
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-        SetRTPCInDimming(closestDimmingSource);
-    }
-    void SetRTPCInDimming(float closestDimmingSource)
-    {
-        if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
-        {
-            Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-            //TODO audio settings
-            //AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
-        }
-        else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
-        {
-            Current_MSX = Mathf.Lerp(Current_MSX, CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-            if (Current_MSX + .01f > CustomEmotesAPI.Actual_MSX)
-            {
-                Current_MSX = CustomEmotesAPI.Actual_MSX;
-            }
-            //TODO audio settings
-            //AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
-        }
-    }
     void LocalFunctions()
     {
         //AudioFunctions();
-        DimmingChecks();
         try
         {
             if ((attacking && currentClip.stopOnAttack) || (moving && currentClip.stopOnMove))
@@ -1101,28 +1025,6 @@ public class BoneMapper : MonoBehaviour
     }
     void HealthAndAutoWalk()
     {
-        //if (autoWalkSpeed != 0)
-        //{
-        //    mapperBody.moveInputVector = Vector2.zero;
-        //    Vector3 moveDir = autoWalkSpeed * mapperBody.transform.forward * Time.deltaTime;
-        //    moveDir.y = 0;
-        //    mapperBody.thisController.Move(moveDir);
-        //    //TODO maybe look at auto walk speed again, but I think it's fine?
-        //    //CharacterModel model = transform.GetComponentInParent<CharacterModel>();
-        //    //if (model)
-        //    //{
-        //    //    if (overrideMoveSpeed)
-        //    //    {
-        //    //        model.body.moveSpeed = autoWalkSpeed;
-        //    //    }
-        //    //    CharacterMotor motor = model.body.GetComponent<CharacterMotor>();
-        //    //    CharacterDirection direction = model.body.GetComponent<CharacterDirection>();
-        //    //    if (autoWalk && motor && direction)
-        //    //    {
-        //    //        motor.moveDirection = direction.forward * autoWalkSpeed;
-        //    //    }
-        //    //}
-        //}
         if (h <= 0)
         {
             UnlockBones(enableAnimatorOnDeath);
@@ -1137,27 +1039,9 @@ public class BoneMapper : MonoBehaviour
             {
                 mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
                 mapperBody.transform.position = parentGameObject.transform.position;
-                //TODO maybe a replacement for motor and/or remove it
-                //CharacterMotor motor = mapperBody.GetComponent<CharacterMotor>();
-                Rigidbody rigidbody = mapperBody.GetComponent<Rigidbody>();
-                //TODO ^^^ and rigidbody
-                //if (motor)
-                //{
-                //    motor.velocity = Vector3.zero;
-                //}
-                //if (rigidbody)
-                //{
-                //    rigidbody.velocity = Vector3.zero;
-                //}
             }
             if (rotationLock)
             {
-                //TODO maybe get rid of character direction if we don't need it
-                //CharacterDirection direction = mapperBody.GetComponent<CharacterDirection>();
-                //if (direction)
-                //{
-                //    mapperBody.GetComponent<CharacterDirection>().enabled = false;
-                //}
                 mapperBody.transform.eulerAngles = parentGameObject.transform.eulerAngles + new Vector3(90, 0, 0);
             }
             if (scaleLock)
@@ -1362,7 +1246,7 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            if (/*(*/currentClip.lockCameraByDefault /*TODO || settings all lock on) && settings all off == false*/)
+            if ((currentClip.lockCameraByDefault || Settings.AllEmotesLockHead.Value) && !Settings.NoEmotesLockHead.Value)
             {
                 cameraConstraint.ActivateConstraints();
             }

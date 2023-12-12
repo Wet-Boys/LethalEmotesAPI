@@ -121,12 +121,12 @@ namespace EmotesAPI
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
                     {
                         buttonLock = true;
-                        PlayAnimation("VirtualInsanity");
+                        PlayAnimation("Hare Hare Yukai");
                     }
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.C]))
                     {
                         buttonLock = true;
-                        PlayAnimation("none"); 
+                        PlayAnimation("none");
                     }
                     if (InputControlExtensions.IsPressed(Keyboard.current[Key.G]))
                     {
@@ -202,8 +202,7 @@ namespace EmotesAPI
                     }
                 }
             }
-            DebugClass.Log($"end of update inputdir: {self.moveInputVector}");
-            
+
         }
         private static Hook playerControllerUpdateHook;
 
@@ -237,15 +236,14 @@ namespace EmotesAPI
         //Vector3 prevCamPosition = Vector3.zero;
         internal static void AutoWalking(PlayerControllerB player)
         {
-            DebugClass.Log($"{localMapper == player.GetComponentInChildren<BoneMapper>()}    {localMapper}    {player.GetComponentInChildren<BoneMapper>()}");
-            if (localMapper == player.GetComponentInChildren<BoneMapper>())
+            if (player == StartOfRound.Instance.localPlayerController) 
             {
-                DebugClass.Log($"{localMapper.autoWalkSpeed}");
-                if (localMapper.autoWalkSpeed != 0)
+                if (localMapper)
                 {
-                    DebugClass.Log($"after {player.moveInputVector}");
-                    player.moveInputVector = new Vector2(localMapper.autoWalkSpeed, 0);
-                    DebugClass.Log($"before {player.moveInputVector}");
+                    if (localMapper.autoWalkSpeed != 0)
+                    {
+                        player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
+                    }
                 }
             }
         }
@@ -285,118 +283,13 @@ namespace EmotesAPI
 
             AnimationReplacements.RunAll();
 
-
-            float WhosSteveJobs = 69420;
             CreateBaseNameTokenPairs();
-            if (Settings.DontTouchThis.Value < 101)
-            {
-                WhosSteveJobs = Settings.DontTouchThis.Value;
-            }
 
-            //TODO scene changed, so audio mainly
-            //On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
+            //TODO setup ui buttons somewhere early on?
+            //if (allClipNames != null)
             //{
-            //    orig(self, scene);
-            //    //TODO stuff
-            //    //AkSoundEngine.SetRTPCValue("Volume_Emotes", Settings.EmotesVolume.Value);
-            //    if (allClipNames != null)
-            //    {
-            //        ScrollManager.SetupButtons(allClipNames);
-            //    }
-            //    //TODO stuff
-            //    //AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
-            //    for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
-            //    {
-            //        CustomAnimationClip.syncTimer[i] = 0;
-            //        CustomAnimationClip.syncPlayerCount[i] = 0;
-            //    }
-            //    if (scene.name == "title" && WhosSteveJobs < 101)
-            //    {
-            //        //TODO stuff
-            //        //AkSoundEngine.SetRTPCValue("Volume_MSX", WhosSteveJobs);
-            //        Actual_MSX = WhosSteveJobs;
-            //        WhosSteveJobs = 69420;
-            //    }
-            //    foreach (var item in BoneMapper.allMappers)
-            //    {
-            //        try
-            //        {
-            //            foreach (var thing in audioContainers)
-            //            {
-            //                //TODO stuff
-            //                //AkSoundEngine.StopAll(thing);
-            //            }
-            //            if (item)
-            //            {
-            //                item.audioObjects[item.currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-            //                //TODO stuff
-            //                //AkSoundEngine.PostEvent(BoneMapper.stopEvents[item.currentClip.syncPos][item.currEvent], item.audioObjects[item.currentClip.syncPos]);
-            //            }
-            //        }
-            //        catch (System.Exception e)
-            //        {
-            //            DebugClass.Log($"Error when cleaning up audio on scene exit: {e}");
-            //        }
-            //    }
-            //    BoneMapper.allMappers.Clear();
-            //    localMapper = null;
-            //    EmoteLocation.visibile = true;
-            //};
-            //TODO base volume slider setting the actual_msx
-            //On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
-            //{
-            //    orig(self, newValue);
-            //    //Volume_MSX
-            //    if (self.GetFieldValue<string>("rtpcName") == "Volume_MSX" && WhosSteveJobs > 100)
-            //    {
-            //        Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
-            //        BoneMapper.Current_MSX = Actual_MSX;
-            //        Settings.DontTouchThis.Value = float.Parse(newValue, CultureInfo.InvariantCulture);
-            //    }
-            //};
-            //On.RoR2.PlayerCharacterMasterController.FixedUpdate += (orig, self) =>
-            //{
-            //    orig(self);
-            //    if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
-            //    {
-            //        if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
-            //        {
-            //            bool newState = false;
-            //            bool newState2 = false;
-            //            bool newState3 = false;
-            //            bool newState4 = false;
-            //            LocalUser localUser;
-            //            Rewired.Player player;
-            //            CameraRigController cameraRigController;
-            //            bool doIt = false;
-            //            if (!self.networkUser)
-            //            {
-            //                localUser = null;
-            //                player = null;
-            //                cameraRigController = null;
-            //                doIt = false;
-            //            }
-            //            else
-            //            {
-            //                localUser = self.networkUser.localUser;
-            //                player = self.networkUser.inputPlayer;
-            //                cameraRigController = self.networkUser.cameraRigController;
-            //                doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
-            //            }
-            //            if (doIt)
-            //            {
-            //                newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
-            //                newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
-            //                newState3 = player.GetButton(9);
-            //                newState4 = player.GetButton(10);
-            //                self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
-            //                self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
-            //                BoneMapper.attacking = newState || newState2 || newState3 || newState4;
-            //                BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
-            //            }
-            //        }
-            //    }
-            //};
+            //    ScrollManager.SetupButtons(allClipNames);
+            //}
 
 
             var types = Assembly.GetExecutingAssembly().GetTypes();
@@ -414,7 +307,6 @@ namespace EmotesAPI
             }
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
-            DebugClass.Log($"emote instance is {CustomEmotesAPI.instance}");
 
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
@@ -427,8 +319,6 @@ namespace EmotesAPI
             BoneMapper.allWorldProps.Add(new WorldProp(worldProp, joinSpots));
             return BoneMapper.allWorldProps.Count - 1;
         }
-        //TODO standard shader
-        //internal static Shader standardShader = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion().GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
         public static GameObject SpawnWorldProp(int propPos)
         {
             BoneMapper.allWorldProps[propPos].prop.GetComponent<WorldPropSpawnHandler>().propPos = propPos;
@@ -496,10 +386,18 @@ namespace EmotesAPI
         //}
         public static void PlayAnimation(string animationName, int pos = -2)
         {
+            if (BoneMapper.customNamePairs.ContainsKey(animationName))
+            {
+                animationName = BoneMapper.customNamePairs[animationName];
+            }
             EmoteNetworker.instance.SyncEmote(StartOfRound.Instance.localPlayerController.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
+            if (BoneMapper.customNamePairs.ContainsKey(animationName))
+            {
+                animationName = BoneMapper.customNamePairs[animationName];
+            }
             EmoteNetworker.instance.SyncEmote(mapper.mapperBody.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
         public static BoneMapper localMapper = null;
@@ -544,8 +442,6 @@ namespace EmotesAPI
                     }
                 }
             }
-            //TODO recalculate stats (probably can remove?)
-            //mapper.mapperBody.RecalculateStats();
             if (animChanged != null)
             {
                 animChanged(newAnimation, mapper);
