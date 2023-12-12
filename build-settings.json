@@ -2,7 +2,8 @@
   "References": [
     "Assembly-CSharp.dll",
     "Unity.Netcode.Components.dll",
-    "Unity.Netcode.Runtime.dll"
+    "Unity.Netcode.Runtime.dll",
+    "Unity.InputSystem.dll"
   ],
   "ProjectFile": "./CustomEmotesApi/LethalEmotesApi.csproj"
 }
