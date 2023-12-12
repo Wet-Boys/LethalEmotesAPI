@@ -357,3 +357,4 @@ MigrationBackup/
 
 .gameReferences/
 .env
+.tools/

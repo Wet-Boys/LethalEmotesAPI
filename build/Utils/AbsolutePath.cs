@@ -53,3 +53,21 @@ public class AbsolutePath
         return left / (AbsolutePath)right;
     }
 }
+
+internal static class AbsolutePathUtils
+{
+    public static void CopyFilesTo(this IEnumerable<AbsolutePath> files, AbsolutePath destDir)
+    {
+        foreach (var file in files)
+        {
+            var destFile = destDir / file.Name;
+            File.Copy(file, destFile, true);
+        }
+    }
+
+    public static void DeleteFiles(this IEnumerable<AbsolutePath> files)
+    {
+        foreach (var file in files)
+            File.Delete(file);
+    }
+}
