@@ -5,5 +5,6 @@
     "Unity.Netcode.Runtime.dll",
     "Unity.InputSystem.dll"
   ],
-  "ProjectFile": "./CustomEmotesApi/LethalEmotesApi.csproj"
+  "ProjectFile": "./CustomEmotesApi/LethalEmotesApi.csproj",
+  "ManifestAuthor": "Gemmumoddo"
 }

@@ -44,6 +44,8 @@ public class BuildContext : FrostingContext
     public string[] References { get; }
     
     public CSharpProject Project { get; }
+    
+    public string ManifestAuthor { get; }
 
     #endregion
     
@@ -71,6 +73,7 @@ public class BuildContext : FrostingContext
         var projectFilePath = (AbsolutePath)"../" / settings.ProjectFile;
         References = settings.References;
         Project = new CSharpProject(projectFilePath);
+        ManifestAuthor = settings.ManifestAuthor;
 
         UseStubbedLibs = context.Environment.GetEnvironmentVariable("USE_STUBBED_LIBS") is not null;
         GameDir = GetGameDirArg(context);
@@ -255,7 +258,7 @@ public sealed class BuildThunderstorePackage : FrostingTask<BuildContext>
         Directory.CreateDirectory(destDir);
 
         var version = context.Version ?? manifest!.version_number;
-        var destFile = destDir / $"Rune580-{manifest!.name}-{version}.zip";
+        var destFile = destDir / $"{context.ManifestAuthor}-{manifest!.name}-{version}.zip";
         if (File.Exists(destFile))
             File.Delete(destFile);
             
