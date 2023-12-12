@@ -54,6 +54,8 @@ public class BuildContext : FrostingContext
     public readonly AbsolutePath GameReferencesDir = new AbsolutePath("../") / ".gameReferences";
     
     public bool UseStubbedLibs { get; }
+    
+    public AbsolutePath[] DeployTargets { get; }
 
     public BuildContext(ICakeContext context) : base(context)
     {
@@ -77,6 +79,19 @@ public class BuildContext : FrostingContext
 
         UseStubbedLibs = context.Environment.GetEnvironmentVariable("USE_STUBBED_LIBS") is not null;
         GameDir = GetGameDirArg(context);
+
+        string deployTargetEnv = context.EnvironmentVariable("DeployTargets");
+        if (deployTargetEnv is not null)
+        {
+            DeployTargets = deployTargetEnv
+                .Split(";")
+                .Select(dir => new AbsolutePath(dir))
+                .ToArray();
+        }
+        else
+        {
+            DeployTargets = [];
+        }
     }
 
     private AbsolutePath? GetGameDirArg(ICakeContext context)
@@ -163,23 +178,24 @@ public sealed class DeployToGame : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        if (!Directory.Exists(context.GameDir!))
-            throw new Exception("Please make sure the game directory actually exists!");
-        
         var project = context.Project;
         
         AbsolutePath buildDir = project.Directory / "bin" / context.MsBuildConfiguration / "netstandard2.1";
-        AbsolutePath destDir = context.GameDir / "BepInEx" / "plugins" / project.Name;
 
-        if (!Directory.Exists(destDir))
-            Directory.CreateDirectory(destDir);
+        foreach (var target in context.DeployTargets)
+        {
+            AbsolutePath destDir = target / project.Name;
+
+            if (!Directory.Exists(destDir))
+                Directory.CreateDirectory(destDir);
             
-        buildDir.GlobFiles("*.dll", "*.pdb")
-            .ForEach(file =>
-            {
-                var destFile = destDir / file.Name;
-                File.Copy(file, destFile, true);
-            });
+            buildDir.GlobFiles("*.dll", "*.pdb")
+                .ForEach(file =>
+                {
+                    var destFile = destDir / file.Name;
+                    File.Copy(file, destFile, true);
+                });
+        }
     }
 }
 
