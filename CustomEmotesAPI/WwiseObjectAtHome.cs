@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EmotesAPI;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -11,9 +12,12 @@ namespace LethalEmotesAPI
         public AudioSource audioSource;
         public bool needToContinueOnFinish = false;
         int syncPos, currEvent;
-        internal void Setup(AudioSource source)
+        public BoneMapper mapper;
+        float audioTimer = 0;
+        internal void Setup(AudioSource source, BoneMapper mapper)
         {
             audioSource = source;
+            this.mapper = mapper;
         }
         private void Start()
         {
@@ -27,6 +31,19 @@ namespace LethalEmotesAPI
                 audioSource.Play();
                 needToContinueOnFinish = false;
                 audioSource.loop = true;
+            }
+            if (audioSource.isPlaying)
+            {
+                audioTimer += Time.deltaTime;
+                if (audioTimer > .75f)
+                {
+                    audioSource.volume = Settings.EmotesVolume.Value / 100f;
+                    audioTimer -= .75f;
+                    if (Settings.EmotesAlertEnemies.Value)
+                    {
+                        RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, .75f, 0, mapper.mapperBody.isInHangarShipRoom && mapper.mapperBody.playersManager.hangarDoorsClosed, 5);
+                    }
+                }
             }
         }
         public void Play(int syncPos, int currEvent, bool looping, bool sync)
