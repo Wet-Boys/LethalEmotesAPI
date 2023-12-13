@@ -10,13 +10,13 @@ namespace LethalEmotesAPI
     {
         public static EmotesInputSettings Instance = new();
 
-        [InputAction("<Keyboard>/", Name = "Open Emote Wheel")]
+        [InputAction("<Keyboard>/c", Name = "Open Emote Wheel")]
         public InputAction EmoteWheel { get; set; }
 
-        [InputAction("<Mouse>/left", Name = "Cycle Wheel Left")]
+        [InputAction("<Mouse>/leftButton", Name = "Cycle Wheel Left")]
         public InputAction Left {  get; set; }
 
-        [InputAction("<Mouse>/right", Name = "Cycle Wheel Right")]
+        [InputAction("<Mouse>/rightButton", Name = "Cycle Wheel Right")]
         public InputAction Right { get; set; }
 
         [InputAction("<Keyboard>/f", Name = "Play Random Emote")]

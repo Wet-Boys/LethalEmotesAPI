@@ -893,7 +893,7 @@ public class BoneMapper : MonoBehaviour
             }
             //a1.enabled = false;
         }
-
+        transform.localPosition = Vector3.zero;
         CustomEmotesAPI.MapperCreated(this);
 
     }
@@ -1067,6 +1067,27 @@ public class BoneMapper : MonoBehaviour
         }
         TwoPartThing();
         HealthAndAutoWalk();
+        RootMotion();
+    }
+    public Vector3 defaultVector = new Vector3(69, 69, 69);
+    public Vector3 prevMapperPos = new Vector3(69, 69, 69);
+    public Vector3 prevMapperRot = new Vector3(69, 69, 69);
+    public void RootMotion()
+    {
+        //TODO replace this with a bool that gets set based on each emote (part of animclipdata or whatever)
+        if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
+        {
+            return;
+        }
+
+
+        Vector3 tempPos = mapperBody.transform.position;
+        //float tempRot = mapperBody.transform.localEulerAngles.y;
+        mapperBody.transform.position = new Vector3(smr1.rootBone.position.x, mapperBody.transform.position.y, smr1.rootBone.position.z);
+        //DebugClass.Log($"{a2.GetBoneTransform(HumanBodyBones.Neck).localEulerAngles.y}        {a2.GetBoneTransform(HumanBodyBones.Head).localEulerAngles.y}");
+        //mapperBody.transform.localEulerAngles = new Vector3(mapperBody.transform.localEulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Neck).localEulerAngles.y, mapperBody.transform.localEulerAngles.z);
+        transform.position += tempPos - mapperBody.transform.position;
+        //transform.localEulerAngles += new Vector3(0, tempRot - mapperBody.transform.localEulerAngles.y, 0);
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
@@ -1181,7 +1202,10 @@ public class BoneMapper : MonoBehaviour
     }
     public void UnlockBones(bool animatorEnabled = true)
     {
-        //CustomEmotesAPI.instance.wackActive(this);
+        prevMapperPos = defaultVector;
+        prevMapperRot = defaultVector;
+        transform.position = Vector3.zero;
+        transform.localEulerAngles = new Vector3(90, 0, 0);
         foreach (var smr in smr2)
         {
             for (int i = 0; i < smr.bones.Length; i++)
@@ -1204,6 +1228,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void LockBones()
     {
+        transform.localPosition = Vector3.zero;
         foreach (var item in currentClip.soloIgnoredBones)
         {
             if (a2.GetBoneTransform(item))

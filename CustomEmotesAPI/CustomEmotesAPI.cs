@@ -204,7 +204,7 @@ namespace EmotesAPI
             }
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
-
+            //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
 
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
@@ -214,13 +214,13 @@ namespace EmotesAPI
 
         private void TestButton_performed(InputAction.CallbackContext obj)
         {
-            PlayAnimation("Hare Hare Yukai");
+
+            PlayAnimation("Markiplier");
         }
         private void EmoteWheel_performed(InputAction.CallbackContext obj)
         {
             //TODO remove this and replace with held whenever the emote wheel gets in
             PlayAnimation("none");
-
         }
 
         private void JoinEmote_performed(InputAction.CallbackContext obj)

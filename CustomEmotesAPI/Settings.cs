@@ -98,6 +98,8 @@ namespace EmotesAPI
             AllEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "All Emotes Lock Head", false, "If turned on, all emotes will lock the FPS camera, even if not specified by the emote itself");
             NoEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Lock Head", false, "If turned on, no emotes will lock the FPS camera, even if specified by the emote itself");
             EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", false, "If turned on, emotes will alert enemies like other sound sources.");
+            EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
+
 
             emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
             emote1 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes1", "none", "Messing with this here is not reccomended, like at all");
