@@ -39,6 +39,9 @@
   <ItemGroup>
     <AssemblyFiles Include="$(AdditionalLibsDir)*.dll" InProject="false" />
     <Reference Include="@(AssemblyFiles)" Private="false" />
+    <Reference Include="LethalCompanyInputUtils">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\plugins\LethalCompanyInputUtils\LethalCompanyInputUtils.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

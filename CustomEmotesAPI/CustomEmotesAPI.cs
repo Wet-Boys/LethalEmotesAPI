@@ -17,6 +17,7 @@ using Unity.Netcode;
 using UnityEngine.Networking;
 using UnityEngine.Experimental.Audio;
 using HarmonyLib;
+using LethalEmotesAPI;
 
 namespace EmotesAPI
 {
@@ -32,6 +33,7 @@ namespace EmotesAPI
         {
             public string nameToken;
             public Sprite sprite;
+
         }
         public static List<NameTokenWithSprite> nameTokenSpritePairs = new List<NameTokenWithSprite>();
         public static bool CreateNameTokenSpritePair(string nameToken, Sprite sprite)
@@ -104,107 +106,6 @@ namespace EmotesAPI
         }
         private static Hook playerControllerStartHook;
 
-        private void PlayerControllerUpdate(Action<PlayerControllerB> orig, PlayerControllerB self)
-        {
-            orig(self);
-            if (!(!self.isPlayerControlled || !((NetworkBehaviour)self).IsOwner))
-            {
-                if (buttonLock)
-                {
-                    if (!InputControlExtensions.IsPressed(Keyboard.current[Key.C]) && !InputControlExtensions.IsPressed(Keyboard.current[Key.G]) && !InputControlExtensions.IsPressed(Keyboard.current[Key.V]) && !InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
-                    {
-                        buttonLock = false;
-                    }
-                }
-                else
-                {
-                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.Y]))
-                    {
-                        buttonLock = true;
-                        PlayAnimation("Hare Hare Yukai");
-                    }
-                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.C]))
-                    {
-                        buttonLock = true;
-                        PlayAnimation("none");
-                    }
-                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.G]))
-                    {
-                        buttonLock = true;
-                        int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                        while (blacklistedClips.Contains(rand))
-                        {
-                            rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                        }
-                        PlayAnimation(allClipNames[rand]);
-                    }
-                    if (InputControlExtensions.IsPressed(Keyboard.current[Key.V]))
-                    {
-                        buttonLock = true;
-                        try
-                        {
-                            if (localMapper)
-                            {
-                                if (localMapper.currentEmoteSpot || localMapper.reservedEmoteSpot)
-                                {
-                                    localMapper.JoinEmoteSpot();
-                                }
-                                else
-                                {
-                                    foreach (var mapper in BoneMapper.allMappers)
-                                    {
-                                        try
-                                        {
-                                            if (mapper != localMapper)
-                                            {
-                                                if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
-                                                {
-                                                    nearestMapper = mapper;
-                                                }
-                                                else if (nearestMapper)
-                                                {
-                                                    if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
-                                                    {
-                                                        nearestMapper = mapper;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        catch (System.Exception)
-                                        {
-                                        }
-                                    }
-                                    if (nearestMapper)
-                                    {
-                                        PlayAnimation(nearestMapper.currentClip.clip[0].name);
-                                        DebugClass.Log($"{nearestMapper.currentClip.clip[0].name}");
-                                        DebugClass.Log($"{localMapper}");
-                                        DebugClass.Log($"{nearestMapper}");
-
-                                        Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
-                                    }
-                                    nearestMapper = null;
-                                }
-                            }
-                        }
-                        catch (System.Exception e)
-                        {
-                            DebugClass.Log($"had issue while attempting to join an emote as a client: {e}\nNotable info: [nearestMapper: {nearestMapper}] [localMapper: {localMapper}]");
-                            try
-                            {
-                                nearestMapper.currentClip.ToString();
-                                DebugClass.Log($"[nearestMapper.currentClip: {nearestMapper.currentClip.ToString()}] [nearestMapper.currentClip.clip[0]: {nearestMapper.currentClip.clip[0]}]");
-                            }
-                            catch (System.Exception)
-                            {
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-        private static Hook playerControllerUpdateHook;
 
         public static List<GameObject> networkedObjects = new List<GameObject>();
         private void NetworkManagerStart(Action<GameNetworkManager> orig, GameNetworkManager self)
@@ -268,10 +169,6 @@ namespace EmotesAPI
             var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             playerControllerStartHook = new Hook(targetMethod, destMethod, this);
 
-            targetMethod = typeof(PlayerControllerB).GetMethod("Update", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerUpdate), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            playerControllerUpdateHook = new Hook(targetMethod, destMethod, this);
-
             targetMethod = typeof(GameNetworkManager).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(NetworkManagerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             networkManagerStartHook = new Hook(targetMethod, destMethod, this);
@@ -308,7 +205,92 @@ namespace EmotesAPI
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
 
+
+            EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
+            EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
+            EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_performed;
+            EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
         }
+
+        private void TestButton_performed(InputAction.CallbackContext obj)
+        {
+            PlayAnimation("Hare Hare Yukai");
+        }
+        private void EmoteWheel_performed(InputAction.CallbackContext obj)
+        {
+            //TODO remove this and replace with held whenever the emote wheel gets in
+            PlayAnimation("none");
+
+        }
+
+        private void JoinEmote_performed(InputAction.CallbackContext obj)
+        {
+            try
+            {
+                if (localMapper)
+                {
+                    if (localMapper.currentEmoteSpot || localMapper.reservedEmoteSpot)
+                    {
+                        localMapper.JoinEmoteSpot();
+                    }
+                    else
+                    {
+                        foreach (var mapper in BoneMapper.allMappers)
+                        {
+                            try
+                            {
+                                if (mapper != localMapper)
+                                {
+                                    if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                                    {
+                                        nearestMapper = mapper;
+                                    }
+                                    else if (nearestMapper)
+                                    {
+                                        if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                        {
+                                            nearestMapper = mapper;
+                                        }
+                                    }
+                                }
+                            }
+                            catch (System.Exception)
+                            {
+                            }
+                        }
+                        if (nearestMapper)
+                        {
+                            PlayAnimation(nearestMapper.currentClip.clip[0].name);
+                            Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
+                        }
+                        nearestMapper = null;
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                DebugClass.Log($"had issue while attempting to join an emote as a client: {e}\nNotable info: [nearestMapper: {nearestMapper}] [localMapper: {localMapper}]");
+                try
+                {
+                    nearestMapper.currentClip.ToString();
+                    DebugClass.Log($"[nearestMapper.currentClip: {nearestMapper.currentClip.ToString()}] [nearestMapper.currentClip.clip[0]: {nearestMapper.currentClip.clip[0]}]");
+                }
+                catch (System.Exception)
+                {
+                }
+            }
+        }
+
+        private void RandomEmote_performed(InputAction.CallbackContext obj)
+        {
+            int rand = UnityEngine.Random.Range(0, allClipNames.Count);
+            while (blacklistedClips.Contains(rand))
+            {
+                rand = UnityEngine.Random.Range(0, allClipNames.Count);
+            }
+            PlayAnimation(allClipNames[rand]);
+        }
+
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
             worldProp.AddComponent<NetworkObject>();
@@ -516,81 +498,6 @@ namespace EmotesAPI
             if (emoteWheelPulledUp != null)
             {
                 emoteWheelPulledUp(wheel, localMapper);
-            }
-        }
-
-        void Update()
-        {
-            if (GetKeyPressed(Settings.RandomEmote))
-            {
-                int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                while (blacklistedClips.Contains(rand))
-                {
-                    rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                }
-                //foreach (var item in BoneMapper.allMappers)
-                //{
-                //    PlayAnimation(allClipNames[rand], item);
-                //}
-                DebugClass.Log($"attempting to play animation: {allClipNames[rand]}");
-                PlayAnimation(allClipNames[rand]);
-            }
-            if (GetKeyPressed(Settings.JoinEmote))
-            {
-                try
-                {
-                    if (localMapper)
-                    {
-                        if (localMapper.currentEmoteSpot || localMapper.reservedEmoteSpot)
-                        {
-                            localMapper.JoinEmoteSpot();
-                        }
-                        else
-                        {
-                            foreach (var mapper in BoneMapper.allMappers)
-                            {
-                                try
-                                {
-                                    if (mapper != localMapper)
-                                    {
-                                        if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
-                                        {
-                                            nearestMapper = mapper;
-                                        }
-                                        else if (nearestMapper)
-                                        {
-                                            if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
-                                            {
-                                                nearestMapper = mapper;
-                                            }
-                                        }
-                                    }
-                                }
-                                catch (System.Exception)
-                                {
-                                }
-                            }
-                            if (nearestMapper)
-                            {
-                                PlayAnimation(nearestMapper.currentClip.clip[0].name);
-                                Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
-                            }
-                            nearestMapper = null;
-                        }
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    DebugClass.Log($"had issue while attempting to join an emote as a client: {e}\nNotable info: [nearestMapper: {nearestMapper}] [localMapper: {localMapper}]");
-                    try
-                    {
-                        nearestMapper.currentClip.ToString();
-                        DebugClass.Log($"[nearestMapper.currentClip: {nearestMapper.currentClip.ToString()}] [nearestMapper.currentClip.clip[0]: {nearestMapper.currentClip.clip[0]}]");
-                    }
-                    catch (System.Exception)
-                    {
-                    }
-                }
             }
         }
         public static void ReserveJoinSpot(GameObject joinSpot, BoneMapper mapper)

@@ -39,7 +39,10 @@ namespace LethalEmotesAPI
                 {
                     audioSource.volume = Settings.EmotesVolume.Value / 100f;
                     audioTimer -= .75f;
-                    RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, .75f, 0, mapper.mapperBody.isInHangarShipRoom && mapper.mapperBody.playersManager.hangarDoorsClosed, 5);
+                    if (Settings.EmotesAlertEnemies.Value)
+                    {
+                        RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, .75f, 0, mapper.mapperBody.isInHangarShipRoom && mapper.mapperBody.playersManager.hangarDoorsClosed, 5);
+                    }
                 }
             }
         }

@@ -1,0 +1,1 @@
+Powershell.exe -ExecutionPolicy Bypass -File "%~dp0build.ps1" --target=Deploy

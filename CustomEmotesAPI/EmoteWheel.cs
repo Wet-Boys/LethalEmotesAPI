@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using EmotesAPI;
 using System.Collections;
+using LethalEmotesAPI;
 
 public class EmoteWheel : MonoBehaviour
 {
@@ -34,7 +35,118 @@ public class EmoteWheel : MonoBehaviour
     void Start()
     {
         transform.localPosition = new Vector3(0, 2000, 0);
+        EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_Pressed;
+        EmotesInputSettings.Instance.EmoteWheel.canceled += EmoteWheel_DePressed;
+        EmotesInputSettings.Instance.Left.started += Left_performed;
+        EmotesInputSettings.Instance.Right.started += Right_performed;
+        EmotesInputSettings.Instance.SetCurrentEmoteToWheel.started += SetCurrentEmoteToWheel_started;
     }
+
+    private void SetCurrentEmoteToWheel_started(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (selected != null && CustomEmotesAPI.allClipNames.Contains(CustomEmotesAPI.localMapper.currentClipName))
+        {
+            //TODO TMPUGUI
+            //selected.GetComponentInChildren<TextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
+            SaveWheelFromGame(activePage, selectedNum, CustomEmotesAPI.localMapper.currentClipName);
+            int actualPage = activePage == 0 ? 1 : activePage == 1 ? 0 : 2;
+            int number = (actualPage * 8) + selectedNum;
+            //TODO TMPUGUI
+            //ScrollManager.circularButtons[number].GetComponentInChildren<HGTextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
+            bLock = CustomEmotesAPI.localMapper.currentClipName;
+            RefreshWheels();
+        }
+    }
+
+    private void Right_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        Vector3 v = new Vector3(0, 0, 0);
+        if (transform.localPosition == v)
+        {
+            //Event.current.Use();
+            if (activePage == 1)
+            {
+                activePage = 2;
+                StartCoroutine(SwitchPage(rightPage));
+            }
+            if (activePage == 0)
+            {
+                activePage = 1;
+                StartCoroutine(SwitchPage(middlePage));
+            }
+        }
+    }
+
+    private void Left_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        Vector3 v = new Vector3(0, 0, 0);
+        if (transform.localPosition == v)
+        {
+            //Event.current.Use();
+            if (activePage == 1)
+            {
+                activePage = 0;
+                StartCoroutine(SwitchPage(leftPage));
+            }
+            if (activePage == 2)
+            {
+                activePage = 1;
+                StartCoroutine(SwitchPage(middlePage));
+            }
+        }
+    }
+
+    private void EmoteWheel_DePressed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        Vector3 v = new Vector3(0, 0, 0);
+        if (transform.localPosition == v)
+        {
+            try
+            {
+                XScale = Screen.width / 1980f;
+                YScale = Screen.height / 1080f;
+                if (Math.Abs(Input.mousePosition.x - (Screen.width / 2.0f)) < 30f * XScale && Math.Abs(Input.mousePosition.y - (Screen.height / 2.0f)) < 30f * YScale)
+                {
+                    CustomEmotesAPI.PlayAnimation("none");
+                }
+                else
+                {
+                    //TODO TMPUGUI
+                    //if (bLock != selected.GetComponentInChildren<TextMeshProUGUI>().text && !selected.GetComponentInChildren<TextMeshProUGUI>().text.StartsWith("Continue Playing Current E"))
+                    //    CustomEmotesAPI.PlayAnimation(selected.GetComponentInChildren<TextMeshProUGUI>().text);
+                }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log(e);
+            }
+            bLock = "asd";
+            //TODO gamepad support?
+            //if (events.cursorOpenerForGamepadCount > 0)
+            //{
+            //    events.cursorOpenerForGamepadCount -= 1;
+            //    events.cursorOpenerCount -= 1;
+            //}
+        }
+        transform.localPosition = new Vector3(0, 2000, 0);
+        StartCoroutine(SwitchPage(middlePage));
+        activePage = 1;
+    }
+
+    private void EmoteWheel_Pressed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        Vector3 v = new Vector3(0, 0, 0);
+        if (transform.localPosition != v)
+        {
+            //TODO joy again
+            //events.cursorOpenerForGamepadCount += 1;
+            //events.cursorOpenerCount += 1;
+            //CustomEmotesAPI.EmoteWheelOpened(joy.sprite);
+        }
+        transform.localPosition = v;
+
+    }
+
     internal void RefreshWheels()
     {
         for (int i = 0; i < gameObjects.Count; i++)
@@ -128,98 +240,6 @@ public class EmoteWheel : MonoBehaviour
         //        break;
         //}
         //DebugClass.Log($"----------{activePage} ---  {joy.color} ---  {joy.sprite.name}");
-        if (CustomEmotesAPI.GetKeyPressed(Settings.Left))
-        {
-            if (transform.localPosition == v)
-            {
-                //Event.current.Use();
-                if (activePage == 1)
-                {
-                    activePage = 0;
-                    StartCoroutine(SwitchPage(leftPage));
-                }
-                if (activePage == 2)
-                {
-                    activePage = 1;
-                    StartCoroutine(SwitchPage(middlePage));
-                }
-            }
-        }
-        if (CustomEmotesAPI.GetKeyPressed(Settings.Right))
-        {
-            if (transform.localPosition == v)
-            {
-                //Event.current.Use();
-                if (activePage == 1)
-                {
-                    activePage = 2;
-                    StartCoroutine(SwitchPage(rightPage));
-                }
-                if (activePage == 0)
-                {
-                    activePage = 1;
-                    StartCoroutine(SwitchPage(middlePage));
-                }
-            }
-        }
-        if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
-        {
-            if (transform.localPosition != v)
-            {
-                //TODO joy again
-                //events.cursorOpenerForGamepadCount += 1;
-                //events.cursorOpenerCount += 1;
-                //CustomEmotesAPI.EmoteWheelOpened(joy.sprite);
-            }
-            transform.localPosition = v;
-            if (CustomEmotesAPI.GetKeyPressed(Settings.SetCurrentEmoteToWheel) && selected != null && CustomEmotesAPI.allClipNames.Contains(CustomEmotesAPI.localMapper.currentClipName))
-            {
-                //TODO TMPUGUI
-                //selected.GetComponentInChildren<TextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
-                SaveWheelFromGame(activePage, selectedNum, CustomEmotesAPI.localMapper.currentClipName);
-                int actualPage = activePage == 0 ? 1 : activePage == 1 ? 0 : 2;
-                int number = (actualPage * 8) + selectedNum;
-                //TODO TMPUGUI
-                //ScrollManager.circularButtons[number].GetComponentInChildren<HGTextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
-                bLock = CustomEmotesAPI.localMapper.currentClipName;
-                RefreshWheels();
-            }
-        }
-        else
-        {
-            if (transform.localPosition == v)
-            {
-                try
-                {
-                    XScale = Screen.width / 1980f;
-                    YScale = Screen.height / 1080f;
-                    if (Math.Abs(Input.mousePosition.x - (Screen.width / 2.0f)) < 30f * XScale && Math.Abs(Input.mousePosition.y - (Screen.height / 2.0f)) < 30f * YScale)
-                    {
-                        CustomEmotesAPI.PlayAnimation("none");
-                    }
-                    else
-                    {
-                        //TODO TMPUGUI
-                        //if (bLock != selected.GetComponentInChildren<TextMeshProUGUI>().text && !selected.GetComponentInChildren<TextMeshProUGUI>().text.StartsWith("Continue Playing Current E"))
-                        //    CustomEmotesAPI.PlayAnimation(selected.GetComponentInChildren<TextMeshProUGUI>().text);
-                    }
-                }
-                catch (Exception e)
-                {
-                    DebugClass.Log(e);
-                }
-                bLock = "asd";
-                //TODO gamepad support?
-                //if (events.cursorOpenerForGamepadCount > 0)
-                //{
-                //    events.cursorOpenerForGamepadCount -= 1;
-                //    events.cursorOpenerCount -= 1;
-                //}
-            }
-            transform.localPosition = new Vector3(0, 2000, 0);
-            StartCoroutine(SwitchPage(middlePage));
-            activePage = 1;
-        }
     }
     private void SaveWheelFromGame(int currentPage, int currentSelected, string newEmoteName)
     {
@@ -270,14 +290,15 @@ public class EmoteWheel : MonoBehaviour
 
     void OnDestroy()
     {
-        if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
-        {
-            //TODO gamepad support?
-            //if (events.cursorOpenerForGamepadCount > 0)
-            //{
-            //    events.cursorOpenerForGamepadCount -= 1;
-            //    events.cursorOpenerCount -= 1;
-            //}
-        }
+        //TODO do we need to do this in lethal company?
+        //if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
+        //{
+        //    //TODO gamepad support?
+        //    //if (events.cursorOpenerForGamepadCount > 0)
+        //    //{
+        //    //    events.cursorOpenerForGamepadCount -= 1;
+        //    //    events.cursorOpenerCount -= 1;
+        //    //}
+        //}
     }
 }

@@ -10,16 +10,11 @@ namespace EmotesAPI
 {
     public static class Settings
     {
-        public static ConfigEntry<KeyboardShortcut> EmoteWheel;
-        public static ConfigEntry<KeyboardShortcut> Left;
-        public static ConfigEntry<KeyboardShortcut> Right;
-        public static ConfigEntry<KeyboardShortcut> RandomEmote;
-        public static ConfigEntry<KeyboardShortcut> JoinEmote;
-        public static ConfigEntry<KeyboardShortcut> SetCurrentEmoteToWheel;
         public static ConfigEntry<float> EmotesVolume;
         public static ConfigEntry<bool> HideJoinSpots;
         public static ConfigEntry<bool> AllEmotesLockHead;
         public static ConfigEntry<bool> NoEmotesLockHead;
+        public static ConfigEntry<bool> EmotesAlertEnemies;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
         public static ConfigEntry<string> emote0;
@@ -99,18 +94,10 @@ namespace EmotesAPI
                 //nut.transform.localScale = new Vector3(.8f, .8f, .8f);
             }
 
-            EmoteWheel = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Emote Wheel", new KeyboardShortcut(KeyCode.C), "Displays the emote wheel");
-            Left = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Cycle Wheel Left", new KeyboardShortcut(KeyCode.Mouse0), "Cycles the emote wheel left");
-            Right = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Cycle Wheel Right", new KeyboardShortcut(KeyCode.Mouse1), "Cycles the emote wheel right");
-            EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
-            RandomEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Play Random Emote", new KeyboardShortcut(KeyCode.G), "Plays a random emote from all available emotes");
-            JoinEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Join Nearest Syncing Emote", new KeyboardShortcut(KeyCode.V), "Picks the nearest player with a syncing emote and joins them");
-            SetCurrentEmoteToWheel = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Bind Current Emote To Wheel", new KeyboardShortcut(KeyCode.B), "Whenever you are performing an emote, if you pull up the emote wheel and press this key while hovering over an emote slot, it will bind the current emote to the selected slot.");
-
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             AllEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "All Emotes Lock Head", false, "If turned on, all emotes will lock the FPS camera, even if not specified by the emote itself");
             NoEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Lock Head", false, "If turned on, no emotes will lock the FPS camera, even if specified by the emote itself");
-
+            EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", false, "If turned on, emotes will alert enemies like other sound sources.");
 
             emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
             emote1 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes1", "none", "Messing with this here is not reccomended, like at all");
