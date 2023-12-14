@@ -17,7 +17,7 @@ public class EmoteWheel : MonoBehaviour
     internal static GameObject dontPlayButton;
 
     internal List<GameObject> gameObjects = new List<GameObject>();
-    //TODO input effectively
+    //TODO ui
     //internal Image joy;
 
     //internal RoR2.UI.MPInput input = GameObject.Find("MPEventSystem Player0").GetComponent<RoR2.UI.MPInput>();
