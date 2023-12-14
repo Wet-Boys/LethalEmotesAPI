@@ -28,5 +28,6 @@ namespace EmotesAPI
         public Action<BoneMapper> customPostEventCodeSync = null;
         public Action<BoneMapper> customPostEventCodeNoSync = null;
         public bool lockFPSHead = false;
+        public bool applyRootMotion;
     }
 }

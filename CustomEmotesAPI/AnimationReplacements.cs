@@ -312,8 +312,9 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
     public bool vulnerableEmote = false;
     public bool lockCameraByDefault = false;
+    public bool applyRootMotion = true;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, bool lockCameraByDefault = false)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, bool lockCameraByDefault = false, bool applyRootMotion = true)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -390,6 +391,7 @@ public class CustomAnimationClip : MonoBehaviour
         {
             DebugClass.Log($"preloading audio, this can take up to 30 seconds unfortunately but prevents microstutters when actually playing.");
             audioLoader = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
+            audioLoader.GetComponent<AudioSource>().volume = 0f;
         }
         audioLoader.name = "sugma balls";
         AudioSource a = audioLoader.GetComponent<AudioSource>();
@@ -417,6 +419,7 @@ public class CustomAnimationClip : MonoBehaviour
         }
 
         this.lockCameraByDefault = lockCameraByDefault;
+        this.applyRootMotion = applyRootMotion;
     }
     private static GameObject audioLoader;
 }
@@ -1074,20 +1077,25 @@ public class BoneMapper : MonoBehaviour
     public Vector3 prevMapperRot = new Vector3(69, 69, 69);
     public void RootMotion()
     {
-        //TODO replace this with a bool that gets set based on each emote (part of animclipdata or whatever)
-        if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
+        try
         {
-            return;
+            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
+            {
+                return;
+            }
+            if (currentClip.applyRootMotion)
+            {
+                Vector3 tempPos = transform.position;
+                Quaternion tempRot = transform.rotation;
+                mapperBody.transform.position = new Vector3(smr1.rootBone.position.x, mapperBody.transform.position.y, smr1.rootBone.position.z);
+                mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
+                transform.position = tempPos;
+                transform.rotation = tempRot;
+            }
         }
-
-
-        Vector3 tempPos = mapperBody.transform.position;
-        //float tempRot = mapperBody.transform.localEulerAngles.y;
-        mapperBody.transform.position = new Vector3(smr1.rootBone.position.x, mapperBody.transform.position.y, smr1.rootBone.position.z);
-        //DebugClass.Log($"{a2.GetBoneTransform(HumanBodyBones.Neck).localEulerAngles.y}        {a2.GetBoneTransform(HumanBodyBones.Head).localEulerAngles.y}");
-        //mapperBody.transform.localEulerAngles = new Vector3(mapperBody.transform.localEulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Neck).localEulerAngles.y, mapperBody.transform.localEulerAngles.z);
-        transform.position += tempPos - mapperBody.transform.position;
-        //transform.localEulerAngles += new Vector3(0, tempRot - mapperBody.transform.localEulerAngles.y, 0);
+        catch (Exception)
+        {
+        }
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
