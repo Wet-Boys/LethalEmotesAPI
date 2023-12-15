@@ -13,6 +13,7 @@
   ],
   "ProjectFile": "./CustomEmotesApi/LethalEmotesApi.csproj",
   "UiProjectFile": "./LethalEmotesApi.Ui/LethalEmotesApi.Ui.csproj",
+  "UiUnityDir": "./Unity-LethalEmotesApi-UI/",
   "ManifestAuthor": "Gemmumoddo",
   "NetcodePatcherRelease": "2.4.0"
 }

@@ -68,6 +68,7 @@ public class BuildContext : FrostingContext
     public readonly AbsolutePath StubbedFilesPath = new AbsolutePath("../") / "libs" / "stubbed-files.zip";
     public AbsolutePath BuildDir { get; }
     public AbsolutePath UiBuildDir { get; }
+    public AbsolutePath UiUnityAssetBundlesDir { get; }
 
     public BuildContext(ICakeContext context) : base(context)
     {
@@ -111,6 +112,8 @@ public class BuildContext : FrostingContext
 
         BuildDir = Project.Directory / "bin" / MsBuildConfiguration / "netstandard2.1";
         UiBuildDir = UiProject.Directory / "bin" / MsBuildConfiguration / "netstandard2.1";
+
+        UiUnityAssetBundlesDir = (AbsolutePath)"../" / settings.UiUnityDir / "AssetBundles" / "StandaloneWindows";
     }
 
     private AbsolutePath? GetGameDirArg(ICakeContext context)
@@ -193,9 +196,20 @@ public sealed class RestoreTask : FrostingTask<BuildContext>
     }
 }
 
+[TaskName("UpdateAssetBundles")]
+public sealed class UpdateAssetBundles : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        context.UiUnityAssetBundlesDir.GlobFiles("customemotes-ui")
+            .CopyFilesTo(context.Project.Directory);
+    }
+}
+
 [TaskName("Build")]
 [IsDependentOn(typeof(RestoreTask))]
 [IsDependentOn(typeof(FetchReferences))]
+[IsDependentOn(typeof(UpdateAssetBundles))]
 public sealed class BuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)

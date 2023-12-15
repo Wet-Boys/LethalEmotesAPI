@@ -20,6 +20,7 @@
     <EmbeddedResource Include="fineilldoitmyself" />
     <EmbeddedResource Include="moisture_animationreplacements" />
     <EmbeddedResource Include="scavbody" />
+    <EmbeddedResource Include="customemotes-ui" />
   </ItemGroup>
 
   <ItemGroup>
