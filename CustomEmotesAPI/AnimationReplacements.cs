@@ -1107,11 +1107,11 @@ public class BoneMapper : MonoBehaviour
     {
         try
         {
-            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none") || !local)
+            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
             {
                 return;
             }
-            if (currentClip.applyRootMotion)
+            if (local && currentClip.applyRootMotion)
             {
                 Vector3 tempPos = transform.position;
                 Quaternion tempRot = transform.rotation;
