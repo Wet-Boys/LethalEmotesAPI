@@ -47,6 +47,7 @@ public class BuildContext : FrostingContext
 
     public string[] References { get; }
     public CSharpProject Project { get; }
+    public CSharpProject UiProject { get; }
     public string ManifestAuthor { get; }
     public string NetcodePatcherRelease { get; }
 
@@ -66,6 +67,7 @@ public class BuildContext : FrostingContext
     public AbsolutePath PatcherDir { get; }
     public readonly AbsolutePath StubbedFilesPath = new AbsolutePath("../") / "libs" / "stubbed-files.zip";
     public AbsolutePath BuildDir { get; }
+    public AbsolutePath UiBuildDir { get; }
 
     public BuildContext(ICakeContext context) : base(context)
     {
@@ -87,6 +89,7 @@ public class BuildContext : FrostingContext
         var projectFilePath = (AbsolutePath)"../" / settings.ProjectFile;
         References = settings.References;
         Project = new CSharpProject(projectFilePath);
+        UiProject = new CSharpProject((AbsolutePath)"../" / settings.UiProjectFile);
         ManifestAuthor = settings.ManifestAuthor;
         NetcodePatcherRelease = settings.NetcodePatcherRelease;
 
@@ -107,6 +110,7 @@ public class BuildContext : FrostingContext
         }
 
         BuildDir = Project.Directory / "bin" / MsBuildConfiguration / "netstandard2.1";
+        UiBuildDir = UiProject.Directory / "bin" / MsBuildConfiguration / "netstandard2.1";
     }
 
     private AbsolutePath? GetGameDirArg(ICakeContext context)
@@ -233,7 +237,7 @@ public sealed class PatchNetcode : FrostingTask<BuildContext>
         patcherPluginsDir.GlobFiles("*_original.*")
             .DeleteFiles();
         
-        patcherPluginsDir.GlobFiles("*.dll", "*.pdb")
+        patcherPluginsDir.GlobFiles($"{context.Project.Name}.dll", $"{context.Project.Name}.dll")
             .CopyFilesTo(context.BuildDir);
     }
 }
@@ -249,21 +253,15 @@ public sealed class DeployToUnity : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        AbsolutePath unityPkgDir = (AbsolutePath)"../" / "Unity-LethalCompanyInputUtils" / "Packages";
-
-        var project = context.Project;
+        AbsolutePath unityPkgDir = (AbsolutePath)"../" / "Unity-LethalEmotesApi-UI" / "Packages";
         
-        AbsolutePath destDir = unityPkgDir / project.Name;
+        AbsolutePath destDir = unityPkgDir / context.UiProject.Name;
 
         if (!Directory.Exists(destDir))
             Directory.CreateDirectory(destDir);
             
-        context.BuildDir.GlobFiles("*.dll", "*.pdb")
-            .ForEach(file =>
-            {
-                var destFile = destDir / file.Name;
-                File.Copy(file, destFile, true);
-            });
+        context.UiBuildDir.GlobFiles("*.dll", "*.pdb")
+            .CopyFilesTo(destDir);
     }
 }
 

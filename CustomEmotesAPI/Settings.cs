@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using BepInEx.Configuration;
+using LethalEmotesApi.Ui;
+using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,32 +19,7 @@ namespace EmotesAPI
         public static ConfigEntry<bool> EmotesAlertEnemies;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
-        public static ConfigEntry<string> emote0;
-        public static ConfigEntry<string> emote1;
-        public static ConfigEntry<string> emote2;
-        public static ConfigEntry<string> emote3;
-        public static ConfigEntry<string> emote4;
-        public static ConfigEntry<string> emote5;
-        public static ConfigEntry<string> emote6;
-        public static ConfigEntry<string> emote7;
-        public static ConfigEntry<string> emote8;
-        public static ConfigEntry<string> emote9;
-        public static ConfigEntry<string> emote10;
-        public static ConfigEntry<string> emote11;
-        public static ConfigEntry<string> emote12;
-        public static ConfigEntry<string> emote13;
-        public static ConfigEntry<string> emote14;
-        public static ConfigEntry<string> emote15;
-        public static ConfigEntry<string> emote16;
-        public static ConfigEntry<string> emote17;
-        public static ConfigEntry<string> emote18;
-        public static ConfigEntry<string> emote19;
-        public static ConfigEntry<string> emote20;
-        public static ConfigEntry<string> emote21;
-        public static ConfigEntry<string> emote22;
-        public static ConfigEntry<string> emote23;
-
-
+        public static ConfigEntry<EmoteWheelSetData> EmoteWheelSetDataEntry;
 
         //TODO loading a base button
         //public static GameObject NakedButton = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/UI/NakedButton.prefab").WaitForCompletion();
@@ -99,32 +76,10 @@ namespace EmotesAPI
             NoEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Lock Head", false, "If turned on, no emotes will lock the FPS camera, even if specified by the emote itself");
             EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", false, "If turned on, emotes will alert enemies like other sound sources.");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
-
-
-            emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
-            emote1 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes1", "none", "Messing with this here is not reccomended, like at all");
-            emote2 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes2", "none", "Messing with this here is not reccomended, like at all");
-            emote3 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes3", "none", "Messing with this here is not reccomended, like at all");
-            emote4 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes4", "none", "Messing with this here is not reccomended, like at all");
-            emote5 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes5", "none", "Messing with this here is not reccomended, like at all");
-            emote6 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes6", "none", "Messing with this here is not reccomended, like at all");
-            emote7 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes7", "none", "Messing with this here is not reccomended, like at all");
-            emote8 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes8", "none", "Messing with this here is not reccomended, like at all");
-            emote9 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes9", "none", "Messing with this here is not reccomended, like at all");
-            emote10 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes10", "none", "Messing with this here is not reccomended, like at all");
-            emote11 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes11", "none", "Messing with this here is not reccomended, like at all");
-            emote12 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes12", "none", "Messing with this here is not reccomended, like at all");
-            emote13 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes13", "none", "Messing with this here is not reccomended, like at all");
-            emote14 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes14", "none", "Messing with this here is not reccomended, like at all");
-            emote15 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes15", "none", "Messing with this here is not reccomended, like at all");
-            emote16 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes16", "none", "Messing with this here is not reccomended, like at all");
-            emote17 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes17", "none", "Messing with this here is not reccomended, like at all");
-            emote18 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes18", "none", "Messing with this here is not reccomended, like at all");
-            emote19 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes19", "none", "Messing with this here is not reccomended, like at all");
-            emote20 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes20", "none", "Messing with this here is not reccomended, like at all");
-            emote21 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes21", "none", "Messing with this here is not reccomended, like at all");
-            emote22 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes22", "none", "Messing with this here is not reccomended, like at all");
-            emote23 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes23", "none", "Messing with this here is not reccomended, like at all");
+            
+            EmoteWheelSetDataEntry = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default(), "Json data of emote wheel");
+            EmoteWheelManager.GetEmoteWheelSetData = () => EmoteWheelSetDataEntry.Value;
+            EmoteWheelManager.SetEmoteWheelSetData = wheelSetData => EmoteWheelSetDataEntry.Value = wheelSetData;
 
             //TODO settings ROO
             //ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));

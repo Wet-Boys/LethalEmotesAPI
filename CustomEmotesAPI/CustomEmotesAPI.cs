@@ -18,6 +18,9 @@ using UnityEngine.Networking;
 using UnityEngine.Experimental.Audio;
 using HarmonyLib;
 using LethalEmotesAPI;
+using LethalEmotesAPI.Data;
+using LethalEmotesApi.Ui;
+using UnityEngine.InputSystem.Controls;
 
 namespace EmotesAPI
 {
@@ -151,6 +154,7 @@ namespace EmotesAPI
         public void Awake()
         {
             instance = this;
+            EmoteWheelSetDataConverter.Init();
             DebugClass.SetLogger(base.Logger);
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginGUID);
 
@@ -210,6 +214,8 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
             EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_performed;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
+
+            EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
         }
 
         private void TestButton_performed(InputAction.CallbackContext obj)
@@ -218,10 +224,19 @@ namespace EmotesAPI
             PlayAnimation("Hare Hare Yukai");
 
         }
-        private void EmoteWheel_performed(InputAction.CallbackContext obj)
+        private void EmoteWheel_performed(InputAction.CallbackContext ctx)
         {
-            //TODO remove this and replace with held whenever the emote wheel gets in
-            PlayAnimation("none");
+            var btn = (ButtonControl)ctx.control;
+
+            if (btn.wasPressedThisFrame)
+            {
+                EmoteWheelManager.OpenEmoteWheel();
+            }
+
+            if (btn.wasReleasedThisFrame)
+            {
+                EmoteWheelManager.CloseEmoteWheel();
+            }
         }
 
         private void JoinEmote_performed(InputAction.CallbackContext obj)
