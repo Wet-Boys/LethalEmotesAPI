@@ -1107,7 +1107,7 @@ public class BoneMapper : MonoBehaviour
     {
         try
         {
-            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none") && !local)
+            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none") || !local)
             {
                 return;
             }
