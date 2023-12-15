@@ -92,7 +92,6 @@ public class EmoteNetworker : NetworkBehaviour
     [ClientRpc]
     public void SyncJoinSpotToClientRpc(ulong playerId, ulong joinSpotId, bool worldProp, int posInArray)
     {
-        DebugClass.Log($"joining spot               1");
 
         GameObject bodyObject = GetNetworkObject(playerId).gameObject;
         GameObject spotObject = GetNetworkObject(joinSpotId).gameObject;
@@ -104,16 +103,12 @@ public class EmoteNetworker : NetworkBehaviour
         {
             DebugClass.Log($"spotObject is null!!!");
         }
-        DebugClass.Log($"joining spot               2");
 
         BoneMapper joinerMapper = bodyObject.GetComponentInChildren<BoneMapper>();
-        DebugClass.Log($"joining spot               3");
 
         joinerMapper.PlayAnim("none", 0);
-        DebugClass.Log($"joining spot               4");
 
         joinerMapper.currentEmoteSpot = spotObject.GetComponentsInChildren<EmoteLocation>()[posInArray].gameObject;
-        DebugClass.Log($"joining spot               5");
 
         if (worldProp)
         {
@@ -131,4 +126,45 @@ public class EmoteNetworker : NetworkBehaviour
         SyncJoinSpotToClientRpc(playerId, joinSpotId, worldProp, posInArray);
     }
 
+
+
+
+
+
+
+
+
+    public void SyncBoneMapperPos(ulong playerId, Vector3 pos, Quaternion rot)
+    {
+        if (IsOwner && IsServer)
+        {
+            SyncBoneMapperPosToClientRpc(playerId, pos, rot);
+        }
+        else
+        {
+            SyncBoneMapperPosToServerRpc(playerId, pos, rot);
+        }
+    }
+    [ClientRpc]
+    public void SyncBoneMapperPosToClientRpc(ulong playerId, Vector3 pos, Quaternion rot)
+    {
+        GameObject bodyObject = GetNetworkObject(playerId).gameObject;
+        if (!bodyObject)
+        {
+            DebugClass.Log($"Body is null!!!");
+        }
+        BoneMapper joinerMapper = bodyObject.GetComponentInChildren<BoneMapper>();
+        if (joinerMapper == CustomEmotesAPI.localMapper)
+        {
+            return;
+        }
+        joinerMapper.gameObject.transform.position = pos;
+        joinerMapper.gameObject.transform.rotation = rot;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncBoneMapperPosToServerRpc(ulong playerId, Vector3 pos, Quaternion rot)
+    {
+        SyncBoneMapperPosToClientRpc(playerId, pos, rot);
+    }
 }
