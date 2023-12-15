@@ -17,6 +17,7 @@ using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using LethalEmotesAPI;
 using UnityEngine.Audio;
+using System.Globalization;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -616,6 +617,10 @@ public class BoneMapper : MonoBehaviour
         if (s == "none")
         {
             a2.Play("none", -1, 0f);
+            if (local)
+            {
+                CustomEmotesAPI.hudAnimator.Play("none", -1, 0f);
+            }
             twopart = false;
             prevClip = currentClip;
             currentClip = null;
@@ -626,6 +631,7 @@ public class BoneMapper : MonoBehaviour
         }
 
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
+        AnimatorOverrideController hudAnimController = new AnimatorOverrideController(CustomEmotesAPI.hudAnimator.runtimeAnimatorController);
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
@@ -669,6 +675,20 @@ public class BoneMapper : MonoBehaviour
             }
         }
         SetAnimationSpeed(1);
+        StartAnimations(animController, pos, a2);
+        if (local)
+        {
+            CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
+            StartAnimations(hudAnimController, pos, CustomEmotesAPI.hudAnimator);
+
+        }
+        twopart = false;
+        NewAnimation(currentClip.joinSpots);
+
+        CustomEmotesAPI.Changed(s, this);
+    }
+    public void StartAnimations(AnimatorOverrideController animController, int pos, Animator animator)
+    {
         if (currentClip.secondaryClip != null && currentClip.secondaryClip.Length != 0)
         {
             if (true)
@@ -676,42 +696,37 @@ public class BoneMapper : MonoBehaviour
                 if (CustomAnimationClip.syncTimer[currentClip.syncPos] > currentClip.clip[pos].length)
                 {
                     animController["Floss"] = currentClip.secondaryClip[pos];
-                    a2.runtimeAnimatorController = animController;
-                    a2.Play("Loop", -1, ((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length);
+                    animator.runtimeAnimatorController = animController;
+                    animator.Play("Loop", -1, ((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length);
                 }
                 else
                 {
                     animController["Dab"] = currentClip.clip[pos];
                     animController["nobones"] = currentClip.secondaryClip[pos];
-                    a2.runtimeAnimatorController = animController;
-                    a2.Play("PoopToLoop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+                    animator.runtimeAnimatorController = animController;
+                    animator.Play("PoopToLoop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
                 }
             }
         }
         else if (currentClip.looping)
         {
             animController["Floss"] = currentClip.clip[pos];
-            a2.runtimeAnimatorController = animController;
+            animator.runtimeAnimatorController = animController;
             if (currentClip.clip[pos].length != 0)
             {
-                a2.Play("Loop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+                animator.Play("Loop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
             }
             else
             {
-                a2.Play("Loop", -1, 0);
+                animator.Play("Loop", -1, 0);
             }
         }
         else
         {
             animController["Default Dance"] = currentClip.clip[pos];
-            a2.runtimeAnimatorController = animController;
-            a2.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+            animator.runtimeAnimatorController = animController;
+            animator.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
         }
-
-        twopart = false;
-        NewAnimation(currentClip.joinSpots);
-
-        CustomEmotesAPI.Changed(s, this);
     }
     public void SetAnimationSpeed(float speed)
     {
@@ -821,7 +836,7 @@ public class BoneMapper : MonoBehaviour
 
         GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
         obj.name = $"{name}_AudioObject";
-        obj.transform.SetParent(transform);
+        obj.transform.SetParent(this.gameObject.transform);
         obj.transform.localPosition = Vector3.zero;
         var source = obj.GetComponent<AudioSource>();
         obj.AddComponent<AudioManager>().Setup(source, this);
@@ -964,6 +979,19 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+
+                    GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
+                    info.transform.SetParent(mapperBody.transform.parent);
+                    CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
+                    CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(90, 0, 0);
+                    CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
+                    CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
+                    CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
+                    if (!CustomEmotesAPI.animationControllerHolder)
+                    {
+                        CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+                    }
+                    CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                 }
             }
         }
@@ -1079,7 +1107,7 @@ public class BoneMapper : MonoBehaviour
     {
         try
         {
-            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
+            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none") && !local)
             {
                 return;
             }
@@ -1091,6 +1119,10 @@ public class BoneMapper : MonoBehaviour
                 mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
                 transform.position = tempPos;
                 transform.rotation = tempRot;
+                //if (local)
+                //{
+                EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, transform.position, transform.rotation);
+                //}
             }
         }
         catch (Exception)
