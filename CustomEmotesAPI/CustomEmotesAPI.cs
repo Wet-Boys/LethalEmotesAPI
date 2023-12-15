@@ -128,6 +128,28 @@ namespace EmotesAPI
         }
         private static Hook startOfRoundUpdateHook;
 
+        public static Animator hudAnimator;
+        public static GameObject hudObject;
+        public static GameObject baseHUDObject;
+        public static GameObject selfRedHUDObject;
+        private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
+        {
+            orig(self);
+            hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarimage2.prefab"));
+            hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
+            baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
+            selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+        }
+        private static Hook hudManagerAwakeHook;
+
+        private void HUDManagerUpdateHealthUI(Action<HUDManager, int, bool> orig, HUDManager self, int health, bool hurtPlayer = true)
+        {
+            orig(self, health, hurtPlayer);
+            hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+        }
+        private static Hook hudManagerUpdateHealthUIHook;
+
+
         private static bool buttonLock = false;
 
 
@@ -177,6 +199,14 @@ namespace EmotesAPI
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(StartOfRoundUpdate), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             startOfRoundUpdateHook = new Hook(targetMethod, destMethod, this);
 
+            targetMethod = typeof(HUDManager).GetMethod("Awake", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HUDManagerAwake), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            hudManagerAwakeHook = new Hook(targetMethod, destMethod, this);
+
+            targetMethod = typeof(HUDManager).GetMethod("UpdateHealthUI", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HUDManagerUpdateHealthUI), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            hudManagerUpdateHealthUIHook = new Hook(targetMethod, destMethod, this);
+
 
             AnimationReplacements.RunAll();
 
@@ -210,13 +240,25 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
             EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_performed;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
+            EmotesInputSettings.Instance.TestButton2.started += TestButton2_performed;
         }
+        int thing = 0;
 
+        private void TestButton2_performed(InputAction.CallbackContext obj)
+        {
+            PlayAnimation("Chika");
+        }
         private void TestButton_performed(InputAction.CallbackContext obj)
         {
-
-            PlayAnimation("Hare Hare Yukai");
-
+            try
+            {
+                PlayAnimation(allClipNames[thing]);
+            }
+            catch (Exception)
+            {
+                thing = -1;
+            }
+            thing++;
         }
         private void EmoteWheel_performed(InputAction.CallbackContext obj)
         {
@@ -404,6 +446,18 @@ namespace EmotesAPI
             {
                 //TODO emote wheel continue playing button (TMPUGUI is the issue)
                 //EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
+                if (newAnimation == "none")
+                {
+                    hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
+                    baseHUDObject.SetActive(true);
+                    selfRedHUDObject.SetActive(true);
+                }
+                else
+                {
+                    hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
+                    baseHUDObject.SetActive(false);
+                    selfRedHUDObject.SetActive(false);
+                }
             }
             foreach (var item in EmoteLocation.emoteLocations)
             {
