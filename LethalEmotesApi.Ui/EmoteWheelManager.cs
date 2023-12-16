@@ -39,7 +39,7 @@ public static class EmoteWheelManager
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
         
-        InteractionHandler.SetMenuLocked(true);
+        InteractionHandler.SetInEmoteUi(true);
         _emotesOpen = true;
     }
 
@@ -55,7 +55,7 @@ public static class EmoteWheelManager
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        InteractionHandler.SetMenuLocked(false);
+        InteractionHandler.SetInEmoteUi(false);
         _emotesOpen = false;
     }
 
