@@ -10,22 +10,22 @@ namespace LethalEmotesAPI
     {
         public static EmotesInputSettings Instance = new();
 
-        [InputAction("<Keyboard>/c", Name = "Open Emote Wheel")]
+        [InputAction("<Keyboard>/c", Name = "CustomEmotesAPI: Open Emote Wheel")]
         public InputAction EmoteWheel { get; set; }
 
-        [InputAction("<Mouse>/leftButton", Name = "Cycle Wheel Left")]
+        [InputAction("<Mouse>/leftButton", Name = "CustomEmotesAPI: Cycle Wheel Left")]
         public InputAction Left {  get; set; }
 
-        [InputAction("<Mouse>/rightButton", Name = "Cycle Wheel Right")]
+        [InputAction("<Mouse>/rightButton", Name = "CustomEmotesAPI: Cycle Wheel Right")]
         public InputAction Right { get; set; }
 
-        [InputAction("<Keyboard>/f", Name = "Play Random Emote")]
+        [InputAction("<Keyboard>/f", Name = "CustomEmotesAPI: Play Random Emote")]
         public InputAction RandomEmote {  get; set; }
 
-        [InputAction("<Keyboard>/v", Name = "Join Emote")]
+        [InputAction("<Keyboard>/v", Name = "CustomEmotesAPI: Join Emote")]
         public InputAction JoinEmote { get; set; }
 
-        [InputAction("<Keyboard>/b", Name = "Bind Currently Playing Emote To Current Selection")]
+        [InputAction("<Keyboard>/b", Name = "CustomEmotesAPI: Bind Currently Playing Emote To Current Selection")]
         public InputAction SetCurrentEmoteToWheel { get; set; }
 
         [InputAction("<Keyboard>/b", Name = "Fuck you")]

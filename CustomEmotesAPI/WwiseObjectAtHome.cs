@@ -27,6 +27,7 @@ namespace LethalEmotesAPI
         {
             if (!audioSource.isPlaying && needToContinueOnFinish)
             {
+                audioSource.timeSamples = 0;
                 audioSource.clip = BoneMapper.secondaryAudioClips[syncPos][currEvent];
                 audioSource.Play();
                 needToContinueOnFinish = false;
@@ -54,20 +55,35 @@ namespace LethalEmotesAPI
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0 && sync)
             {
                 this.currEvent = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].gameObject.transform.parent.GetComponent<BoneMapper>().currEvent;
+                currEvent = this.currEvent;
             }
 
             if (BoneMapper.secondaryAudioClips[syncPos].Length > currEvent && BoneMapper.secondaryAudioClips[syncPos][currEvent] != null)
             {
                 if (CustomAnimationClip.syncTimer[syncPos] > BoneMapper.primaryAudioClips[syncPos][currEvent].length)
                 {
-                    SetAndPlayAudio(BoneMapper.secondaryAudioClips[syncPos][currEvent]);
+                    if (Settings.DMCAFree.Value)
+                    {
+                        SetAndPlayAudio(BoneMapper.secondaryDMCAFreeAudioClips[syncPos][currEvent]);
+                    }
+                    else
+                    {
+                        SetAndPlayAudio(BoneMapper.secondaryAudioClips[syncPos][currEvent]);
+                    }
                     SampleCheck();
                     needToContinueOnFinish = false;
                     audioSource.loop = true;
                 }
                 else
                 {
-                    SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                    if (Settings.DMCAFree.Value)
+                    {
+                        SetAndPlayAudio(BoneMapper.primaryDMCAFreeAudioClips[syncPos][currEvent]);
+                    }
+                    else
+                    {
+                        SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                    }
                     SampleCheck();
                     needToContinueOnFinish = true;
                     audioSource.loop = false;
@@ -75,14 +91,29 @@ namespace LethalEmotesAPI
             }
             else if (looping)
             {
-                SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                if (Settings.DMCAFree.Value)
+                {
+                    SetAndPlayAudio(BoneMapper.primaryDMCAFreeAudioClips[syncPos][currEvent]);
+                }
+                else
+                {
+                    SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                }
                 SampleCheck();
                 needToContinueOnFinish = false;
                 audioSource.loop = true;
             }
             else
             {
-                SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                if (Settings.DMCAFree.Value)
+                {
+                    SetAndPlayAudio(BoneMapper.primaryDMCAFreeAudioClips[syncPos][currEvent]);
+                }
+                else
+                {
+                    DebugClass.Log($"BoneMapper.primaryAudioClips[{syncPos}][{currEvent}] == {BoneMapper.primaryAudioClips[syncPos][currEvent]}");
+                    SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
+                }
                 SampleCheck();
                 needToContinueOnFinish = false;
                 audioSource.loop = false;
@@ -102,6 +133,7 @@ namespace LethalEmotesAPI
         {
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0)
             {
+                DebugClass.Log($"setting timesamples");
                 audioSource.timeSamples = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].timeSamples;
                 var theBusStopProblem = gameObject.AddComponent<BusStop>();
                 theBusStopProblem.desiredSampler = BoneMapper.listOfCurrentEmoteAudio[syncPos][0];
@@ -109,6 +141,7 @@ namespace LethalEmotesAPI
             }
             else
             {
+                DebugClass.Log($"setting timesamples");
                 audioSource.timeSamples = 0;
             }
         }
@@ -127,13 +160,14 @@ namespace LethalEmotesAPI
             }
             if (desiredSampler.timeSamples != receiverSampler.timeSamples)
             {
+                DebugClass.Log($"setting timesamples in the bus stop");
                 receiverSampler.timeSamples = desiredSampler.timeSamples;
                 success = 0;
             }
             else
             {
                 success++;
-                if (success == 2)
+                if (success == 3)
                 {
                     DestroyImmediate(this);
                 }

@@ -11,6 +11,8 @@ namespace EmotesAPI
         public bool looping;
         public AudioClip[] _primaryAudioClips = null;
         public AudioClip[] _secondaryAudioClips = null;
+        public AudioClip[] _primaryDMCAFreeAudioClips = null;
+        public AudioClip[] _secondaryDMCAFreeAudioClips = null;
         public HumanBodyBones[] rootBonesToIgnore = null;
         public HumanBodyBones[] soloBonesToIgnore = null;
         public AnimationClip[] secondaryAnimation = null;
