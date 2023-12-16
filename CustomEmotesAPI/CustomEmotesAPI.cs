@@ -270,7 +270,6 @@ namespace EmotesAPI
             }
             catch (Exception)
             {
-                thing = -1;
             }
             thing++;
         }
@@ -408,7 +407,7 @@ namespace EmotesAPI
                 animationClipParams._secondaryAudioClips = new AudioClip[] { null };
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockFPSHead, animationClipParams.applyRootMotion);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType);
             if (animationClipParams.visible)
                 allClipNames.Add(animationClipParams.animationClip[0].name);
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
@@ -518,6 +517,11 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
                 }
+                if (mapper.currentClip.lockType == AnimationClipParams.LockType.rootMotion)
+                {
+                    mapper.prevMapperPos = mapper.transform.position;
+                    mapper.prevMapperRot = mapper.transform.eulerAngles;
+                }
             }
             else
             {
@@ -529,6 +533,8 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
                 }
+                mapper.transform.localPosition = Vector3.zero;
+                mapper.transform.localEulerAngles = new Vector3(90, 0, 0);
             }
         }
         public delegate void JoinedEmoteSpotBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);

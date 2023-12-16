@@ -14,8 +14,9 @@ namespace EmotesAPI
     {
         public static ConfigEntry<float> EmotesVolume;
         public static ConfigEntry<bool> HideJoinSpots;
-        public static ConfigEntry<bool> AllEmotesLockHead;
-        public static ConfigEntry<bool> NoEmotesLockHead;
+        public static ConfigEntry<bool> AllEmotesHaveRootMotion;
+        public static ConfigEntry<bool> NoEmotesHaveRootMotion;
+        public static ConfigEntry<bool> AllowHeadBobbing;
         public static ConfigEntry<bool> EmotesAlertEnemies;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
@@ -72,8 +73,9 @@ namespace EmotesAPI
             }
 
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
-            AllEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "All Emotes Lock Head", false, "If turned on, all emotes will lock the FPS camera, even if not specified by the emote itself");
-            NoEmotesLockHead = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Lock Head", false, "If turned on, no emotes will lock the FPS camera, even if specified by the emote itself");
+            AllEmotesHaveRootMotion = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "All Emotes Have Root Motion", false, "If turned on, all emotes will have root motion, even if not specified by the emote itself");
+            NoEmotesHaveRootMotion = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Have Root Motion", false, "If turned on, no emotes will have root motion, even if specified by the emote itself");
+            AllowHeadBobbing = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "Allow Head Bobbing Emotes", true, "Some emotes, even if they don't apply root motion, might have head bobbing, this can turn that off.");
             EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", false, "If turned on, emotes will alert enemies like other sound sources.");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
             
@@ -92,22 +94,22 @@ namespace EmotesAPI
             //ModSettingsManager.AddOption(new KeyBindOption(JoinEmote));
             EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
             HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
-            AllEmotesLockHead.SettingChanged += AllEmotesLock_SettingChanged;
-            NoEmotesLockHead.SettingChanged += NoEmotesLock_SettingChanged;
+            AllEmotesHaveRootMotion.SettingChanged += AllEmotesLock_SettingChanged;
+            NoEmotesHaveRootMotion.SettingChanged += NoEmotesLock_SettingChanged;
         }
 
         private static void AllEmotesLock_SettingChanged(object sender, EventArgs e)
         {
-            if (AllEmotesLockHead.Value)
+            if (AllEmotesHaveRootMotion.Value)
             {
-                NoEmotesLockHead.Value = false;
+                NoEmotesHaveRootMotion.Value = false;
             }
         }
         private static void NoEmotesLock_SettingChanged(object sender, EventArgs e)
         {
-            if (NoEmotesLockHead.Value)
+            if (NoEmotesHaveRootMotion.Value)
             {
-                AllEmotesLockHead.Value = false;
+                AllEmotesHaveRootMotion.Value = false;
             }
         }
         private static void HideJoinSpots_SettingChanged(object sender, EventArgs e)

@@ -313,10 +313,9 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<int> syncPlayerCount = new List<int>();
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
     public bool vulnerableEmote = false;
-    public bool lockCameraByDefault = false;
-    public bool applyRootMotion = true;
+    public AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, bool lockCameraByDefault = false, bool applyRootMotion = true)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -383,7 +382,7 @@ public class CustomAnimationClip : MonoBehaviour
         joinSpots = _joinSpots;
         this.useSafePositionReset = safePositionReset;
         this.customName = customName;
-        if (customName != "NO_CUSTOM_NAME")
+        if (customName != "")
         {
             BoneMapper.customNamePairs.Add(customName, _clip[0].name);
         }
@@ -419,9 +418,7 @@ public class CustomAnimationClip : MonoBehaviour
                 }
             }
         }
-
-        this.lockCameraByDefault = lockCameraByDefault;
-        this.applyRootMotion = applyRootMotion;
+        this.lockType = lockType;
     }
     private static GameObject audioLoader;
 }
@@ -558,7 +555,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
+                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
             }
         }
         catch (Exception)
@@ -1105,29 +1102,46 @@ public class BoneMapper : MonoBehaviour
         HealthAndAutoWalk();
         RootMotion();
     }
-    public Vector3 defaultVector = new Vector3(69, 69, 69);
     public Vector3 prevMapperPos = new Vector3(69, 69, 69);
-    public Vector3 prevMapperRot = new Vector3(69, 69, 69);
+    public Vector3 prevMapperRot = new Vector3();
     public void RootMotion()
     {
         try
         {
-            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none") && !local)
+            //just skip it all if we aren't playing anything
+            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
             {
                 return;
             }
-            if (currentClip.applyRootMotion)
+            //only do this if current animation applies root motion
+            if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
             {
-                Vector3 tempPos = transform.position;
-                Quaternion tempRot = transform.rotation;
-                mapperBody.transform.position = new Vector3(smr1.rootBone.position.x, mapperBody.transform.position.y, smr1.rootBone.position.z);
-                mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
-                transform.position = tempPos;
-                transform.rotation = tempRot;
-                //if (local)
-                //{
-                EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, transform.position, transform.rotation);
-                //}
+                //owner of the bonemapper
+                if (local)
+                {
+                    //grab current BoneMapper position
+                    Vector3 tempPos = transform.position;
+                    Quaternion tempRot = transform.rotation;
+
+                    //move player body
+                    mapperBody.transform.position = new Vector3(smr1.rootBone.position.x, mapperBody.transform.position.y, smr1.rootBone.position.z);
+                    mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
+
+                    //revert self to current BoneMapper position from earlier
+                    transform.position = tempPos;
+                    transform.rotation = tempRot;
+
+                    //tell server where we are now
+                    EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, transform.position, transform.eulerAngles);
+                }
+                //or not
+                else
+                {
+                    //move bonemapper to last synced position
+                    transform.position = prevMapperPos;
+                    transform.eulerAngles = prevMapperRot;
+                }
+
             }
         }
         catch (Exception)
@@ -1247,8 +1261,6 @@ public class BoneMapper : MonoBehaviour
     }
     public void UnlockBones(bool animatorEnabled = true)
     {
-        prevMapperPos = defaultVector;
-        prevMapperRot = defaultVector;
         transform.position = Vector3.zero;
         transform.localEulerAngles = new Vector3(90, 0, 0);
         foreach (var smr in smr2)
@@ -1316,9 +1328,15 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            if ((currentClip.lockCameraByDefault || Settings.AllEmotesLockHead.Value) && !Settings.NoEmotesLockHead.Value)
+            if (!Settings.NoEmotesHaveRootMotion.Value &&
+                (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.AllEmotesHaveRootMotion.Value || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
                 cameraConstraint.ActivateConstraints();
+            }
+            else if (Settings.AllowHeadBobbing.Value && currentClip.lockType == AnimationClipParams.LockType.headBobbing)
+            {
+                cameraConstraint.ActivateConstraints();
+                cameraConstraint.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
             }
             else
             {
