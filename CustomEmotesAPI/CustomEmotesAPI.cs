@@ -267,7 +267,7 @@ namespace EmotesAPI
             
             try
             {
-                PlayAnimation(shitmotewheel[thing]);
+                // PlayAnimation(shitmotewheel[thing]);
             }
             catch (Exception)
             {
