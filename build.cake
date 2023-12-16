@@ -27,12 +27,12 @@ Task("BuildAndPatch")
 Task("Deploy")
 .Does(() => {
    StartProcess("dotnet", "run --project ./build/Build.csproj --target=Deploy");
-})
+});
 
 Task("DeployUnity")
 .Does(() => {
    StartProcess("dotnet", "run --project ./build/Build.csproj --target=DeDeployUnity");
-})
+});
 
 Task("Default")
 .Does(() => {
