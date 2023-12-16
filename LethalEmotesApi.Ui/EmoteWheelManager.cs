@@ -58,4 +58,20 @@ public static class EmoteWheelManager
         InteractionHandler.SetMenuLocked(false);
         _emotesOpen = false;
     }
+
+    public static void WheelLeft()
+    {
+        if (WheelControllerInstance is null || !_emotesOpen)
+            return;
+        
+        WheelControllerInstance.NextWheel();
+    }
+
+    public static void WheelRight()
+    {
+        if (WheelControllerInstance is null || !_emotesOpen)
+            return;
+        
+        WheelControllerInstance.PrevWheel();
+    }
 }

@@ -249,6 +249,8 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
             EmotesInputSettings.Instance.EmoteWheel.canceled += EmoteWheelInteracted;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
+            EmotesInputSettings.Instance.Left.started += ctx => EmoteWheelManager.WheelLeft();
+            EmotesInputSettings.Instance.Right.started += ctx => EmoteWheelManager.WheelRight();
 
             EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
         }

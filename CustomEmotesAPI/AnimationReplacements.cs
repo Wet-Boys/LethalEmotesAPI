@@ -993,7 +993,23 @@ public class BoneMapper : MonoBehaviour
                     
                     var quickMenu = mapperBody.quickMenuManager;
                     EmoteWheelManager.InteractionHandler = new EmoteInteractionHandler(() => quickMenu.isMenuOpen || mapperBody.isTypingChat || mapperBody.inTerminalMenu,
-                        locked => quickMenu.isMenuOpen = locked);
+                        locked =>
+                        {
+                            quickMenu.isMenuOpen = locked;
+
+                            if (locked)
+                            {
+                                mapperBody.playerActions.asset["ActivateItem"].Disable();
+                                mapperBody.playerActions.asset["Use"].Disable();
+                                mapperBody.playerActions.asset["PingScan"].Disable();
+                            }
+                            else
+                            {
+                                mapperBody.playerActions.asset["ActivateItem"].Enable();
+                                mapperBody.playerActions.asset["Use"].Enable();
+                                mapperBody.playerActions.asset["PingScan"].Enable();
+                            }
+                        });
                 }
             }
         }
