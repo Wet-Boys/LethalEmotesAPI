@@ -24,10 +24,17 @@ namespace EmotesAPI
         public int joinPref = -1;
         public JoinSpot[] joinSpots = null;
         public bool useSafePositionReset = false;
-        public string customName = "NO_CUSTOM_NAME";
+        public string customName = "";
         public Action<BoneMapper> customPostEventCodeSync = null;
         public Action<BoneMapper> customPostEventCodeNoSync = null;
-        public bool lockFPSHead = false;
-        public bool applyRootMotion;
+        public LockType lockType = LockType.none;
+
+        public enum LockType
+        {
+            none,
+            headBobbing,
+            lockHead,
+            rootMotion
+        }
     }
 }

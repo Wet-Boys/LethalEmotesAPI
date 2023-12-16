@@ -134,7 +134,7 @@ public class EmoteNetworker : NetworkBehaviour
 
 
 
-    public void SyncBoneMapperPos(ulong playerId, Vector3 pos, Quaternion rot)
+    public void SyncBoneMapperPos(ulong playerId, Vector3 pos, Vector3 rot)
     {
         if (IsOwner && IsServer)
         {
@@ -146,7 +146,7 @@ public class EmoteNetworker : NetworkBehaviour
         }
     }
     [ClientRpc]
-    public void SyncBoneMapperPosToClientRpc(ulong playerId, Vector3 pos, Quaternion rot)
+    public void SyncBoneMapperPosToClientRpc(ulong playerId, Vector3 pos, Vector3 rot)
     {
         GameObject bodyObject = GetNetworkObject(playerId).gameObject;
         if (!bodyObject)
@@ -158,12 +158,12 @@ public class EmoteNetworker : NetworkBehaviour
         {
             return;
         }
-        joinerMapper.gameObject.transform.position = pos;
-        joinerMapper.gameObject.transform.rotation = rot;
+        joinerMapper.prevMapperPos = pos;
+        joinerMapper.prevMapperRot = rot;
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SyncBoneMapperPosToServerRpc(ulong playerId, Vector3 pos, Quaternion rot)
+    public void SyncBoneMapperPosToServerRpc(ulong playerId, Vector3 pos, Vector3 rot)
     {
         SyncBoneMapperPosToClientRpc(playerId, pos, rot);
     }

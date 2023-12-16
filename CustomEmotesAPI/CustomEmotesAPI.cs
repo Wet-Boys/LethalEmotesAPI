@@ -241,14 +241,60 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_performed;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
             EmotesInputSettings.Instance.TestButton2.started += TestButton2_performed;
+            EmotesInputSettings.Instance.TestButton3.started += TestButton3_performed;
+            EmotesInputSettings.Instance.TestButton4.started += TestButton4_started;
+            EmotesInputSettings.Instance.TestButton5.started += TestButton5_started;
+            EmotesInputSettings.Instance.TestButton6.started += TestButton6_started;
+            EmotesInputSettings.Instance.TestButton7.started += TestButton7_started;
         }
+
+        private void TestButton7_started(InputAction.CallbackContext obj)
+        {
+            string name = allClipNames[thing];
+            if (BoneMapper.customNamePairs.ContainsKey(name))
+            {
+                name = BoneMapper.customNamePairs[name];
+            }
+            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.lockHead;
+            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
+        }
+
+        private void TestButton6_started(InputAction.CallbackContext obj)
+        {
+            string name = allClipNames[thing];
+            if (BoneMapper.customNamePairs.ContainsKey(name))
+            {
+                name = BoneMapper.customNamePairs[name];
+            }
+            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.none;
+            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
+        }
+
+        private void TestButton5_started(InputAction.CallbackContext obj)
+        {
+            string name = allClipNames[thing];
+            if (BoneMapper.customNamePairs.ContainsKey(name))
+            {
+                name = BoneMapper.customNamePairs[name];
+            }
+            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.rootMotion;
+            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
+        }
+
+        private void TestButton4_started(InputAction.CallbackContext obj)
+        {
+            string name = allClipNames[thing];
+            if (BoneMapper.customNamePairs.ContainsKey(name))
+            {
+                name = BoneMapper.customNamePairs[name];
+            }
+            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.headBobbing;
+            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
+        }
+
         int thing = 0;
 
         private void TestButton2_performed(InputAction.CallbackContext obj)
-        {
-            PlayAnimation("Chika");
-        }
-        private void TestButton_performed(InputAction.CallbackContext obj)
         {
             try
             {
@@ -256,9 +302,29 @@ namespace EmotesAPI
             }
             catch (Exception)
             {
-                thing = -1;
             }
+        }
+        private void TestButton_performed(InputAction.CallbackContext obj)
+        {
             thing++;
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log(allClipNames[thing]);
+        }
+        private void TestButton3_performed(InputAction.CallbackContext obj)
+        {
+            thing--;
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log($"");
+            DebugClass.Log(allClipNames[thing]);
         }
         private void EmoteWheel_performed(InputAction.CallbackContext obj)
         {
@@ -378,7 +444,7 @@ namespace EmotesAPI
                 animationClipParams._secondaryAudioClips = new AudioClip[] { null };
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockFPSHead, animationClipParams.applyRootMotion);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType);
             if (animationClipParams.visible)
                 allClipNames.Add(animationClipParams.animationClip[0].name);
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
@@ -488,6 +554,11 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
                 }
+                if (mapper.currentClip.lockType == AnimationClipParams.LockType.rootMotion)
+                {
+                    mapper.prevMapperPos = mapper.transform.position;
+                    mapper.prevMapperRot = mapper.transform.eulerAngles;
+                }
             }
             else
             {
@@ -499,6 +570,8 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
                 }
+                mapper.transform.localPosition = Vector3.zero;
+                mapper.transform.localEulerAngles = new Vector3(90, 0, 0);
             }
         }
         public delegate void JoinedEmoteSpotBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
