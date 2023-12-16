@@ -8,6 +8,8 @@ public class ProjectBuildSettings
 {
     public required string[] References { get; set; }
     public required string ProjectFile { get; set; }
+    public required string UiProjectFile { get; set; }
+    public required string UiUnityDir { get; set; }
     public required string ManifestAuthor { get; set; }
     public required string NetcodePatcherRelease { get; set; }
 
