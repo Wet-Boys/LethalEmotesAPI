@@ -289,6 +289,10 @@ public sealed class DeployToUnity : FrostingTask<BuildContext>
             
         context.UiBuildDir.GlobFiles("*.dll", "*.pdb")
             .CopyFilesTo(destDir);
+        
+        AbsolutePath packageFile = destDir / "package.json";
+        if (!File.Exists(packageFile))
+            File.WriteAllText(packageFile, "{\"name\": \"com.gemumoddo.lethalemotesapi.ui\",\"version\": \"0.1.0\"}");
     }
 }
 
