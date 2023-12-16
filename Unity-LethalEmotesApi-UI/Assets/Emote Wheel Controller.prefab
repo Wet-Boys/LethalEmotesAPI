@@ -225,12 +225,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4701963996636128679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -605478304, guid: f7dc9c9d48c7de446beff08c83f8fac4, type: 3}
+  m_Script: {fileID: -605478304, guid: b2c656f14b2d18f468e54fdcaa06a25c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   xScale: 500
   zScale: 10
-  wheelPrefab: {fileID: 68377981483171356, guid: e4ec11a8fc0475542b0d54208c818136, type: 3}
+  wheelPrefab: {fileID: 68377981483171356, guid: 170d2ec24334c064ea30495916507f24, type: 3}
   tweenCurve:
     serializedVersion: 2
     m_Curve:

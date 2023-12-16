@@ -71,13 +71,10 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-/[Pp]ackages/BepInExPack
-/[Pp]ackages/Lethal Company
-/[Pp]ackages/**/*.dll
-/[Pp]ackages/**/*.dll.meta
-!/[Pp]ackages/manifest.json
-
 /[Aa]ssets/[Tt]hunder[Kk]it[Ss]ettings/
 /[Aa]ssets/[Tt]hunder[Kk]it[Ss]ettings/*
 /[Aa]ssets/[Ss]treamingAssets
 /[Aa]ssets/TextMesh Pro
+
+/[Aa]ssets/TextMesh Pro.meta
+/[Pp]roject[Ss]ettings/Packages/*
