@@ -253,26 +253,11 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.Right.started += ctx => EmoteWheelManager.WheelRight();
             EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
         }
-        int thing = 0;
-
-        private void TestButton2_performed(InputAction.CallbackContext obj)
-        {
-            PlayAnimation("Chika");
-        }
         
         private void TestButton_performed(InputAction.CallbackContext obj)
         {
             if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
                 return;
-            
-            try
-            {
-                PlayAnimation(shitmotewheel[thing]);
-            }
-            catch (Exception)
-            {
-            }
-            thing++;
         }
         
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
