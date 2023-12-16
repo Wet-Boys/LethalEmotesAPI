@@ -39,6 +39,7 @@ public class BuildContext : FrostingContext
     public AbsolutePath? GameDir { get; }
     
     public readonly string? Version;
+    public readonly bool SkipPatching;
 
     #endregion
 
@@ -75,7 +76,8 @@ public class BuildContext : FrostingContext
         PatcherDir = ToolsDir / "netcode-patcher";
         
         DotEnv.Load(new DotEnvOptions(envFilePaths: new[] { "../.env" }));
-        
+
+        SkipPatching = context.HasArgument("skipPatching");
         MsBuildConfiguration = context.Argument<string>("configuration", "Debug");
         Version = context.EnvironmentVariable("RELEASE_VERSION");
 
@@ -150,6 +152,9 @@ public sealed class SetupNetcodePatcher : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
+        if (context.SkipPatching)
+            return false;
+        
         if (!Directory.Exists(context.PatcherDir))
             return true;
 
@@ -226,6 +231,14 @@ public sealed class BuildTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public sealed class PatchNetcode : FrostingTask<BuildContext>
 {
+    public override bool ShouldRun(BuildContext context)
+    {
+        if (context.SkipPatching)
+            return false;
+
+        return true;
+    }
+
     public override void Run(BuildContext context)
     {
         AbsolutePath patcherPluginsDir = context.PatcherDir / "plugins";

@@ -142,6 +142,9 @@ namespace EmotesAPI
             hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
             baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
             selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+
+            var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote wheel controller.prefab"),
+                self.PlayerInfo.canvasGroup.transform.parent.parent);
         }
         private static Hook hudManagerAwakeHook;
 
@@ -184,6 +187,7 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
             CustomEmotesAPI.LoadResource("scavbody");
+            LoadResource("customemotes-ui");
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -242,7 +246,8 @@ namespace EmotesAPI
 
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
-            EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_performed;
+            EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
+            EmotesInputSettings.Instance.EmoteWheel.canceled += EmoteWheelInteracted;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
 
             EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
@@ -256,6 +261,9 @@ namespace EmotesAPI
         
         private void TestButton_performed(InputAction.CallbackContext obj)
         {
+            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+                return;
+            
             try
             {
                 PlayAnimation(allClipNames[thing]);
@@ -267,7 +275,7 @@ namespace EmotesAPI
             thing++;
         }
         
-        private void EmoteWheel_performed(InputAction.CallbackContext ctx)
+        private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
         {
             var btn = (ButtonControl)ctx.control;
 
@@ -284,6 +292,9 @@ namespace EmotesAPI
 
         private void JoinEmote_performed(InputAction.CallbackContext obj)
         {
+            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+                return;
+            
             try
             {
                 if (localMapper)
@@ -342,6 +353,9 @@ namespace EmotesAPI
 
         private void RandomEmote_performed(InputAction.CallbackContext obj)
         {
+            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+                return;
+            
             int rand = UnityEngine.Random.Range(0, allClipNames.Count);
             while (blacklistedClips.Contains(rand))
             {

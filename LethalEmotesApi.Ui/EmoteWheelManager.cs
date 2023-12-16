@@ -1,4 +1,5 @@
 using LethalEmotesApi.Ui.Data;
+using UnityEngine;
 
 namespace LethalEmotesApi.Ui;
 
@@ -15,6 +16,8 @@ public static class EmoteWheelManager
     public delegate void SetEmoteWheelSetDataDelegate(EmoteWheelSetData wheelSetData);
     public static SetEmoteWheelSetDataDelegate? SetEmoteWheelSetData;
 
+    public static EmoteInteractionHandler? InteractionHandler;
+
     internal static void EmoteSelected(string emote)
     {
         OnEmoteSelected?.Invoke(emote);
@@ -22,13 +25,37 @@ public static class EmoteWheelManager
 
     internal static EmoteWheelsController? WheelControllerInstance;
 
+    private static bool _emotesOpen;
+
     public static void OpenEmoteWheel()
     {
+        if (WheelControllerInstance is null || InteractionHandler is null)
+            return;
+
+        if (InteractionHandler.InOtherMenu() || _emotesOpen)
+            return;
         
+        WheelControllerInstance.Show();
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
+        
+        InteractionHandler.SetMenuLocked(true);
+        _emotesOpen = true;
     }
 
     public static void CloseEmoteWheel()
     {
+        if (WheelControllerInstance is null || InteractionHandler is null)
+            return;
         
+        if (InteractionHandler.InOtherMenu() && !_emotesOpen)
+            return;
+        
+        WheelControllerInstance.Hide();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        InteractionHandler.SetMenuLocked(false);
+        _emotesOpen = false;
     }
 }

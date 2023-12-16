@@ -1,4 +1,5 @@
 using LethalEmotesApi.Ui.Animation;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,8 +14,10 @@ public class SegmentLabel : UIBehaviour
     private readonly TweenRunner<Vector3Tween> _scaleTweenRunner = new();
     
     public RectTransform? targetLabel;
+    public TextMeshProUGUI? targetText;
 
     private RectTransform? _rectTransform;
+    private string? _emote;
 
     public RectTransform RectTransform
     {
@@ -43,6 +46,8 @@ public class SegmentLabel : UIBehaviour
 
         var worldRot = RectTransform.eulerAngles;
         targetLabel.localEulerAngles = -worldRot;
+        
+        UpdateText();
     }
 
     protected override void OnDisable()
@@ -50,6 +55,20 @@ public class SegmentLabel : UIBehaviour
         base.OnDisable();
         
         Tracker.Clear();
+    }
+
+    public void SetEmote(string? emote)
+    {
+        _emote = emote;
+        UpdateText();
+    }
+
+    private void UpdateText()
+    {
+        if (targetText is null || _emote is null)
+            return;
+        
+        targetText.SetText(_emote);
     }
 
     public void TweenScale(Vector3 targetScale, float duration, bool ignoreTimeScale)

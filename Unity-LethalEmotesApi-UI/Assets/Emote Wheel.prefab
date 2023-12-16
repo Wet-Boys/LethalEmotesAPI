@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2973636139063087802}
   - component: {fileID: 5245562302176385834}
   - component: {fileID: 3385355674128285483}
+  - component: {fileID: 2569495113185451972}
   m_Layer: 5
   m_Name: Emote Wheel
   m_TagString: Untagged
@@ -71,6 +72,7 @@ MonoBehaviour:
   segmentRotOffset: 22.5
   minRadius: 100
   maxRadius: 400
+  test: 0
   wheelSegments:
   - {fileID: 6043074316510893431}
   - {fileID: 544507829616216780}
@@ -80,6 +82,15 @@ MonoBehaviour:
   - {fileID: 4009880438502208385}
   - {fileID: 153690692264592614}
   - {fileID: 3012772962541104243}
+  emoteArray:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
 --- !u!222 &5245562302176385834
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -118,6 +129,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &2569495113185451972
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68377981483171356}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &97983372732917012
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,6 +364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 133936623494724799}
+  targetText: {fileID: 5952275310636672036}
 --- !u!1 &831017599364184979
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,6 +415,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 783664515776610334}
+  targetText: {fileID: 3498496956418357908}
 --- !u!1 &963764035338959181
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,6 +466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 4579388208366469576}
+  targetText: {fileID: 3361202071285421477}
 --- !u!1 &991069474165643510
 GameObject:
   m_ObjectHideFlags: 0
@@ -1225,6 +1251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 252918329700842512}
+  targetText: {fileID: 5517588078453085371}
 --- !u!1 &3263098781347597546
 GameObject:
   m_ObjectHideFlags: 0
@@ -1706,6 +1733,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 9216546110724194780}
+  targetText: {fileID: 2651971149896336586}
 --- !u!1 &4952173651458605347
 GameObject:
   m_ObjectHideFlags: 0
@@ -2227,6 +2255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 2816997814414242704}
+  targetText: {fileID: 6344424338236239255}
 --- !u!1 &7179021574506339321
 GameObject:
   m_ObjectHideFlags: 0
@@ -2775,6 +2804,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 5265462492584513216}
+  targetText: {fileID: 6468145506804752692}
 --- !u!1 &7928670568538094461
 GameObject:
   m_ObjectHideFlags: 0
@@ -2897,6 +2927,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLabel: {fileID: 253127986379574104}
+  targetText: {fileID: 4697821850619839296}
 --- !u!1 &8279827946929640819
 GameObject:
   m_ObjectHideFlags: 0

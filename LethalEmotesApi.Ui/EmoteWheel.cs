@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -16,6 +17,8 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
     public float segmentRotOffset = 22.5f;
     public float minRadius = 100f;
     public float maxRadius = 300f;
+
+    public bool test = false;
     
     public List<EmoteWheelSegment> wheelSegments = [];
     public string[] emoteArray;
@@ -60,6 +63,9 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
             
             segment.ResetState();
         }
+        
+        if (test)
+            LoadEmotes(EmoteWheelData.Default().Emotes);
     }
 
     private void OnEnable()
@@ -122,6 +128,14 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
     public void LoadEmotes(string[] emotes)
     {
         emoteArray = emotes;
+        for (int i = 0; i < emoteArray.Length; i++)
+        {
+            var label = wheelSegments[i].targetLabel;
+            if (label is null)
+                continue;
+
+            label.SetEmote(emoteArray[i]);
+        }
     }
 
     private int GetClosestSegmentIndex(Vector2 mousePos)

@@ -16,6 +16,8 @@ public class EmoteWheelsController : MonoBehaviour
 
     public RectTransform? wheelContainer;
 
+    public bool test;
+
     private EmoteWheel[] _wheels = Array.Empty<EmoteWheel>();
     private EmoteWheel? _focusedWheel;
     private IEnumerator? _moveCoroutine;
@@ -26,6 +28,9 @@ public class EmoteWheelsController : MonoBehaviour
     private void Awake()
     {
         EmoteWheelManager.WheelControllerInstance = this;
+
+        if (test)
+            _wheelSetData = EmoteWheelSetData.Default();
     }
 
     public void Start()
@@ -115,8 +120,20 @@ public class EmoteWheelsController : MonoBehaviour
         UpdateWheelPositions();
     }
 
-    private void OnDisable()
+    public void Show()
     {
+        if (wheelContainer is null)
+            return;
+        wheelContainer.gameObject.SetActive(true);
+    }
+    
+    public void Hide()
+    {
+        if (wheelContainer is null)
+            return;
+        
+        wheelContainer.gameObject.SetActive(false);
+        
         if (string.IsNullOrEmpty(_selectedEmote))
             return;
         
@@ -169,7 +186,7 @@ public class EmoteWheelsController : MonoBehaviour
                 float z = (float)(pos.z + -Math.Cos(rad) * zScale);
 
                 var endPos = new Vector3(x, pos.y, z + zScale);
-                        
+                
                 wheelTransform.position = Vector3.Lerp(startPos, endPos, percent);
                     
                 var dist = Mathf.Min(i, _currentWheelTotal - i);
@@ -179,8 +196,6 @@ public class EmoteWheelsController : MonoBehaviour
                 var endScale = new Vector3(scale, scale, scale);
 
                 wheelTransform.localScale = Vector3.Lerp(startScale, endScale, percent);
-                
-                Debug.Log($"{i}: {dist}");
             }
 
             yield return new WaitForEndOfFrame();
