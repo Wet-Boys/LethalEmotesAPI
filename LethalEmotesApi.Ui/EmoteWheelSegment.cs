@@ -7,9 +7,12 @@ using UnityEngine.UI;
 namespace LethalEmotesApi.Ui;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(RectTransform))]
 [ExecuteAlways]
 public class EmoteWheelSegment : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    private RectTransform? _rectTransform;
+    
     public WheelSegmentGraphic? targetGraphic;
     public SegmentLabel? targetLabel;
     public RectTransform? segmentRectTransform;

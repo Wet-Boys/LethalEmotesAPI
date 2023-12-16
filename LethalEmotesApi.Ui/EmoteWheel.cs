@@ -146,7 +146,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         for (var i = 0; i < wheelSegments.Count; i++)
         {
             var emoteWheelSegment = wheelSegments[i];
-            Vector2 pos = emoteWheelSegment.segmentRectTransform!.position;
+            Vector2 pos = emoteWheelSegment.segmentRectTransform!.position - _rectTransform.position;
 
             float distToMouse = Vector2.Distance(pos, mousePos);
             if (!(distToMouse < shortestDist))
@@ -164,6 +164,5 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         _emoteSelectedCallback.AddListener(callback);
     }
     
-
     private class EmoteSelectedCallback : UnityEvent<string>;
 }
