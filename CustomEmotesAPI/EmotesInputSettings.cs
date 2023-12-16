@@ -33,5 +33,17 @@ namespace LethalEmotesAPI
 
         [InputAction("<Keyboard>/u", Name = "Fuck you")]
         public InputAction TestButton2 { get; set; }
+
+        [InputAction("<Keyboard>/i", Name = "Fuck you")]
+        public InputAction TestButton3 { get; set; }
+
+        [InputAction("<Keyboard>/j", Name = "Fuck you")]
+        public InputAction TestButton4 { get; set; }
+        [InputAction("<Keyboard>/k", Name = "Fuck you")]
+        public InputAction TestButton5 { get; set; }
+        [InputAction("<Keyboard>/l", Name = "Fuck you")]
+        public InputAction TestButton6 { get; set; }
+        [InputAction("<Keyboard>/m", Name = "Fuck you")]
+        public InputAction TestButton7 { get; set; }
     }
 }

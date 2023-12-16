@@ -14,12 +14,20 @@ public class EmoteConstraint : MonoBehaviour
     public bool revertTransform;
     bool firstTime = true;
     bool hasEverActivatedConstraints = false;
+    public bool onlyY = false;
     void Update()
     {
         if (constraintActive)
         {
-            originalBone.position = emoteBone.position;
-            originalBone.rotation = emoteBone.rotation;
+            if (onlyY)
+            {
+                originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+            }
+            else
+            {
+                originalBone.position = emoteBone.position;
+                originalBone.rotation = emoteBone.rotation;
+            }
         }
     }
     public void ActivateConstraints()
@@ -30,6 +38,7 @@ public class EmoteConstraint : MonoBehaviour
             originalRotation = originalBone.localRotation;
             hasEverActivatedConstraints = true;
             constraintActive = true;
+            onlyY = false;
         }
     }
     public void DeactivateConstraints()
