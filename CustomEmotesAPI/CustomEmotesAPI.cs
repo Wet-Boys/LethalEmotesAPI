@@ -18,6 +18,9 @@ using UnityEngine.Networking;
 using UnityEngine.Experimental.Audio;
 using HarmonyLib;
 using LethalEmotesAPI;
+using LethalEmotesAPI.Data;
+using LethalEmotesApi.Ui;
+using UnityEngine.InputSystem.Controls;
 
 namespace EmotesAPI
 {
@@ -139,6 +142,9 @@ namespace EmotesAPI
             hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
             baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
             selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+
+            var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote wheel controller.prefab"),
+                self.PlayerInfo.canvasGroup.transform.parent.parent);
         }
         private static Hook hudManagerAwakeHook;
 
@@ -173,6 +179,7 @@ namespace EmotesAPI
         public void Awake()
         {
             instance = this;
+            EmoteWheelSetDataConverter.Init();
             DebugClass.SetLogger(base.Logger);
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginGUID);
 
@@ -180,6 +187,7 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
             CustomEmotesAPI.LoadResource("scavbody");
+            LoadResource("customemotes-ui");
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -238,65 +246,25 @@ namespace EmotesAPI
 
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
-            EmotesInputSettings.Instance.EmoteWheel.started += EmoteWheel_performed;
+            EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
+            EmotesInputSettings.Instance.EmoteWheel.canceled += EmoteWheelInteracted;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
-            EmotesInputSettings.Instance.TestButton2.started += TestButton2_performed;
-            EmotesInputSettings.Instance.TestButton3.started += TestButton3_performed;
-            EmotesInputSettings.Instance.TestButton4.started += TestButton4_started;
-            EmotesInputSettings.Instance.TestButton5.started += TestButton5_started;
-            EmotesInputSettings.Instance.TestButton6.started += TestButton6_started;
-            EmotesInputSettings.Instance.TestButton7.started += TestButton7_started;
+            EmotesInputSettings.Instance.Left.started += ctx => EmoteWheelManager.WheelLeft();
+            EmotesInputSettings.Instance.Right.started += ctx => EmoteWheelManager.WheelRight();
+            EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
         }
-
-        internal static string[] shitmotewheel = new string[] { "ChugJug", "Get Down", "DanceTherapyIntro" };
-        private void TestButton7_started(InputAction.CallbackContext obj)
-        {
-            string name = allClipNames[thing];
-            if (BoneMapper.customNamePairs.ContainsKey(name))
-            {
-                name = BoneMapper.customNamePairs[name];
-            }
-            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.lockHead;
-            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
-        }
-
-        private void TestButton6_started(InputAction.CallbackContext obj)
-        {
-            string name = allClipNames[thing];
-            if (BoneMapper.customNamePairs.ContainsKey(name))
-            {
-                name = BoneMapper.customNamePairs[name];
-            }
-            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.none;
-            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
-        }
-
-        private void TestButton5_started(InputAction.CallbackContext obj)
-        {
-            string name = allClipNames[thing];
-            if (BoneMapper.customNamePairs.ContainsKey(name))
-            {
-                name = BoneMapper.customNamePairs[name];
-            }
-            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.rootMotion;
-            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
-        }
-
-        private void TestButton4_started(InputAction.CallbackContext obj)
-        {
-            string name = allClipNames[thing];
-            if (BoneMapper.customNamePairs.ContainsKey(name))
-            {
-                name = BoneMapper.customNamePairs[name];
-            }
-            BoneMapper.animClips[name].lockType = AnimationClipParams.LockType.headBobbing;
-            DebugClass.Log($"{name} {BoneMapper.animClips[name].lockType}");
-        }
-
         int thing = 0;
 
         private void TestButton2_performed(InputAction.CallbackContext obj)
         {
+            PlayAnimation("Chika");
+        }
+        
+        private void TestButton_performed(InputAction.CallbackContext obj)
+        {
+            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+                return;
+            
             try
             {
                 PlayAnimation(shitmotewheel[thing]);
@@ -304,37 +272,29 @@ namespace EmotesAPI
             catch (Exception)
             {
             }
-        }
-        private void TestButton_performed(InputAction.CallbackContext obj)
-        {
             thing++;
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log(shitmotewheel[thing]);
         }
-        private void TestButton3_performed(InputAction.CallbackContext obj)
+        
+        private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
         {
-            thing--;
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log($"");
-            DebugClass.Log(shitmotewheel[thing]);
-        }
-        private void EmoteWheel_performed(InputAction.CallbackContext obj)
-        {
-            //TODO remove this and replace with held whenever the emote wheel gets in
-            PlayAnimation("none");
+            var btn = (ButtonControl)ctx.control;
+
+            if (btn.wasPressedThisFrame)
+            {
+                EmoteWheelManager.OpenEmoteWheel();
+            }
+
+            if (btn.wasReleasedThisFrame)
+            {
+                EmoteWheelManager.CloseEmoteWheel();
+            }
         }
 
         private void JoinEmote_performed(InputAction.CallbackContext obj)
         {
+            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+                return;
+            
             try
             {
                 if (localMapper)
@@ -393,6 +353,9 @@ namespace EmotesAPI
 
         private void RandomEmote_performed(InputAction.CallbackContext obj)
         {
+            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+                return;
+            
             int rand = UnityEngine.Random.Range(0, allClipNames.Count);
             while (blacklistedClips.Contains(rand))
             {

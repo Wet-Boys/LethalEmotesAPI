@@ -18,6 +18,7 @@ using Unity.Netcode;
 using LethalEmotesAPI;
 using UnityEngine.Audio;
 using System.Globalization;
+using LethalEmotesApi.Ui;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -1009,6 +1010,26 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
                     }
                     CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
+                    
+                    var quickMenu = mapperBody.quickMenuManager;
+                    EmoteWheelManager.InteractionHandler = new EmoteInteractionHandler(() => quickMenu.isMenuOpen || mapperBody.isTypingChat || mapperBody.inTerminalMenu,
+                        locked =>
+                        {
+                            quickMenu.isMenuOpen = locked;
+
+                            if (locked)
+                            {
+                                mapperBody.playerActions.asset["ActivateItem"].Disable();
+                                mapperBody.playerActions.asset["Use"].Disable();
+                                mapperBody.playerActions.asset["PingScan"].Disable();
+                            }
+                            else
+                            {
+                                mapperBody.playerActions.asset["ActivateItem"].Enable();
+                                mapperBody.playerActions.asset["Use"].Enable();
+                                mapperBody.playerActions.asset["PingScan"].Enable();
+                            }
+                        });
                 }
             }
         }

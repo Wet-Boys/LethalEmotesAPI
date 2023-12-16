@@ -39,6 +39,7 @@ public class BuildContext : FrostingContext
     public AbsolutePath? GameDir { get; }
     
     public readonly string? Version;
+    public readonly bool SkipPatching;
 
     #endregion
 
@@ -47,6 +48,7 @@ public class BuildContext : FrostingContext
 
     public string[] References { get; }
     public CSharpProject Project { get; }
+    public CSharpProject UiProject { get; }
     public string ManifestAuthor { get; }
     public string NetcodePatcherRelease { get; }
 
@@ -66,13 +68,16 @@ public class BuildContext : FrostingContext
     public AbsolutePath PatcherDir { get; }
     public readonly AbsolutePath StubbedFilesPath = new AbsolutePath("../") / "libs" / "stubbed-files.zip";
     public AbsolutePath BuildDir { get; }
+    public AbsolutePath UiBuildDir { get; }
+    public AbsolutePath UiUnityAssetBundlesDir { get; }
 
     public BuildContext(ICakeContext context) : base(context)
     {
         PatcherDir = ToolsDir / "netcode-patcher";
         
         DotEnv.Load(new DotEnvOptions(envFilePaths: new[] { "../.env" }));
-        
+
+        SkipPatching = context.HasArgument("skipPatching");
         MsBuildConfiguration = context.Argument<string>("configuration", "Debug");
         Version = context.EnvironmentVariable("RELEASE_VERSION");
 
@@ -87,6 +92,7 @@ public class BuildContext : FrostingContext
         var projectFilePath = (AbsolutePath)"../" / settings.ProjectFile;
         References = settings.References;
         Project = new CSharpProject(projectFilePath);
+        UiProject = new CSharpProject((AbsolutePath)"../" / settings.UiProjectFile);
         ManifestAuthor = settings.ManifestAuthor;
         NetcodePatcherRelease = settings.NetcodePatcherRelease;
 
@@ -107,6 +113,9 @@ public class BuildContext : FrostingContext
         }
 
         BuildDir = Project.Directory / "bin" / MsBuildConfiguration / "netstandard2.1";
+        UiBuildDir = UiProject.Directory / "bin" / MsBuildConfiguration / "netstandard2.1";
+
+        UiUnityAssetBundlesDir = (AbsolutePath)"../" / settings.UiUnityDir / "AssetBundles" / "StandaloneWindows";
     }
 
     private AbsolutePath? GetGameDirArg(ICakeContext context)
@@ -143,6 +152,9 @@ public sealed class SetupNetcodePatcher : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
+        if (context.SkipPatching)
+            return false;
+        
         if (!Directory.Exists(context.PatcherDir))
             return true;
 
@@ -189,9 +201,20 @@ public sealed class RestoreTask : FrostingTask<BuildContext>
     }
 }
 
+[TaskName("UpdateAssetBundles")]
+public sealed class UpdateAssetBundles : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        context.UiUnityAssetBundlesDir.GlobFiles("customemotes-ui")
+            .CopyFilesTo(context.Project.Directory);
+    }
+}
+
 [TaskName("Build")]
 [IsDependentOn(typeof(RestoreTask))]
 [IsDependentOn(typeof(FetchReferences))]
+[IsDependentOn(typeof(UpdateAssetBundles))]
 public sealed class BuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
@@ -208,6 +231,14 @@ public sealed class BuildTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public sealed class PatchNetcode : FrostingTask<BuildContext>
 {
+    public override bool ShouldRun(BuildContext context)
+    {
+        if (context.SkipPatching)
+            return false;
+
+        return true;
+    }
+
     public override void Run(BuildContext context)
     {
         AbsolutePath patcherPluginsDir = context.PatcherDir / "plugins";
@@ -233,7 +264,7 @@ public sealed class PatchNetcode : FrostingTask<BuildContext>
         patcherPluginsDir.GlobFiles("*_original.*")
             .DeleteFiles();
         
-        patcherPluginsDir.GlobFiles("*.dll", "*.pdb")
+        patcherPluginsDir.GlobFiles($"{context.Project.Name}.dll", $"{context.Project.Name}.dll")
             .CopyFilesTo(context.BuildDir);
     }
 }
@@ -249,21 +280,15 @@ public sealed class DeployToUnity : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        AbsolutePath unityPkgDir = (AbsolutePath)"../" / "Unity-LethalCompanyInputUtils" / "Packages";
-
-        var project = context.Project;
+        AbsolutePath unityPkgDir = (AbsolutePath)"../" / "Unity-LethalEmotesApi-UI" / "Packages";
         
-        AbsolutePath destDir = unityPkgDir / project.Name;
+        AbsolutePath destDir = unityPkgDir / context.UiProject.Name;
 
         if (!Directory.Exists(destDir))
             Directory.CreateDirectory(destDir);
             
-        context.BuildDir.GlobFiles("*.dll", "*.pdb")
-            .ForEach(file =>
-            {
-                var destFile = destDir / file.Name;
-                File.Copy(file, destFile, true);
-            });
+        context.UiBuildDir.GlobFiles("*.dll", "*.pdb")
+            .CopyFilesTo(destDir);
     }
 }
 

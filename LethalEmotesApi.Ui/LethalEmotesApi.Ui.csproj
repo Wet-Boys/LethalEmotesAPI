@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <AdditionalLibsDir Condition="'$(USE_STUBBED_LIBS)' == ''">..\.gameReferences\</AdditionalLibsDir>
+        <AdditionalLibsDir Condition="'$(USE_STUBBED_LIBS)' != ''">..\libs\</AdditionalLibsDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyFiles Include="$(AdditionalLibsDir)*.dll" InProject="false" />
+        <Reference Include="@(AssemblyFiles)" Private="false" />
+    </ItemGroup>
+
+</Project>

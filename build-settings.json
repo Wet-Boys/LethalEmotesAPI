@@ -3,9 +3,17 @@
     "Assembly-CSharp.dll",
     "Unity.Netcode.Components.dll",
     "Unity.Netcode.Runtime.dll",
-    "Unity.InputSystem.dll"
+    "Unity.InputSystem.dll",
+    "UnityEngine.UI.dll",
+    "UnityEngine.UIModule.dll",
+    "Unity.TextMeshPro.dll",
+    "UnityEngine.dll",
+    "UnityEngine.CoreModule.dll",
+    "Newtonsoft.Json.dll"
   ],
   "ProjectFile": "./CustomEmotesApi/LethalEmotesApi.csproj",
+  "UiProjectFile": "./LethalEmotesApi.Ui/LethalEmotesApi.Ui.csproj",
+  "UiUnityDir": "./Unity-LethalEmotesApi-UI/",
   "ManifestAuthor": "Gemmumoddo",
   "NetcodePatcherRelease": "2.4.0"
 }

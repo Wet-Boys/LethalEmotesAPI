@@ -8,9 +8,9 @@ namespace LethalEmotesAPI
 {
     public class EmotesInputSettings : LcInputActions
     {
-        public static EmotesInputSettings Instance = new();
+        public static readonly EmotesInputSettings Instance = new();
 
-        [InputAction("<Keyboard>/c", Name = "CustomEmotesAPI: Open Emote Wheel")]
+        [InputAction("<Keyboard>/c", Name = "Open Emote Wheel", ActionType = InputActionType.Value)]
         public InputAction EmoteWheel { get; set; }
 
         [InputAction("<Mouse>/leftButton", Name = "CustomEmotesAPI: Cycle Wheel Left")]
