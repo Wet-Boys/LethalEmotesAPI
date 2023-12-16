@@ -900,6 +900,10 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 3942889877637562136, guid: c1b565c141d002849bc920b5bb761611, type: 3}
+      propertyPath: test
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4701963996636128679, guid: c1b565c141d002849bc920b5bb761611, type: 3}
       propertyPath: m_Name
       value: Emote Wheel Controller
