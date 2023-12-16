@@ -854,7 +854,7 @@ public class BoneMapper : MonoBehaviour
 
         GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
         obj.name = $"{name}_AudioObject";
-        obj.transform.SetParent(this.gameObject.transform);
+        obj.transform.SetParent(mapperBody.transform);
         obj.transform.localPosition = Vector3.zero;
         var source = obj.GetComponent<AudioSource>();
         obj.AddComponent<AudioManager>().Setup(source, this);
@@ -1079,7 +1079,7 @@ public class BoneMapper : MonoBehaviour
             twopart = false;
         }
     }
-    void HealthAndAutoWalk()
+    void Health()
     {
         if (h <= 0)
         {
@@ -1122,7 +1122,7 @@ public class BoneMapper : MonoBehaviour
             GetLocal();
         }
         TwoPartThing();
-        HealthAndAutoWalk();
+        Health();
         RootMotion();
     }
     public Vector3 prevMapperPos = new Vector3(69, 69, 69);

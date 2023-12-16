@@ -10,7 +10,7 @@ namespace LethalEmotesAPI
     {
         public static readonly EmotesInputSettings Instance = new();
 
-        [InputAction("<Keyboard>/c", Name = "Open Emote Wheel", ActionType = InputActionType.Value)]
+        [InputAction("<Keyboard>/c", Name = "CustomEmotesAPI: Open Emote Wheel", ActionType = InputActionType.Value)]
         public InputAction EmoteWheel { get; set; }
 
         [InputAction("<Mouse>/leftButton", Name = "CustomEmotesAPI: Cycle Wheel Left")]
@@ -28,7 +28,7 @@ namespace LethalEmotesAPI
         [InputAction("<Keyboard>/b", Name = "CustomEmotesAPI: Bind Currently Playing Emote To Current Selection")]
         public InputAction SetCurrentEmoteToWheel { get; set; }
 
-        [InputAction("<Keyboard>/b", Name = "Fuck you")]
+        [InputAction("<Keyboard>/y", Name = "Fuck you")]
         public InputAction TestButton { get; set; }
 
         [InputAction("<Keyboard>/u", Name = "Fuck you")]
@@ -36,14 +36,5 @@ namespace LethalEmotesAPI
 
         [InputAction("<Keyboard>/i", Name = "Fuck you")]
         public InputAction TestButton3 { get; set; }
-
-        [InputAction("<Keyboard>/j", Name = "Fuck you")]
-        public InputAction TestButton4 { get; set; }
-        [InputAction("<Keyboard>/k", Name = "Fuck you")]
-        public InputAction TestButton5 { get; set; }
-        [InputAction("<Keyboard>/l", Name = "Fuck you")]
-        public InputAction TestButton6 { get; set; }
-        [InputAction("<Keyboard>/m", Name = "Fuck you")]
-        public InputAction TestButton7 { get; set; }
     }
 }
