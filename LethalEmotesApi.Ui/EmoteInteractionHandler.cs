@@ -7,6 +7,7 @@ public class EmoteInteractionHandler
 {
     private readonly Func<bool> _callback;
     private readonly Action<bool> _lockCallback;
+    private bool _inEmoteUi;
 
     public EmoteInteractionHandler(Func<bool> callback, Action<bool> lockCallback)
     {
@@ -19,8 +20,14 @@ public class EmoteInteractionHandler
         return _callback.Invoke();
     }
 
-    public void SetMenuLocked(bool locked)
+    public void SetInEmoteUi(bool inEmoteUi)
     {
-        _lockCallback.Invoke(locked);
+        _lockCallback.Invoke(inEmoteUi);
+        _inEmoteUi = inEmoteUi;
+    }
+
+    public bool InEmoteUi()
+    {
+        return _inEmoteUi;
     }
 }
