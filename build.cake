@@ -31,7 +31,7 @@ Task("Deploy")
 
 Task("DeployUnity")
 .Does(() => {
-   StartProcess("dotnet", "run --project ./build/Build.csproj --target=DeDeployUnity");
+   StartProcess("dotnet", "run --project ./build/Build.csproj --target=DeployUnity");
 });
 
 Task("Default")
