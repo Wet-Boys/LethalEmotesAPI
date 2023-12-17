@@ -19,6 +19,7 @@ using LethalEmotesAPI;
 using UnityEngine.Audio;
 using System.Globalization;
 using LethalEmotesApi.Ui;
+using LethalEmotesAPI.Utils;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -237,11 +238,11 @@ internal static class AnimationReplacements
         try
         {
             test.jank = jank;
-            test.smr1 = smr1;
-            test.smr2 = smr2;
+            test.emoteSkeletonSMR = smr1;
+            test.basePlayerModelSMR = smr2;
             test.bodyPrefab = bodyPrefab;
-            test.a1 = modelTransform.GetComponentInChildren<Animator>();
-            test.a2 = animcontroller.GetComponentInChildren<Animator>();
+            test.basePlayerModelAnimator = modelTransform.GetComponentInChildren<Animator>();
+            test.emoteSkeletonAnimator = animcontroller.GetComponentInChildren<Animator>();
         }
         catch (Exception e)
         {
@@ -404,38 +405,11 @@ public class CustomAnimationClip : MonoBehaviour
         {
             BoneMapper.customNamePairs.Add(customName, _clip[0].name);
         }
+        else
+        {
+            this.customName = clip[0].name;
+        }
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
-
-        if (!audioLoader)
-        {
-            DebugClass.Log($"preloading audio, this can take up to 30 seconds unfortunately but prevents microstutters when actually playing.");
-            audioLoader = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
-            audioLoader.GetComponent<AudioSource>().volume = 0f;
-        }
-        audioLoader.name = "sugma balls";
-        AudioSource a = audioLoader.GetComponent<AudioSource>();
-        if (primaryAudioClips != null)
-        {
-            foreach (var item in primaryAudioClips)
-            {
-                if (item != null)
-                {
-                    a.PlayOneShot(item);
-                    a.Stop();
-                }
-            }
-        }
-        if (secondaryAudioClips != null)
-        {
-            foreach (var item in secondaryAudioClips)
-            {
-                if (item != null)
-                {
-                    a.PlayOneShot(item);
-                    a.Stop();
-                }
-            }
-        }
         this.lockType = lockType;
     }
     private static GameObject audioLoader;
@@ -468,9 +442,9 @@ public class BoneMapper : MonoBehaviour
     public static List<AudioClip[]> primaryDMCAFreeAudioClips = new List<AudioClip[]>();
     public static List<AudioClip[]> secondaryDMCAFreeAudioClips = new List<AudioClip[]>();
     public GameObject audioObject;
-    public SkinnedMeshRenderer smr1;
-    public SkinnedMeshRenderer[] smr2;
-    public Animator a1, a2;
+    public SkinnedMeshRenderer emoteSkeletonSMR;
+    public SkinnedMeshRenderer[] basePlayerModelSMR;
+    public Animator basePlayerModelAnimator, emoteSkeletonAnimator;
     public int h;
     public List<BonePair> pairs = new List<BonePair>();
     public float timer = 0;
@@ -550,7 +524,7 @@ public class BoneMapper : MonoBehaviour
                 return;
             }
         }
-        a2.enabled = true;
+        emoteSkeletonAnimator.enabled = true;
 
         dontAnimateUs.Clear();
         try
@@ -634,7 +608,7 @@ public class BoneMapper : MonoBehaviour
 
         if (s == "none")
         {
-            a2.Play("none", -1, 0f);
+            emoteSkeletonAnimator.Play("none", -1, 0f);
             if (local)
             {
                 CustomEmotesAPI.hudAnimator.Play("none", -1, 0f);
@@ -648,7 +622,7 @@ public class BoneMapper : MonoBehaviour
             return;
         }
 
-        AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
+        AnimatorOverrideController animController = new AnimatorOverrideController(emoteSkeletonAnimator.runtimeAnimatorController);
         AnimatorOverrideController hudAnimController = new AnimatorOverrideController(CustomEmotesAPI.hudAnimator.runtimeAnimatorController);
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
@@ -693,10 +667,10 @@ public class BoneMapper : MonoBehaviour
             }
         }
         SetAnimationSpeed(1);
-        StartAnimations(animController, pos, a2);
+        StartAnimations(animController, pos, emoteSkeletonAnimator);
         if (local)
         {
-            CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
+            CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
             StartAnimations(hudAnimController, pos, CustomEmotesAPI.hudAnimator);
 
         }
@@ -748,7 +722,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void SetAnimationSpeed(float speed)
     {
-        a2.speed = speed;
+        emoteSkeletonAnimator.speed = speed;
     }
     internal void NewAnimation(JoinSpot[] locations)
     {
@@ -866,25 +840,25 @@ public class BoneMapper : MonoBehaviour
         bool nuclear = true;
         if (nuclear)
         {
-            foreach (var smr in smr2)
+            foreach (var smr in basePlayerModelSMR)
             {
                 int startingXPoint = 0;
-                for (int i = 0; i < smr1.bones.Length; i++)
+                for (int i = 0; i < emoteSkeletonSMR.bones.Length; i++)
                 {
                     for (int x = startingXPoint; x < smr.bones.Length; x++)
                     {
                         //DebugClass.Log($"comparing:    {smr1.bones[i].name}     {smr.bones[x].name}");
                         //DebugClass.Log($"--------------  {smrbone.gameObject.name}   {smr1bone.gameObject.name}      {smrbone.GetComponent<ParentConstraint>()}");
-                        if (smr1.bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
+                        if (emoteSkeletonSMR.bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
                         {
                             startingXPoint = x;
                             //DebugClass.Log($"they are equal!");
                             var s = new ConstraintSource();
-                            s.sourceTransform = smr1.bones[i];
+                            s.sourceTransform = emoteSkeletonSMR.bones[i];
                             s.weight = 1;
                             //DebugClass.Log($"{smr.name}--- i is equal to {x}  ------ {smr.bones[x].name}");
                             EmoteConstraint e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
-                            e.AddSource(ref smr.bones[x], ref smr1.bones[i]);
+                            e.AddSource(ref smr.bones[x], ref emoteSkeletonSMR.bones[i]);
                             e.revertTransform = revertTransform;
                             break;
                         }
@@ -909,7 +883,7 @@ public class BoneMapper : MonoBehaviour
         }
         if (jank)
         {
-            foreach (var smr in smr2)
+            foreach (var smr in basePlayerModelSMR)
             {
                 for (int i = 0; i < smr.bones.Length; i++)
                 {
@@ -1010,7 +984,7 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
                     }
                     CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-                    
+
                     var quickMenu = mapperBody.quickMenuManager;
                     EmoteWheelManager.InteractionHandler = new EmoteInteractionHandler(() => quickMenu.isMenuOpen || mapperBody.isTypingChat || mapperBody.inTerminalMenu,
                         locked =>
@@ -1026,7 +1000,7 @@ public class BoneMapper : MonoBehaviour
     }
     void TwoPartThing()
     {
-        if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
+        if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
         {
             if (!twopart)
             {
@@ -1034,7 +1008,7 @@ public class BoneMapper : MonoBehaviour
             }
             else
             {
-                if (a2.enabled)
+                if (emoteSkeletonAnimator.enabled)
                 {
                     if (!jank)
                     {
@@ -1044,10 +1018,10 @@ public class BoneMapper : MonoBehaviour
                 //DebugClass.Log($"----------{a1}");
                 if (!ragdolling)
                 {
-                    a1.enabled = true;
+                    basePlayerModelAnimator.enabled = true;
                     oneFrameAnimatorLeeWay = true;
                 }
-                a2.enabled = false;
+                emoteSkeletonAnimator.enabled = false;
                 try
                 {
                     currentClip.clip.ToString();
@@ -1132,7 +1106,7 @@ public class BoneMapper : MonoBehaviour
         try
         {
             //just skip it all if we aren't playing anything
-            if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
+            if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
             {
                 return;
             }
@@ -1147,8 +1121,8 @@ public class BoneMapper : MonoBehaviour
                     Quaternion tempRot = transform.rotation;
 
                     //move player body
-                    mapperBody.transform.position = new Vector3(smr1.rootBone.position.x, mapperBody.transform.position.y, smr1.rootBone.position.z);
-                    mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, a2.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
+                    mapperBody.transform.position = new Vector3(emoteSkeletonSMR.rootBone.position.x, mapperBody.transform.position.y, emoteSkeletonSMR.rootBone.position.z);
+                    mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
 
                     //revert self to current BoneMapper position from earlier
                     transform.position = tempPos;
@@ -1244,7 +1218,7 @@ public class BoneMapper : MonoBehaviour
     internal IEnumerator waitForTwoFramesThenDisableA1()
     {
         yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
-        a1.enabled = false;
+        basePlayerModelAnimator.enabled = false;
     }
     void OnDestroy()
     {
@@ -1286,7 +1260,7 @@ public class BoneMapper : MonoBehaviour
     {
         transform.position = Vector3.zero;
         transform.localEulerAngles = new Vector3(90, 0, 0);
-        foreach (var smr in smr2)
+        foreach (var smr in basePlayerModelSMR)
         {
             for (int i = 0; i < smr.bones.Length; i++)
             {
@@ -1304,21 +1278,21 @@ public class BoneMapper : MonoBehaviour
             }
         }
         cameraConstraint.DeactivateConstraints();
-        a1.enabled = animatorEnabled;
+        basePlayerModelAnimator.enabled = animatorEnabled;
     }
     public void LockBones()
     {
         transform.localPosition = Vector3.zero;
         foreach (var item in currentClip.soloIgnoredBones)
         {
-            if (a2.GetBoneTransform(item))
-                dontAnimateUs.Add(a2.GetBoneTransform(item).name);
+            if (emoteSkeletonAnimator.GetBoneTransform(item))
+                dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
         }
         foreach (var item in currentClip.rootIgnoredBones)
         {
-            if (a2.GetBoneTransform(item))
-                dontAnimateUs.Add(a2.GetBoneTransform(item).name);
-            foreach (var bone in a2.GetBoneTransform(item).GetComponentsInChildren<Transform>())
+            if (emoteSkeletonAnimator.GetBoneTransform(item))
+                dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
+            foreach (var bone in emoteSkeletonAnimator.GetBoneTransform(item).GetComponentsInChildren<Transform>())
             {
 
                 dontAnimateUs.Add(bone.name);
@@ -1328,7 +1302,7 @@ public class BoneMapper : MonoBehaviour
         {
             //a1.enabled = false;
             StartCoroutine(waitForTwoFramesThenDisableA1());
-            foreach (var smr in smr2)
+            foreach (var smr in basePlayerModelSMR)
             {
                 for (int i = 0; i < smr.bones.Length; i++)
                 {
@@ -1351,6 +1325,7 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
+            cameraConstraint.DeactivateConstraints();
             if (!Settings.NoEmotesHaveRootMotion.Value &&
                 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.AllEmotesHaveRootMotion.Value || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
@@ -1360,10 +1335,6 @@ public class BoneMapper : MonoBehaviour
             {
                 cameraConstraint.ActivateConstraints();
                 cameraConstraint.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
-            }
-            else
-            {
-                cameraConstraint.DeactivateConstraints();
             }
         }
         else

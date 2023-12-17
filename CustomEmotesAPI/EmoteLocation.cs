@@ -92,7 +92,7 @@ public class EmoteLocation : MonoBehaviour
     {
         yield return new WaitForSeconds(.1f);
         Vector3 scal = Vector3.one;
-        if (owner.smr1)
+        if (owner.emoteSkeletonSMR)
         {
             scal = owner.transform.parent.lossyScale;
         }

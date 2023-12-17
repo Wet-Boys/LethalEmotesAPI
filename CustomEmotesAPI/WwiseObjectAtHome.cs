@@ -28,7 +28,14 @@ namespace LethalEmotesAPI
             if (!audioSource.isPlaying && needToContinueOnFinish)
             {
                 audioSource.timeSamples = 0;
-                audioSource.clip = BoneMapper.secondaryAudioClips[syncPos][currEvent];
+                if (Settings.DMCAFree.Value)
+                {
+                    audioSource.clip = BoneMapper.secondaryDMCAFreeAudioClips[syncPos][currEvent];
+                }
+                else
+                {
+                    audioSource.clip = BoneMapper.secondaryAudioClips[syncPos][currEvent];
+                }
                 audioSource.Play();
                 needToContinueOnFinish = false;
                 audioSource.loop = true;
@@ -111,7 +118,6 @@ namespace LethalEmotesAPI
                 }
                 else
                 {
-                    DebugClass.Log($"BoneMapper.primaryAudioClips[{syncPos}][{currEvent}] == {BoneMapper.primaryAudioClips[syncPos][currEvent]}");
                     SetAndPlayAudio(BoneMapper.primaryAudioClips[syncPos][currEvent]);
                 }
                 SampleCheck();
@@ -126,14 +132,20 @@ namespace LethalEmotesAPI
         }
         public void SetAndPlayAudio(AudioClip a)
         {
-            audioSource.clip = a;
-            audioSource.Play();
+            if (a)
+            {
+                audioSource.clip = a;
+                audioSource.Play();
+            }
+            else
+            {
+                needToContinueOnFinish = false;
+            }
         }
         public void SampleCheck()
         {
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0)
             {
-                DebugClass.Log($"setting timesamples");
                 audioSource.timeSamples = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].timeSamples;
                 var theBusStopProblem = gameObject.AddComponent<BusStop>();
                 theBusStopProblem.desiredSampler = BoneMapper.listOfCurrentEmoteAudio[syncPos][0];
@@ -141,7 +153,6 @@ namespace LethalEmotesAPI
             }
             else
             {
-                DebugClass.Log($"setting timesamples");
                 audioSource.timeSamples = 0;
             }
         }
@@ -160,7 +171,6 @@ namespace LethalEmotesAPI
             }
             if (desiredSampler.timeSamples != receiverSampler.timeSamples)
             {
-                DebugClass.Log($"setting timesamples in the bus stop");
                 receiverSampler.timeSamples = desiredSampler.timeSamples;
                 success = 0;
             }

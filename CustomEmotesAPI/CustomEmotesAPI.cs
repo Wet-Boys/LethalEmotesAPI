@@ -56,6 +56,7 @@ namespace EmotesAPI
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
         public static List<string> allClipNames = new List<string>();
+        public static List<string> randomClipList = new List<string>();
         public static List<int> blacklistedClips = new List<int>();
         public static void BlackListEmote(string name)
         {
@@ -142,6 +143,7 @@ namespace EmotesAPI
             hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
             baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
             selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+            CustomEmotesAPI.hudObject.transform.localPosition = baseHUDObject.transform.localPosition;
 
             var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote wheel controller.prefab"),
                 self.PlayerInfo.canvasGroup.transform.parent.parent);
@@ -154,6 +156,14 @@ namespace EmotesAPI
             hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
         }
         private static Hook hudManagerUpdateHealthUIHook;
+
+        private void StartOfRoundOnPlayerDC(Action<StartOfRound, int, ulong> orig, StartOfRound self, int playerObjectNumber, ulong clientId)
+        {
+            PlayerControllerB component = self.allPlayerObjects[playerObjectNumber].GetComponent<PlayerControllerB>();
+            PlayAnimation("none", component.GetComponentInChildren<BoneMapper>());
+            orig(self, playerObjectNumber, clientId);
+        }
+        private static Hook startOfRoundOnPlayerDCHook;
 
 
         private static bool buttonLock = false;
@@ -214,6 +224,10 @@ namespace EmotesAPI
             targetMethod = typeof(HUDManager).GetMethod("UpdateHealthUI", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(HUDManagerUpdateHealthUI), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             hudManagerUpdateHealthUIHook = new Hook(targetMethod, destMethod, this);
+
+            targetMethod = typeof(StartOfRound).GetMethod("OnPlayerDC", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(StartOfRoundOnPlayerDC), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            startOfRoundOnPlayerDCHook = new Hook(targetMethod, destMethod, this);
 
 
             AnimationReplacements.RunAll();
@@ -368,7 +382,10 @@ namespace EmotesAPI
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
             if (visible)
+            {
                 allClipNames.Add(emoteName);
+                randomClipList.Add(emoteName);
+            }
             BoneMapper.animClips.Add(emoteName, null);
         }
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
@@ -387,15 +404,39 @@ namespace EmotesAPI
                 animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
             if (animationClipParams.soloBonesToIgnore == null)
                 animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
+
+
             if (animationClipParams._primaryAudioClips == null)
                 animationClipParams._primaryAudioClips = new AudioClip[] { null };
             if (animationClipParams._secondaryAudioClips == null)
                 animationClipParams._secondaryAudioClips = new AudioClip[] { null };
+            if (animationClipParams._primaryDMCAFreeAudioClips == null)
+                animationClipParams._primaryDMCAFreeAudioClips = new AudioClip[] { null };
+            if (animationClipParams._secondaryDMCAFreeAudioClips == null)
+                animationClipParams._secondaryDMCAFreeAudioClips = new AudioClip[] { null };
+
+            List<AudioClip> testClipList = new List<AudioClip>(animationClipParams._primaryDMCAFreeAudioClips);
+            while (testClipList.Count != animationClipParams._primaryAudioClips.Length)
+            {
+                testClipList.Add(null);
+            }
+            animationClipParams._primaryDMCAFreeAudioClips = testClipList.ToArray();
+
+            testClipList = new List<AudioClip>(animationClipParams._secondaryDMCAFreeAudioClips);
+            while (testClipList.Count != animationClipParams._secondaryAudioClips.Length)
+            {
+                testClipList.Add(null);
+            }
+            animationClipParams._secondaryDMCAFreeAudioClips = testClipList.ToArray();
+
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
             CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips);
             if (animationClipParams.visible)
-                allClipNames.Add(animationClipParams.animationClip[0].name);
+            {
+                allClipNames.Add(clip.customName);
+                randomClipList.Add(clip.customName);
+            }
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
         }
 
@@ -591,12 +632,12 @@ namespace EmotesAPI
         }
         internal IEnumerator wackActive2(BoneMapper mapper)
         {
-            DebugClass.Log($"{mapper.a1.gameObject.name}");
-            mapper.a1.gameObject.SetActive(false);
+            DebugClass.Log($"{mapper.basePlayerModelAnimator.gameObject.name}");
+            mapper.basePlayerModelAnimator.gameObject.SetActive(false);
             yield return new WaitForSeconds(5f);
-            mapper.a1.enabled = true;
+            mapper.basePlayerModelAnimator.enabled = true;
             mapper.oneFrameAnimatorLeeWay = true;
-            mapper.a1.gameObject.SetActive(true);
+            mapper.basePlayerModelAnimator.gameObject.SetActive(true);
             DebugClass.Log($"reenabling");
 
         }
