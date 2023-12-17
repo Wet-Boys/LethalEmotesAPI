@@ -22,6 +22,7 @@ namespace EmotesAPI
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
         public static ConfigEntry<EmoteWheelSetData> EmoteWheelSetDataEntry;
+        public static ConfigEntry<string> RandomEmoteBlacklist;
 
         //TODO loading a base button
         //public static GameObject NakedButton = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/UI/NakedButton.prefab").WaitForCompletion();
@@ -77,12 +78,13 @@ namespace EmotesAPI
             AllEmotesHaveRootMotion = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "All Emotes Have Root Motion", false, "If turned on, all emotes will have root motion, even if not specified by the emote itself");
             NoEmotesHaveRootMotion = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Have Root Motion", false, "If turned on, no emotes will have root motion, even if specified by the emote itself");
             AllowHeadBobbing = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "Allow Head Bobbing Emotes", true, "Some emotes, even if they don't apply root motion, might have head bobbing, this can turn that off.");
-            EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", false, "If turned on, emotes will alert enemies like other sound sources.");
+            EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", true, "If turned on, emotes will alert enemies like other sound sources.");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
             DMCAFree = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "DMCA Free Songs", false, "If turned on, emotes will either use their DMCA free version or no audio at all.");
             EmoteWheelSetDataEntry = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default(), "Json data of emote wheel");
             EmoteWheelManager.GetEmoteWheelSetData = () => EmoteWheelSetDataEntry.Value;
             EmoteWheelManager.SetEmoteWheelSetData = wheelSetData => EmoteWheelSetDataEntry.Value = wheelSetData;
+            RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key");
 
             //TODO settings ROO
             //ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));
