@@ -1,6 +1,8 @@
 ﻿using System;
 using LethalEmotesApi.Ui.Data;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LethalEmotesApi.Ui.Wheel;
 
@@ -8,6 +10,7 @@ public class EmoteWheelsController : MonoBehaviour
 {
     public GameObject? wheelPrefab;
     public RectTransform? wheelContainer;
+    public TextMeshProUGUI? wheelLabel;
 
     public float fadeDist = 500f;
     public float fadeDuration = 0.5f;
@@ -106,7 +109,13 @@ public class EmoteWheelsController : MonoBehaviour
     {
         if (wheelContainer is null)
             return;
+        
         wheelContainer.gameObject.SetActive(true);
+
+        if (wheelLabel is null)
+            return;
+        
+        wheelLabel.gameObject.SetActive(true);
     }
     
     public void Hide()
@@ -121,6 +130,11 @@ public class EmoteWheelsController : MonoBehaviour
         
         EmoteWheelManager.EmoteSelected(_selectedEmote);
         _selectedEmote = EmoteWheelManager.EmoteNone;
+
+        if (wheelLabel is null)
+            return;
+        
+        wheelLabel.gameObject.SetActive(false);
     }
 
     private EmoteWheel GetCurrentWheel()
@@ -142,6 +156,9 @@ public class EmoteWheelsController : MonoBehaviour
         wheel.ResetState();
         wheel.Focused = true;
         wheel.AddOnEmoteSelectedCallback(UpdateSelectedEmote);
+
+        var data = _wheelSetData!.EmoteWheels[_currentWheelIndex];
+        wheelLabel!.SetText(data.Name);
     }
 
     private void UpdateSelectedEmote(string selectedEmote)
