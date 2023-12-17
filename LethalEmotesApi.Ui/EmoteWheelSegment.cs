@@ -11,8 +11,6 @@ namespace LethalEmotesApi.Ui;
 [ExecuteAlways]
 public class EmoteWheelSegment : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    private RectTransform? _rectTransform;
-    
     public WheelSegmentGraphic? targetGraphic;
     public SegmentLabel? targetLabel;
     public RectTransform? segmentRectTransform;

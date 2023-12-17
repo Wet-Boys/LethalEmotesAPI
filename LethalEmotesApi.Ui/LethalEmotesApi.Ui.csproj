@@ -16,4 +16,8 @@
         <Reference Include="@(AssemblyFiles)" Private="false" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Customize\" />
+    </ItemGroup>
+
 </Project>
