@@ -138,7 +138,7 @@ public class EmoteWheelsController : MonoBehaviour
             return;
         
         EmoteWheelManager.EmoteSelected(_selectedEmote);
-        _selectedEmote = "";
+        _selectedEmote = EmoteWheelManager.EmoteNone;
     }
 
     private void UpdateWheelState()
