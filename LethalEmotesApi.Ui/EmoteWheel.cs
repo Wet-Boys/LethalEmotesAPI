@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using LethalEmotesApi.Ui.Animation;
 using LethalEmotesApi.Ui.Data;
+using LethalEmotesApi.Ui.Wheel;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -16,6 +17,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
     private readonly DelayedActionRunner<DelayedAction> _delayedActionRunner = new();
 
     public CanvasGroup? canvasGroup;
+    public WheelStopEmote? wheelStopEmote;
     
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
@@ -102,6 +104,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         {
             DeSelectAll();
             _emoteSelectedCallback.Invoke(EmoteWheelManager.EmoteNone);
+            wheelStopEmote!.OnPointerEnter(eventData);
             return;
         }
 
@@ -115,6 +118,8 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         var segmentIndex = GetClosestSegmentIndex(mousePos);
         if (segmentIndex == _currentSegmentIndex)
             return;
+        
+        wheelStopEmote!.OnPointerExit(eventData);
         
         if (_currentSegmentIndex > -1)
             wheelSegments[_currentSegmentIndex].OnPointerExit(eventData);
