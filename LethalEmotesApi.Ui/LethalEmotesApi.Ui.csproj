@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <Folder Include="Customize\" />
+      <Folder Include="Views\" />
     </ItemGroup>
 
 </Project>

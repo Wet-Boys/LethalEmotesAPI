@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 
@@ -7,30 +6,31 @@ namespace LethalEmotesApi.Ui;
 
 public class EmoteWheelsController : MonoBehaviour
 {
-    [Range(10, 2000)] public float xScale = 650f;
-    [Range(10, 2000)] public float zScale = 360f;
-    
     public GameObject? wheelPrefab;
-    public AnimationCurve tweenCurve;
-    public AnimationCurve distScaleCurve;
-
     public RectTransform? wheelContainer;
+
+    public float fadeDist = 500f;
+    public float fadeDuration = 0.5f;
+    public AnimationCurve? fadeCurve;
 
     public bool test;
 
     private EmoteWheel[] _wheels = Array.Empty<EmoteWheel>();
-    private EmoteWheel? _focusedWheel;
-    private IEnumerator? _moveCoroutine;
     private EmoteWheelSetData? _wheelSetData = EmoteWheelManager.GetEmoteWheelSetData?.Invoke();
-    private int _currentWheelTotal;
+    private int _currentWheelIndex;
     private string _selectedEmote = "";
-
+    
     private void Awake()
     {
         EmoteWheelManager.WheelControllerInstance = this;
 
         if (test)
-            _wheelSetData = EmoteWheelSetData.Default();
+        {
+            _wheelSetData = new EmoteWheelSetData
+            {
+                EmoteWheels = [EmoteWheelData.Default(), EmoteWheelData.Default(1), EmoteWheelData.Default(2), EmoteWheelData.Default(3), EmoteWheelData.Default(4)]
+            };
+        }
     }
 
     public void Start()
@@ -51,73 +51,57 @@ public class EmoteWheelsController : MonoBehaviour
         if (_wheels.Length == totalWheels)
             return;
         
-        var pos = transform.position;
-        float degPer = (float)(Math.PI * 2 / totalWheels);
-            
         _wheels = new EmoteWheel[totalWheels];
+        
         for (int i = 0; i < _wheels.Length; i++)
         {
-            float rad = i * degPer;
-            float x = (float)(pos.x + Math.Sin(rad) * xScale);
-            float z = (float)(pos.z + -Math.Cos(rad) * zScale);
-            
-            var wheel = Instantiate(wheelPrefab, wheelContainer);
-            wheel.transform.position = new Vector3(x, pos.y, z + zScale);
+            var wheelGameObject = Instantiate(wheelPrefab, wheelContainer);
+            wheelGameObject.transform.localPosition = Vector3.zero;
 
-            _wheels[i] = wheel.GetComponent<EmoteWheel>();
+            var wheel = wheelGameObject.GetComponent<EmoteWheel>();
 
             var emoteWheelData = _wheelSetData.EmoteWheels[i];
-            _wheels[i].LoadEmotes(emoteWheelData.Emotes);
+            wheel.LoadEmotes(emoteWheelData.Emotes);
+            wheel.Focused = false;
+            wheel.gameObject.SetActive(false);
+
+            _wheels[i] = wheel;
         }
 
-        _currentWheelTotal = totalWheels;
-
+        _currentWheelIndex = 0;
         UpdateWheelState();
-        UpdateWheelPositions();
     }
 
     public void NextWheel()
     {
-        EmoteWheel[] temp = new EmoteWheel[_currentWheelTotal];
-        Array.Copy(_wheels, temp, _currentWheelTotal);
+        var prevWheelIndex = _currentWheelIndex;
+        
+        _currentWheelIndex++;
+        if (_currentWheelIndex >= _wheels.Length)
+            _currentWheelIndex = 0;
 
-        for (int i = 0; i < _currentWheelTotal; i++)
-        {
-            _wheels[i].Focused = false;
-            _wheels[i].DeSelectAll();
-            
-            int index = i + 1;
-
-            if (index >= _currentWheelTotal)
-                index = 0;
-
-            _wheels[i] = temp[index];
-        }
-
+        var prevWheel = _wheels[prevWheelIndex];
+        prevWheel.Focused = false;
+        prevWheel.DeSelectAll();
+        
+        FadeWheelLeft(prevWheelIndex);
         UpdateWheelState();
-        UpdateWheelPositions();
     }
 
     public void PrevWheel()
     {
-        EmoteWheel[] temp = new EmoteWheel[_currentWheelTotal];
-        Array.Copy(_wheels, temp, _currentWheelTotal);
+        var prevWheelIndex = _currentWheelIndex;
+        
+        _currentWheelIndex--;
+        if (_currentWheelIndex < 0)
+            _currentWheelIndex = _wheels.Length - 1;
 
-        for (int i = 0; i < _currentWheelTotal; i++)
-        {
-            _wheels[i].Focused = false;
-            _wheels[i].DeSelectAll();
-            
-            int index = i - 1;
-
-            if (index < 0)
-                index = _currentWheelTotal - 1;
-
-            _wheels[i] = temp[index];
-        }
-
+        var prevWheel = _wheels[prevWheelIndex];
+        prevWheel.Focused = false;
+        prevWheel.DeSelectAll();
+        
+        FadeWheelRight(prevWheelIndex);
         UpdateWheelState();
-        UpdateWheelPositions();
     }
 
     public void Show()
@@ -141,65 +125,45 @@ public class EmoteWheelsController : MonoBehaviour
         _selectedEmote = EmoteWheelManager.EmoteNone;
     }
 
-    private void UpdateWheelState()
+    private EmoteWheel GetCurrentWheel()
     {
-        _focusedWheel = _wheels[0];
-        _focusedWheel.Focused = true;
-        
-        _focusedWheel.AddOnEmoteSelectedCallback(UpdateSelectedEmote);
+        return _wheels[_currentWheelIndex];
     }
 
-    private void UpdateWheelPositions()
+    private void UpdateWheelState()
     {
-        if (_moveCoroutine is not null)
-            StopCoroutine(_moveCoroutine);
+        var wheel = GetCurrentWheel();
+        
+        wheel.gameObject.SetActive(true);
 
-        _moveCoroutine = MoveWheelCoroutine();
-        StartCoroutine(_moveCoroutine);
+        var wheelTransform = wheel.transform;
+        
+        wheelTransform.SetAsLastSibling();
+        wheelTransform.localPosition = Vector3.zero;
+        
+        wheel.ResetState();
+        wheel.Focused = true;
+        wheel.AddOnEmoteSelectedCallback(UpdateSelectedEmote);
     }
 
     private void UpdateSelectedEmote(string selectedEmote)
     {
         _selectedEmote = selectedEmote;
     }
+    
+    private void FadeWheelLeft(int wheelIndex, bool instant = false) => FadeWheel(wheelIndex, true, instant);
+    private void FadeWheelRight(int wheelIndex, bool instant = false) => FadeWheel(wheelIndex, false, instant);
 
-    private IEnumerator MoveWheelCoroutine()
+    private void FadeWheel(int wheelIndex, bool left, bool instant = false)
     {
-        var pos = transform.position;
-        float degPer = (float)(Math.PI * 2 / _currentWheelTotal);
-            
-        float deltaTime = 0f;
-        float percent;
-        do
-        {
-            deltaTime += Time.unscaledDeltaTime;
-            percent = tweenCurve.Evaluate(deltaTime);
-                
-            for (int i = 0; i < _currentWheelTotal; i++)
-            {
-                var wheel = _wheels[i];
-                var wheelTransform = wheel.transform;
-                    
-                var startPos = wheelTransform.position;
-                    
-                float rad = i * degPer;
-                float x = (float)(pos.x + Math.Sin(rad) * xScale);
-                float z = (float)(pos.z + -Math.Cos(rad) * zScale);
+        if (fadeCurve is null)
+            return;
+        
+        var wheel = _wheels[wheelIndex];
 
-                var endPos = new Vector3(x, pos.y, z + zScale);
-                
-                wheelTransform.position = Vector3.Lerp(startPos, endPos, percent);
-                    
-                var dist = Mathf.Min(i, _currentWheelTotal - i);
-
-                var startScale = wheelTransform.localScale;
-                var scale = distScaleCurve.Evaluate(dist);
-                var endScale = new Vector3(scale, scale, scale);
-
-                wheelTransform.localScale = Vector3.Lerp(startScale, endScale, percent);
-            }
-
-            yield return new WaitForEndOfFrame();
-        } while (percent != 1);
+        var targetPos = new Vector3(left ? -fadeDist : fadeDist, 0, 0);        
+        wheel.TweenPos(targetPos, fadeCurve, instant ? 0f : fadeDuration, true);
+        wheel.TweenAlpha(0f, fadeCurve, instant ? 0f : fadeDuration, true);
+        wheel.DisableAfterDuration(instant ? 0f : fadeDuration, true);
     }
 }
