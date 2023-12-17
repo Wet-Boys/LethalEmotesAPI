@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using LethalEmotesApi.Ui.Animation;
 using LethalEmotesApi.Ui.Data;
-using LethalEmotesApi.Ui.Wheel;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace LethalEmotesApi.Ui;
+namespace LethalEmotesApi.Ui.Wheel;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class EmoteWheel : MonoBehaviour, IPointerMoveHandler

@@ -1170,7 +1170,10 @@ MonoBehaviour:
     m_ColorMultiplier: 0
     m_FadeDuration: 0.2
   scaleSelected: 1.2
-  scalePressed: 0
+  scalePressed: 1.1
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1748051632
 GameObject:
   m_ObjectHideFlags: 0

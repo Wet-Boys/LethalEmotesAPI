@@ -2,7 +2,7 @@
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 
-namespace LethalEmotesApi.Ui;
+namespace LethalEmotesApi.Ui.Wheel;
 
 public class EmoteWheelsController : MonoBehaviour
 {
@@ -22,8 +22,6 @@ public class EmoteWheelsController : MonoBehaviour
     
     private void Awake()
     {
-        EmoteWheelManager.WheelControllerInstance = this;
-
         if (test)
         {
             _wheelSetData = new EmoteWheelSetData

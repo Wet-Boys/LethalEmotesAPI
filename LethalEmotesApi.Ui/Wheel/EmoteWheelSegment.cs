@@ -1,10 +1,8 @@
-using System;
-using LethalEmotesApi.Ui.Wheel;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace LethalEmotesApi.Ui;
+namespace LethalEmotesApi.Ui.Wheel;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RectTransform))]

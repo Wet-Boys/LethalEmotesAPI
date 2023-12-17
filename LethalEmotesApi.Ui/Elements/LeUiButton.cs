@@ -1,17 +1,20 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Elements;
 
 [DisallowMultipleComponent]
-public class LeUiButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public class LeUiButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 {
     public Graphic? targetGraphic;
     public LeUiScaleTweener? scaleTweener;
     public ColorBlock colors;
     [Range(0, 2)] public float scaleSelected;
     [Range(0, 2)] public float scalePressed;
+
+    public UnityEvent onClick = new();
 
     private bool _selected;
     private bool _pressed;
@@ -38,6 +41,11 @@ public class LeUiButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         _pressed = false;
         UpdateState();
+    }
+    
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        onClick.Invoke();
     }
 
     private Color GetColor()
