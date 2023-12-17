@@ -1,3 +1,4 @@
+using LethalEmotesApi.Ui.Elements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,6 +12,7 @@ public class WheelStopEmote : UIBehaviour, IPointerEnterHandler, IPointerExitHan
 {
     public WheelStopEmoteGraphic? backgroundGraphic;
     public Graphic? foregroundGraphic;
+    public LeUiScaleTweener? scaleTweener;
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
     
@@ -63,11 +65,23 @@ public class WheelStopEmote : UIBehaviour, IPointerEnterHandler, IPointerExitHan
         var backgroundColor = GetBackgroundColor();
         var foregroundColor = GetForegroundColor();
         StartColorTween(foregroundColor * colors.colorMultiplier, backgroundColor * colors.colorMultiplier, instant);
+
+        var scale = GetScale();
+        StartScaleTween(scale, instant);
     }
 
     private void StartColorTween(Color foregroundColor, Color backgroundColor, bool instant)
     {
         backgroundGraphic!.CrossFadeColor(backgroundColor, instant ? 0.0f : colors.fadeDuration, true, true);
         foregroundGraphic!.CrossFadeColor(foregroundColor, instant ? 0.0f : colors.fadeDuration, true, true);
+    }
+
+    private void StartScaleTween(float scale, bool instant)
+    {
+        if (scaleTweener is null)
+            return;
+        
+        var scaleVec = new Vector3(scale, scale, scale);
+        scaleTweener.TweenScale(scaleVec, instant ? 0.0f : colors.fadeDuration, true);
     }
 }

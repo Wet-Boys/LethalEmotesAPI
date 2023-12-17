@@ -208,8 +208,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wheelPrefab: {fileID: 68377981483171356, guid: 170d2ec24334c064ea30495916507f24, type: 3}
   wheelContainer: {fileID: 1502682546640342380}
-  fadeDist: 1200
-  fadeDuration: 0.5
+  fadeDist: 1000
+  fadeDuration: 0.4
   fadeCurve:
     serializedVersion: 2
     m_Curve:
