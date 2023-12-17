@@ -21,6 +21,7 @@ using LethalEmotesAPI;
 using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem.Controls;
+using LethalEmotesAPI.Utils;
 
 namespace EmotesAPI
 {
@@ -204,6 +205,7 @@ namespace EmotesAPI
             //}
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
+            BlacklistSettings.LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
 
             var targetMethod = typeof(PlayerControllerB).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -267,13 +269,13 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.Right.started += ctx => EmoteWheelManager.WheelRight();
             EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
         }
-        
+
         private void TestButton_performed(InputAction.CallbackContext obj)
         {
             if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
                 return;
         }
-        
+
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
         {
             var btn = (ButtonControl)ctx.control;
@@ -293,7 +295,7 @@ namespace EmotesAPI
         {
             if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
                 return;
-            
+
             try
             {
                 if (localMapper)
@@ -354,13 +356,9 @@ namespace EmotesAPI
         {
             if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
                 return;
-            
-            int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-            while (blacklistedClips.Contains(rand))
-            {
-                rand = UnityEngine.Random.Range(0, allClipNames.Count);
-            }
-            PlayAnimation(allClipNames[rand]);
+
+            int rand = UnityEngine.Random.Range(0, randomClipList.Count);
+            PlayAnimation(randomClipList[rand]);
         }
 
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
@@ -384,7 +382,10 @@ namespace EmotesAPI
             if (visible)
             {
                 allClipNames.Add(emoteName);
-                randomClipList.Add(emoteName);
+                if (!BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
+                {
+                    randomClipList.Add(emoteName);
+                }
             }
             BoneMapper.animClips.Add(emoteName, null);
         }
@@ -434,8 +435,11 @@ namespace EmotesAPI
             CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips);
             if (animationClipParams.visible)
             {
-                allClipNames.Add(clip.customName);
-                randomClipList.Add(clip.customName);
+                allClipNames.Add(animationClipParams.animationClip[0].name);
+                if (!BlacklistSettings.emotesExcludedFromRandom.Contains(animationClipParams.animationClip[0].name))
+                {
+                    randomClipList.Add(animationClipParams.animationClip[0].name);
+                }
             }
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
         }

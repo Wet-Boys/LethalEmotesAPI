@@ -61,10 +61,9 @@ namespace LethalEmotesAPI
             this.currEvent = currEvent;
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0 && sync)
             {
-                this.currEvent = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].gameObject.transform.parent.GetComponent<BoneMapper>().currEvent;
+                this.currEvent = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].gameObject.transform.parent.GetComponentInChildren<BoneMapper>().currEvent;
                 currEvent = this.currEvent;
             }
-
             if (BoneMapper.secondaryAudioClips[syncPos].Length > currEvent && BoneMapper.secondaryAudioClips[syncPos][currEvent] != null)
             {
                 if (CustomAnimationClip.syncTimer[syncPos] > BoneMapper.primaryAudioClips[syncPos][currEvent].length)

@@ -490,22 +490,23 @@ public class BoneMapper : MonoBehaviour
     public EmoteConstraint cameraConstraint;
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
 
-
+    public static string GetRealAnimationName(string animationName)
+    {
+        if (customNamePairs.ContainsKey(animationName))
+        {
+            return customNamePairs[animationName];
+        }
+        return animationName;
+    }
     public void PlayAnim(string s, int pos, int eventNum)
     {
         desiredEvent = eventNum;
-        if (customNamePairs.ContainsKey(s))
-        {
-            s = customNamePairs[s];
-        }
+        s = GetRealAnimationName(s);
         PlayAnim(s, pos);
     }
     public void PlayAnim(string s, int pos)
     {
-        if (customNamePairs.ContainsKey(s))
-        {
-            s = customNamePairs[s];
-        }
+        s = GetRealAnimationName(s);
         prevClipName = currentClipName;
         if (s != "none")
         {
