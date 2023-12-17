@@ -315,8 +315,9 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
     public bool vulnerableEmote = false;
     public AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none;
+    public bool willGetClaimed = false;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -411,6 +412,7 @@ public class CustomAnimationClip : MonoBehaviour
         }
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
         this.lockType = lockType;
+        this.willGetClaimed = willGetClaimed;
     }
     private static GameObject audioLoader;
 }
@@ -661,7 +663,7 @@ public class BoneMapper : MonoBehaviour
                 }
                 //audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
             }
-            audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio);
+            audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio, currentClip.willGetClaimed);
             if (currentClip.syncronizeAudio && primaryAudioClips[currentClip.syncPos][currEvent] != null)
             {
                 listOfCurrentEmoteAudio[currentClip.syncPos].Add(audioObject.GetComponent<AudioSource>());
@@ -1283,6 +1285,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void LockBones()
     {
+        UnlockBones();
         transform.localPosition = Vector3.zero;
         foreach (var item in currentClip.soloIgnoredBones)
         {
@@ -1326,7 +1329,6 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            cameraConstraint.DeactivateConstraints();
             if (!Settings.NoEmotesHaveRootMotion.Value &&
                 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.AllEmotesHaveRootMotion.Value || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {

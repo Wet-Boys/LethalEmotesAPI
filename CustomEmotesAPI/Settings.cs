@@ -18,7 +18,7 @@ namespace EmotesAPI
         public static ConfigEntry<bool> NoEmotesHaveRootMotion;
         public static ConfigEntry<bool> AllowHeadBobbing;
         public static ConfigEntry<bool> EmotesAlertEnemies;
-        public static ConfigEntry<bool> DMCAFree;
+        public static ConfigEntry<int> DMCAFree;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
         public static ConfigEntry<EmoteWheelSetData> EmoteWheelSetDataEntry;
@@ -80,7 +80,7 @@ namespace EmotesAPI
             AllowHeadBobbing = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "Allow Head Bobbing Emotes", true, "Some emotes, even if they don't apply root motion, might have head bobbing, this can turn that off.");
             EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", true, "If turned on, emotes will alert enemies like other sound sources.");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
-            DMCAFree = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "DMCA Free Songs", false, "If turned on, emotes will either use their DMCA free version or no audio at all.");
+            DMCAFree = CustomEmotesAPI.instance.Config.Bind<int>("Misc", "DMCA Free Songs", 0, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will use DMCA friendly versions or none at all");
             EmoteWheelSetDataEntry = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default(), "Json data of emote wheel");
             EmoteWheelManager.GetEmoteWheelSetData = () => EmoteWheelSetDataEntry.Value;
             EmoteWheelManager.SetEmoteWheelSetData = wheelSetData => EmoteWheelSetDataEntry.Value = wheelSetData;
