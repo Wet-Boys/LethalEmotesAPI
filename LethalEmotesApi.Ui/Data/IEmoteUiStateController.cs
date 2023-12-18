@@ -19,7 +19,9 @@ public interface IEmoteUiStateController
 
     public void PlayAnimationOn(Animator animator, string emoteKey);
 
-    public IReadOnlyCollection<string> GetAllEmoteNames();
+    public IReadOnlyCollection<string> EmoteKeys { get; }
+
+    public string GetEmoteName(string emoteKey);
 
     public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
 

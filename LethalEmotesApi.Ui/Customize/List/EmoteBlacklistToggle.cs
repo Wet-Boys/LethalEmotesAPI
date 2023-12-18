@@ -9,8 +9,6 @@ namespace LethalEmotesApi.Ui.Customize.List;
 public class EmoteBlacklistToggle : UIBehaviour
 {
     public Image? toggleImage;
-    public Sprite? enabledSprite;
-    public Sprite? disabledSprite;
 
     private string? _emoteKey;
     private bool InBlacklist => EmoteUiManager.RandomPoolBlacklist.Contains(_emoteKey);
@@ -57,16 +55,8 @@ public class EmoteBlacklistToggle : UIBehaviour
         
         if (toggleImage is null)
             return;
-        
-        var sprite = GetSprite();
-        if (sprite is null)
-            return;
 
-        toggleImage.sprite = sprite;
+        toggleImage.enabled = InBlacklist;
     }
-
-    private Sprite? GetSprite()
-    {
-        return InBlacklist ? disabledSprite : enabledSprite;
-    }
+    
 }

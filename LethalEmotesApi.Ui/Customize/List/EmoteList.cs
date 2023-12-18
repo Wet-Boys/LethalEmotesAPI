@@ -32,9 +32,9 @@ public class EmoteList : UIBehaviour
         if (_listObjects.Count > 0)
             return;
         
-        var emoteNames = EmoteUiManager.AllEmoteNames;
+        var emoteKeys = EmoteUiManager.EmoteKeys;
 
-        foreach (var emote in emoteNames)
+        foreach (var emote in emoteKeys)
         {
             var entryGameObject = Instantiate(entryPrefab, listContentContainer);
             var entry = entryGameObject.GetComponent<EmoteListItem>();

@@ -36,7 +36,7 @@ public class EmoteListItem : UIBehaviour
         if (label is null)
             return;
         
-        label.SetText(EmoteKey);
+        label.SetText(EmoteUiManager.GetEmoteName(EmoteKey));
 
         if (blacklistToggle is null)
             return;

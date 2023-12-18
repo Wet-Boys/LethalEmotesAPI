@@ -53,7 +53,9 @@ public static class EmoteUiManager
         _stateController?.PlayAnimationOn(animator, emoteKey);
     }
 
-    internal static IReadOnlyCollection<string> AllEmoteNames => _stateController!.GetAllEmoteNames();
+    internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteKeys;
+
+    internal static string GetEmoteName(string emoteKey) => _stateController!.GetEmoteName(emoteKey);
     
     internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
     

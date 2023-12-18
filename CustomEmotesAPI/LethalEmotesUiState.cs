@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using EmotesAPI;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesAPI.Utils;
@@ -58,9 +59,24 @@ public class LethalEmotesUiState : IEmoteUiStateController
         BoneMapper.PreviewAnimations(animator, emoteKey);
     }
 
-    public IReadOnlyCollection<string> GetAllEmoteNames()
+    private IReadOnlyCollection<string> _emoteKeys;
+
+    public IReadOnlyCollection<string> EmoteKeys
     {
-        return CustomEmotesAPI.allClipNames;
+        get
+        {
+            _emoteKeys ??= BoneMapper.animClips
+                .Where(kvp => kvp.Value is null || kvp.Value.visibility)
+                .Select(kvp => kvp.Key)
+                .ToArray();
+            return _emoteKeys;
+        }
+    }
+
+    public string GetEmoteName(string emoteKey)
+    {
+        var clip = BoneMapper.animClips[emoteKey];
+        return clip is null || string.IsNullOrEmpty(clip.customName) ? emoteKey : clip.customName;
     }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist => BlacklistSettings.emotesExcludedFromRandom;
