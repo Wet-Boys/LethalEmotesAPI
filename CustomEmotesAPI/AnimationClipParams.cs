@@ -30,6 +30,7 @@ namespace EmotesAPI
         public Action<BoneMapper> customPostEventCodeSync = null;
         public Action<BoneMapper> customPostEventCodeNoSync = null;
         public LockType lockType = LockType.none;
+        public bool willGetClaimedByDMCA = false;
 
         public enum LockType
         {

@@ -14,6 +14,7 @@ namespace LethalEmotesAPI
         int syncPos, currEvent;
         public BoneMapper mapper;
         float audioTimer = 0;
+        bool currentClipDMCA;
         internal void Setup(AudioSource source, BoneMapper mapper)
         {
             audioSource = source;
@@ -27,8 +28,13 @@ namespace LethalEmotesAPI
         {
             if (!audioSource.isPlaying && needToContinueOnFinish)
             {
+                if (currentClipDMCA && Settings.DMCAFree.Value == 2)
+                {
+                    needToContinueOnFinish = false;
+                    return;
+                }
                 audioSource.timeSamples = 0;
-                if (Settings.DMCAFree.Value)
+                if (CheckDMCA(currentClipDMCA))
                 {
                     audioSource.clip = BoneMapper.secondaryDMCAFreeAudioClips[syncPos][currEvent];
                 }
@@ -54,9 +60,14 @@ namespace LethalEmotesAPI
                 }
             }
         }
-        public void Play(int syncPos, int currEvent, bool looping, bool sync)
+        public void Play(int syncPos, int currEvent, bool looping, bool sync, bool willGetClaimed)
         {
-            //emotes with multiple song choices are causing errors
+            currentClipDMCA = willGetClaimed;
+            if (currentClipDMCA && Settings.DMCAFree.Value == 2)
+            {
+                return;
+            }
+            audioSource.timeSamples = 0;
             this.syncPos = syncPos;
             this.currEvent = currEvent;
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0 && sync)
@@ -68,7 +79,7 @@ namespace LethalEmotesAPI
             {
                 if (CustomAnimationClip.syncTimer[syncPos] > BoneMapper.primaryAudioClips[syncPos][currEvent].length)
                 {
-                    if (Settings.DMCAFree.Value)
+                    if (CheckDMCA(willGetClaimed))
                     {
                         SetAndPlayAudio(BoneMapper.secondaryDMCAFreeAudioClips[syncPos][currEvent]);
                     }
@@ -82,7 +93,7 @@ namespace LethalEmotesAPI
                 }
                 else
                 {
-                    if (Settings.DMCAFree.Value)
+                    if (CheckDMCA(willGetClaimed))
                     {
                         SetAndPlayAudio(BoneMapper.primaryDMCAFreeAudioClips[syncPos][currEvent]);
                     }
@@ -97,7 +108,7 @@ namespace LethalEmotesAPI
             }
             else if (looping)
             {
-                if (Settings.DMCAFree.Value)
+                if (CheckDMCA(willGetClaimed))
                 {
                     SetAndPlayAudio(BoneMapper.primaryDMCAFreeAudioClips[syncPos][currEvent]);
                 }
@@ -111,7 +122,7 @@ namespace LethalEmotesAPI
             }
             else
             {
-                if (Settings.DMCAFree.Value)
+                if (CheckDMCA(willGetClaimed))
                 {
                     SetAndPlayAudio(BoneMapper.primaryDMCAFreeAudioClips[syncPos][currEvent]);
                 }
@@ -153,6 +164,26 @@ namespace LethalEmotesAPI
             else
             {
                 audioSource.timeSamples = 0;
+            }
+        }
+        public bool CheckDMCA(bool willGetClaimed)
+        {
+            switch (Settings.DMCAFree.Value)
+            {
+                case 0:
+                    //all songs are normal
+                    return false;
+                case 1:
+                    //based on import settings
+                    return willGetClaimed;
+                case 2:
+                    //need to just mute the song
+                    return willGetClaimed;
+                case 3:
+                    //all songs are dmca free or quiet if no dmca track is given
+                    return true;
+                default:
+                    return true;
             }
         }
     }

@@ -315,8 +315,9 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
     public bool vulnerableEmote = false;
     public AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none;
+    public bool willGetClaimed = false;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -411,6 +412,7 @@ public class CustomAnimationClip : MonoBehaviour
         }
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
         this.lockType = lockType;
+        this.willGetClaimed = willGetClaimed;
     }
     private static GameObject audioLoader;
 }
@@ -661,7 +663,7 @@ public class BoneMapper : MonoBehaviour
                 }
                 //audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
             }
-            audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio);
+            audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio, currentClip.willGetClaimed);
             if (currentClip.syncronizeAudio && primaryAudioClips[currentClip.syncPos][currEvent] != null)
             {
                 listOfCurrentEmoteAudio[currentClip.syncPos].Add(audioObject.GetComponent<AudioSource>());
@@ -719,6 +721,31 @@ public class BoneMapper : MonoBehaviour
             animController["Default Dance"] = currentClip.clip[pos];
             animator.runtimeAnimatorController = animController;
             animator.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+        }
+    }
+    public static void PreviewAnimations(Animator animator, string animation)
+    {
+        AnimatorOverrideController animController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+        CustomAnimationClip customClip = animClips[GetRealAnimationName(animation)];
+        int pos = 0;
+        if (customClip.secondaryClip != null && customClip.secondaryClip.Length != 0)
+        {
+            animController["Dab"] = customClip.clip[pos];
+            animController["nobones"] = customClip.secondaryClip[pos];
+            animator.runtimeAnimatorController = animController;
+            animator.Play("PoopToLoop", -1, 0);
+        }
+        else if (customClip.clip[0].isLooping)
+        {
+            animController["Floss"] = customClip.clip[pos];
+            animator.runtimeAnimatorController = animController;
+            animator.Play("Loop", -1, 0);
+        }
+        else
+        {
+            animController["Default Dance"] = customClip.clip[pos];
+            animator.runtimeAnimatorController = animController;
+            animator.Play("Poop", -1, 0);
         }
     }
     public void SetAnimationSpeed(float speed)
@@ -972,19 +999,21 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-
-                    GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
-                    info.transform.SetParent(mapperBody.transform.parent);
-                    CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
-                    CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(90, 0, 0);
-                    CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
-                    CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
-                    CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
-                    if (!CustomEmotesAPI.animationControllerHolder)
+                    if (CustomEmotesAPI.hudAnimator == null)
                     {
-                        CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+                        GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
+                        info.transform.SetParent(mapperBody.transform.parent);
+                        CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
+                        CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(90, 0, 0);
+                        CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
+                        CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
+                        CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
+                        if (!CustomEmotesAPI.animationControllerHolder)
+                        {
+                            CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+                        }
+                        CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                     }
-                    CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                 }
             }
         }
@@ -1276,6 +1305,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void LockBones()
     {
+        UnlockBones();
         transform.localPosition = Vector3.zero;
         foreach (var item in currentClip.soloIgnoredBones)
         {
@@ -1319,7 +1349,6 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            cameraConstraint.DeactivateConstraints();
             if (!Settings.NoEmotesHaveRootMotion.Value &&
                 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.AllEmotesHaveRootMotion.Value || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
