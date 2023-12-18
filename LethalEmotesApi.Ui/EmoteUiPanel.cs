@@ -155,6 +155,7 @@ public class EmoteUiPanel : MonoBehaviour
         
         _previewInstance.SetActive(false);
         DestroyImmediate(_previewInstance);
+        _previewInstance = null;
     }
 
     public void ShowCustomizeButton()
