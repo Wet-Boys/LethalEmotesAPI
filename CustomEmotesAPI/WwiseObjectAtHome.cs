@@ -28,6 +28,11 @@ namespace LethalEmotesAPI
         {
             if (!audioSource.isPlaying && needToContinueOnFinish)
             {
+                if (currentClipDMCA && Settings.DMCAFree.Value == 2)
+                {
+                    needToContinueOnFinish = false;
+                    return;
+                }
                 audioSource.timeSamples = 0;
                 if (CheckDMCA(currentClipDMCA))
                 {
@@ -58,6 +63,10 @@ namespace LethalEmotesAPI
         public void Play(int syncPos, int currEvent, bool looping, bool sync, bool willGetClaimed)
         {
             currentClipDMCA = willGetClaimed;
+            if (currentClipDMCA && Settings.DMCAFree.Value == 2)
+            {
+                return;
+            }
             audioSource.timeSamples = 0;
             this.syncPos = syncPos;
             this.currEvent = currEvent;
@@ -168,6 +177,9 @@ namespace LethalEmotesAPI
                     //based on import settings
                     return willGetClaimed;
                 case 2:
+                    //need to just mute the song
+                    return willGetClaimed;
+                case 3:
                     //all songs are dmca free or quiet if no dmca track is given
                     return true;
                 default:

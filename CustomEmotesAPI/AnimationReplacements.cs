@@ -723,6 +723,31 @@ public class BoneMapper : MonoBehaviour
             animator.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
         }
     }
+    public static void PreviewAnimations(Animator animator, string animation)
+    {
+        AnimatorOverrideController animController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+        CustomAnimationClip customClip = animClips[GetRealAnimationName(animation)];
+        int pos = 0;
+        if (customClip.secondaryClip != null && customClip.secondaryClip.Length != 0)
+        {
+            animController["Dab"] = customClip.clip[pos];
+            animController["nobones"] = customClip.secondaryClip[pos];
+            animator.runtimeAnimatorController = animController;
+            animator.Play("PoopToLoop", -1, 0);
+        }
+        else if (customClip.clip[0].isLooping)
+        {
+            animController["Floss"] = customClip.clip[pos];
+            animator.runtimeAnimatorController = animController;
+            animator.Play("Loop", -1, 0);
+        }
+        else
+        {
+            animController["Default Dance"] = customClip.clip[pos];
+            animator.runtimeAnimatorController = animController;
+            animator.Play("Poop", -1, 0);
+        }
+    }
     public void SetAnimationSpeed(float speed)
     {
         emoteSkeletonAnimator.speed = speed;
@@ -974,19 +999,21 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-
-                    GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
-                    info.transform.SetParent(mapperBody.transform.parent);
-                    CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
-                    CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(90, 0, 0);
-                    CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
-                    CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
-                    CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
-                    if (!CustomEmotesAPI.animationControllerHolder)
+                    if (CustomEmotesAPI.hudAnimator == null)
                     {
-                        CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+                        GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
+                        info.transform.SetParent(mapperBody.transform.parent);
+                        CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
+                        CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(90, 0, 0);
+                        CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
+                        CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
+                        CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
+                        if (!CustomEmotesAPI.animationControllerHolder)
+                        {
+                            CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+                        }
+                        CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                     }
-                    CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
 
                     var quickMenu = mapperBody.quickMenuManager;
                     EmoteWheelManager.InteractionHandler = new EmoteInteractionHandler(() => quickMenu.isMenuOpen || mapperBody.isTypingChat || mapperBody.inTerminalMenu,
