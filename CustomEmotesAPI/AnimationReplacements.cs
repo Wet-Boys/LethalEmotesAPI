@@ -317,12 +317,12 @@ public class CustomAnimationClip : MonoBehaviour
     public AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none;
     public bool willGetClaimed = false;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null/*, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null*/, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false)
     {
-        if (rootBonesToIgnore == null)
-            rootBonesToIgnore = new HumanBodyBones[0];
-        if (soloBonesToIgnore == null)
-            soloBonesToIgnore = new HumanBodyBones[0];
+        //if (rootBonesToIgnore == null)
+        //    rootBonesToIgnore = new HumanBodyBones[0];
+        //if (soloBonesToIgnore == null)
+        //    soloBonesToIgnore = new HumanBodyBones[0];
         clip = _clip;
         secondaryClip = _secondaryClip;
         looping = _loop;
@@ -368,23 +368,23 @@ public class CustomAnimationClip : MonoBehaviour
             BoneMapper.secondaryDMCAFreeAudioClips.Add(secondaryDMCAFreeAudioClips);
         }
 
-        if (soloBonesToIgnore.Length != 0)
-        {
-            soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
-        }
-        else
-        {
+        //if (soloBonesToIgnore.Length != 0)
+        //{
+        //    soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
+        //}
+        //else
+        //{
+        //}
             soloIgnoredBones = new List<HumanBodyBones>();
-        }
 
-        if (rootBonesToIgnore.Length != 0)
-        {
-            rootIgnoredBones = new List<HumanBodyBones>(rootBonesToIgnore);
-        }
-        else
-        {
+        //if (rootBonesToIgnore.Length != 0)
+        //{
+        //    rootIgnoredBones = new List<HumanBodyBones>(rootBonesToIgnore);
+        //}
+        //else
+        //{
+        //}
             rootIgnoredBones = new List<HumanBodyBones>();
-        }
         syncronizeAnimation = syncAnim;
         syncronizeAudio = syncAudio;
         syncPos = syncTimer.Count;
@@ -652,7 +652,6 @@ public class BoneMapper : MonoBehaviour
                 {
                     currentClip.customPostEventCodeSync.Invoke(this);
                 }
-                //audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
             }
             else if (!currentClip.syncronizeAudio)
             {
@@ -661,7 +660,6 @@ public class BoneMapper : MonoBehaviour
                 {
                     currentClip.customPostEventCodeNoSync.Invoke(this);
                 }
-                //audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping);
             }
             audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio, currentClip.willGetClaimed);
             if (currentClip.syncronizeAudio && primaryAudioClips[currentClip.syncPos][currEvent] != null)
@@ -937,14 +935,14 @@ public class BoneMapper : MonoBehaviour
     }
     public GameObject parentGameObject;
     bool positionLock, rotationLock, scaleLock;
-    public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale, bool scaleAsBandit = true, bool disableCollider = true)
+    public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale, bool scaleAsScavenger = true, bool disableCollider = true)
     {
         if (parentGameObject)
         {
             NewAnimation(null);
         }
         ogScale = mapperBody.transform.localScale;
-        if (scaleAsBandit)
+        if (scaleAsScavenger)
             scaleDiff = ogScale / scale;
         else
             scaleDiff = ogScale;
@@ -979,9 +977,8 @@ public class BoneMapper : MonoBehaviour
         //AudioFunctions();
         try
         {
-            if ((attacking && currentClip.stopOnAttack) || (moving && currentClip.stopOnMove))
+            if ((moving && currentClip.stopOnMove))
             {
-
                 CustomEmotesAPI.PlayAnimation("none");
             }
         }
