@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 
@@ -16,7 +17,15 @@ public static class EmoteUiManager
 
     internal static void PlayEmote(string emoteKey)
     {
-        _stateController?.PlayEmote(emoteKey);
+        try
+        {
+            _stateController?.PlayEmote(emoteKey);
+        }
+        catch
+        {
+            Debug.Log("Emote selected might not exist");
+        }
+        
     }
 
     internal static void LockMouseInput()

@@ -36,5 +36,9 @@ namespace LethalEmotesAPI
 
         [InputAction("<Keyboard>/i", Name = "Fuck you")]
         public InputAction TestButton3 { get; set; }
+
+        [InputAction("", Name = "Stop emoting")]
+        public InputAction StopEmoting { get; set; }
+
     }
 }
