@@ -112,4 +112,15 @@ public static class PlayerControllerPatches
                 .InstructionEnumeration();
         }
     }
+
+    [HarmonyPatch(typeof(PlayerControllerB), "OpenMenu_performed")]
+    public static class OpenMenuPerformedPatch
+    {
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        {
+            return new CodeMatcher(instructions, generator)
+                .CloseEmoteUi()
+                .InstructionEnumeration();
+        } 
+    }
 }

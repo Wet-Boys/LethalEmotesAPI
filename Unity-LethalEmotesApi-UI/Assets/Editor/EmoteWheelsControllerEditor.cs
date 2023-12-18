@@ -1,4 +1,5 @@
 ﻿using LethalEmotesApi.Ui;
+using LethalEmotesApi.Ui.Wheel;
 using UnityEditor;
 using UnityEngine;
 
