@@ -1,4 +1,5 @@
 ﻿using LethalEmotesApi.Ui.Data;
+using UnityEngine;
 
 namespace LethalEmotesApi.Ui;
 
@@ -35,6 +36,11 @@ public static class EmoteUiManager
     internal static void UnlockPlayerInput()
     {
         _stateController?.UnlockPlayerInput();
+    }
+
+    internal static void PlayAnimationOn(Animator animator, string emoteKey)
+    {
+        _stateController?.PlayAnimationOn(animator, emoteKey);
     }
 
     internal static EmoteWheelSetData LoadEmoteWheelSetData()

@@ -51,6 +51,11 @@ public class LethalEmotesUiState : IEmoteUiStateController
         return !localPlayer.inTerminalMenu && !localPlayer.isTypingChat && !localPlayer.quickMenuManager.isMenuOpen;
     }
 
+    public void PlayAnimationOn(Animator animator, string emoteKey)
+    {
+        BoneMapper.PreviewAnimations(animator, emoteKey);
+    }
+
     public EmoteWheelSetData LoadEmoteWheelSetData()
     {
         return Settings.EmoteWheelSetDataEntry.Value;

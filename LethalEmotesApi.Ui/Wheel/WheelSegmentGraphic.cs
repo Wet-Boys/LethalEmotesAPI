@@ -1,7 +1,6 @@
 using System;
 using LethalEmotesApi.Ui.Animation;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Wheel;

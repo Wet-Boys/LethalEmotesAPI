@@ -1,4 +1,6 @@
-﻿namespace LethalEmotesApi.Ui.Data;
+﻿using UnityEngine;
+
+namespace LethalEmotesApi.Ui.Data;
 
 public interface IEmoteUiStateController
 {
@@ -13,6 +15,8 @@ public interface IEmoteUiStateController
     public void UnlockPlayerInput();
 
     public bool CanOpenEmoteUi();
+
+    public void PlayAnimationOn(Animator animator, string emoteKey);
     
     #region Loading Config Data
 
