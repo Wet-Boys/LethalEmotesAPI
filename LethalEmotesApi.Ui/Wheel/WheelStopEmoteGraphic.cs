@@ -14,7 +14,7 @@ public class WheelStopEmoteGraphic : Graphic
     protected override void OnEnable()
     {
         base.OnEnable();
-        raycastTarget = true;
+        raycastTarget = false;
     }
 
     protected override void OnPopulateMesh(VertexHelper vh)

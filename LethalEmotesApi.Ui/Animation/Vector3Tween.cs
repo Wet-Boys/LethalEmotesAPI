@@ -8,7 +8,6 @@ public struct Vector3Tween : ITweenValue
     public float Duration { get; set; }
     public Vector3 StartValue { get; set; }
     public Vector3 TargetValue { get; set; }
-    
     public bool IgnoreTimeScale { get; set; }
     
     private Vector3TweenCallback? _target;

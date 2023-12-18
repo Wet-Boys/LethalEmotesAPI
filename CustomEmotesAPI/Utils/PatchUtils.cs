@@ -1,6 +1,5 @@
 ﻿using System.Reflection.Emit;
 using HarmonyLib;
-using LethalEmotesAPI.Patches;
 using LethalEmotesApi.Ui;
 
 namespace LethalEmotesAPI.Utils;
@@ -14,20 +13,35 @@ internal static class PatchUtils
         
         matcher
             .InsertAndAdvance(new CodeInstruction(OpCodes.Call,
-                AccessTools.Method(typeof(PatchUtils), nameof(InEmoteUi))))
+                AccessTools.Method(typeof(PatchUtils), nameof(EmoteWheelsOpen))))
             .InsertAndAdvance(new CodeInstruction(OpCodes.Brfalse_S, origLocLabel));
 
         if (returnABool)
             matcher.InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_I4_1));
         
-        matcher.InsertAndAdvance(new CodeInstruction(OpCodes.Ret))
-            .AddLabels(new []{ origLocLabel });
+        matcher.InsertAndAdvance(new CodeInstruction(OpCodes.Ret));
+
+        return matcher;
+    }
+    
+    internal static CodeMatcher CloseEmoteUi(this CodeMatcher matcher)
+    {
+        matcher.Advance(1);
+        matcher.CreateLabel(out var origLocLabel);
+        
+        matcher
+            .InsertAndAdvance(new CodeInstruction(OpCodes.Call,
+                AccessTools.Method(typeof(PatchUtils), nameof(EmoteWheelsOpen))))
+            .InsertAndAdvance(new CodeInstruction(OpCodes.Brfalse_S, origLocLabel))
+            .InsertAndAdvance(new CodeInstruction(OpCodes.Call,
+                AccessTools.Method(typeof(EmoteUiManager), nameof(EmoteUiManager.CloseUiGracefully))))
+            .InsertAndAdvance(new CodeInstruction(OpCodes.Ret));
 
         return matcher;
     }
 
-    private static bool InEmoteUi()
+    private static bool EmoteWheelsOpen()
     {
-        return EmoteWheelManager.InteractionHandler is not null && EmoteWheelManager.InteractionHandler.InEmoteUi();
+        return EmoteUiManager.IsEmoteWheelsOpen() || EmoteUiManager.IsCustomizePanelOpen();
     }
 }

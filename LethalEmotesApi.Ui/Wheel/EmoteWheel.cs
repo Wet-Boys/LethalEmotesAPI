@@ -1,15 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using LethalEmotesApi.Ui.Animation;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace LethalEmotesApi.Ui;
+namespace LethalEmotesApi.Ui.Wheel;
 
+[RequireComponent(typeof(CanvasGroup))]
 public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
 {
+    private readonly TweenRunner<AnimCurveTween<Vector3Tween>> _posTweenRunner = new();
+    private readonly TweenRunner<AnimCurveTween<FloatTween>> _alphaTweenRunner = new();
+    private readonly DelayedActionRunner<DelayedAction> _delayedActionRunner = new();
+
+    public CanvasGroup? canvasGroup;
+    public WheelStopEmote? wheelStopEmote;
+    
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
     
@@ -45,11 +53,18 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
     protected EmoteWheel()
     {
         emoteArray = new string[segmentCount];
+        
+        _posTweenRunner.Init(this);
+        _alphaTweenRunner.Init(this);
+        _delayedActionRunner.Init(this);
     }
 
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
+
+        if (canvasGroup is null)
+            canvasGroup = GetComponent<CanvasGroup>();
         
         foreach (var segment in wheelSegments)
         {
@@ -70,7 +85,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
 
     private void OnEnable()
     {
-        ResetAll();
+        ResetState();
     }
 
     public void OnPointerMove(PointerEventData eventData)
@@ -87,7 +102,8 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         if (dist < minRadius)
         {
             DeSelectAll();
-            _emoteSelectedCallback.Invoke(EmoteWheelManager.EmoteNone);
+            _emoteSelectedCallback.Invoke("none");
+            wheelStopEmote!.OnPointerEnter(eventData);
             return;
         }
 
@@ -101,6 +117,8 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         var segmentIndex = GetClosestSegmentIndex(mousePos);
         if (segmentIndex == _currentSegmentIndex)
             return;
+        
+        wheelStopEmote!.OnPointerExit(eventData);
         
         if (_currentSegmentIndex > -1)
             wheelSegments[_currentSegmentIndex].OnPointerExit(eventData);
@@ -118,11 +136,17 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
             segment.DeSelect();
     }
 
-    public void ResetAll()
+    public void ResetState()
     {
         _currentSegmentIndex = -1;
         foreach (var segment in wheelSegments)
             segment.ResetState();
+        
+        _posTweenRunner.StopTween();
+        _alphaTweenRunner.StopTween();
+        _delayedActionRunner.StopAction();
+
+        canvasGroup!.alpha = 1.0f;
     }
 
     public void LoadEmotes(string[] emotes)
@@ -163,6 +187,95 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
     {
         _emoteSelectedCallback.AddListener(callback);
     }
-    
+
+    public void TweenPos(Vector3 targetPos, AnimationCurve curve, float duration, bool ignoreTimeScale)
+    {
+        if (transform.localPosition == targetPos)
+        {
+            _posTweenRunner.StopTween();
+            return;
+        }
+
+        var tween = new Vector3Tween
+        {
+            Duration = duration,
+            StartValue = transform.localPosition,
+            TargetValue = targetPos,
+            IgnoreTimeScale = ignoreTimeScale
+        };
+        tween.AddOnChangedCallback(TweenPosChanged);
+        
+        var animTween = new AnimCurveTween<Vector3Tween>
+        {
+            WrappedTweenValue = tween,
+            Curve = curve
+        };
+        
+        _posTweenRunner.StartTween(animTween);
+    }
+
+    private void TweenPosChanged(Vector3 pos)
+    {
+        transform.localPosition = pos;
+    }
+
+    public void TweenAlpha(float targetAlpha, AnimationCurve curve, float duration, bool ignoreTimeScale)
+    {
+        if (canvasGroup is null)
+            return;
+        
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (canvasGroup.alpha == targetAlpha)
+        {
+            _alphaTweenRunner.StopTween();
+            return;
+        }
+
+        var tween = new FloatTween
+        {
+            Duration = duration,
+            StartValue = canvasGroup.alpha,
+            TargetValue = targetAlpha,
+            IgnoreTimeScale = ignoreTimeScale
+        };
+        tween.AddOnChangedCallback(TweenAlphaChanged);
+
+        var animTween = new AnimCurveTween<FloatTween>
+        {
+            WrappedTweenValue = tween,
+            Curve = curve
+        };
+        
+        _alphaTweenRunner.StartTween(animTween);
+    }
+
+    private void TweenAlphaChanged(float alpha)
+    {
+        canvasGroup!.alpha = alpha;
+    }
+
+    public void DisableAfterDuration(float duration, bool ignoreTimeScale)
+    {
+        if (!gameObject.activeInHierarchy)
+        {
+            _delayedActionRunner.StopAction();
+            return;
+        }
+
+        var action = new DelayedAction
+        {
+            Duration = duration,
+            IgnoreTimeScale = ignoreTimeScale,
+            Action = DelayedDisable
+        };
+        
+        _delayedActionRunner.StartAction(action);
+    }
+
+    private void DelayedDisable()
+    {
+        gameObject.SetActive(false);
+    }
+
     private class EmoteSelectedCallback : UnityEvent<string>;
 }

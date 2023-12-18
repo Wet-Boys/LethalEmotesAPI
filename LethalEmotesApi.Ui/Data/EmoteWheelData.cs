@@ -11,7 +11,7 @@ public class EmoteWheelData(string name)
     public static EmoteWheelData Default(int wheelIndex = 0)
     {
         var wheel = new EmoteWheelData($"Wheel {wheelIndex + 1}");
-        Array.Fill(wheel.Emotes, EmoteWheelManager.EmoteNone);
+        Array.Fill(wheel.Emotes, "none");
 
         return wheel;
     }
