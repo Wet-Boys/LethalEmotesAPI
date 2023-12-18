@@ -985,13 +985,6 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
                     }
                     CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-
-                    var quickMenu = mapperBody.quickMenuManager;
-                    EmoteWheelManager.InteractionHandler = new EmoteInteractionHandler(() => quickMenu.isMenuOpen || mapperBody.isTypingChat || mapperBody.inTerminalMenu,
-                        locked =>
-                        {
-                            mapperBody.disableLookInput = locked;
-                        });
                 }
             }
         }

@@ -102,7 +102,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         if (dist < minRadius)
         {
             DeSelectAll();
-            _emoteSelectedCallback.Invoke(EmoteWheelManager.EmoteNone);
+            _emoteSelectedCallback.Invoke("none");
             wheelStopEmote!.OnPointerEnter(eventData);
             return;
         }

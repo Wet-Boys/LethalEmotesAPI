@@ -18,7 +18,13 @@ public class LeUiButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     private bool _selected;
     private bool _pressed;
-    
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        UpdateState(true);
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         _selected = true;

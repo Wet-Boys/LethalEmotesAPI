@@ -146,7 +146,7 @@ namespace EmotesAPI
             selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
             CustomEmotesAPI.hudObject.transform.localPosition = baseHUDObject.transform.localPosition;
 
-            var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote wheel controller.prefab"),
+            var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote ui.prefab"),
                 self.PlayerInfo.canvasGroup.transform.parent.parent);
         }
         private static Hook hudManagerAwakeHook;
@@ -265,14 +265,15 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
             EmotesInputSettings.Instance.EmoteWheel.canceled += EmoteWheelInteracted;
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
-            EmotesInputSettings.Instance.Left.started += ctx => EmoteWheelManager.WheelLeft();
-            EmotesInputSettings.Instance.Right.started += ctx => EmoteWheelManager.WheelRight();
-            EmoteWheelManager.OnEmoteSelected += emote => PlayAnimation(emote);
+            EmotesInputSettings.Instance.Left.started += ctx => EmoteUiManager.OnLeftWheel();
+            EmotesInputSettings.Instance.Right.started += ctx => EmoteUiManager.OnRightWheel();
+            
+            EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
 
         private void TestButton_performed(InputAction.CallbackContext obj)
         {
-            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+            if (!LethalEmotesUiState.Instance.CanOpenEmoteUi())
                 return;
         }
 
@@ -282,18 +283,18 @@ namespace EmotesAPI
 
             if (btn.wasPressedThisFrame)
             {
-                EmoteWheelManager.OpenEmoteWheel();
+                EmoteUiManager.OpenEmoteWheels();
             }
 
             if (btn.wasReleasedThisFrame)
             {
-                EmoteWheelManager.CloseEmoteWheel();
+                EmoteUiManager.CloseEmoteWheels();
             }
         }
 
         private void JoinEmote_performed(InputAction.CallbackContext obj)
         {
-            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+            if (!EmoteUiManager.CanOpenEmoteWheels())
                 return;
 
             try
@@ -354,7 +355,7 @@ namespace EmotesAPI
 
         private void RandomEmote_performed(InputAction.CallbackContext obj)
         {
-            if (EmoteWheelManager.InteractionHandler is null || EmoteWheelManager.InteractionHandler.InOtherMenu())
+            if (!EmoteUiManager.CanOpenEmoteWheels())
                 return;
 
             int rand = UnityEngine.Random.Range(0, randomClipList.Count);

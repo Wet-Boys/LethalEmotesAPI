@@ -82,8 +82,6 @@ namespace EmotesAPI
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
             DMCAFree = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "DMCA Free Songs", false, "If turned on, emotes will either use their DMCA free version or no audio at all.");
             EmoteWheelSetDataEntry = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default(), "Json data of emote wheel");
-            EmoteWheelManager.GetEmoteWheelSetData = () => EmoteWheelSetDataEntry.Value;
-            EmoteWheelManager.SetEmoteWheelSetData = wheelSetData => EmoteWheelSetDataEntry.Value = wheelSetData;
             RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key");
 
             //TODO settings ROO

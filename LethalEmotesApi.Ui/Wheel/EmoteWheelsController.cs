@@ -2,7 +2,6 @@
 using LethalEmotesApi.Ui.Data;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LethalEmotesApi.Ui.Wheel;
 
@@ -19,7 +18,7 @@ public class EmoteWheelsController : MonoBehaviour
     public bool test;
 
     private EmoteWheel[] _wheels = Array.Empty<EmoteWheel>();
-    private EmoteWheelSetData? _wheelSetData = EmoteWheelManager.GetEmoteWheelSetData?.Invoke();
+    private EmoteWheelSetData? _wheelSetData;
     private int _currentWheelIndex;
     private string _selectedEmote = "";
     
@@ -33,10 +32,42 @@ public class EmoteWheelsController : MonoBehaviour
             };
         }
     }
-
+    
     public void Start()
     {
+        if (test)
+        {
+            InitWheels();
+            return;
+        }
+        _wheelSetData = EmoteUiManager.LoadEmoteWheelSetData();
         InitWheels();
+    }
+
+    public void ReloadWheels()
+    {
+        if (test)
+            return;
+        
+        _wheelSetData = EmoteUiManager.LoadEmoteWheelSetData();
+
+        if (_wheelSetData.EmoteWheels.Length != _wheels.Length)
+        {
+            foreach (var wheel in _wheels)
+                DestroyImmediate(wheel.gameObject);
+            
+            InitWheels();
+            return;
+        }
+
+        for (var i = 0; i < _wheels.Length; i++)
+        {
+            var wheel = _wheels[i];
+            var wheelData = _wheelSetData.EmoteWheels[i];
+            
+            wheel.gameObject.SetActive(true);
+            wheel.LoadEmotes(wheelData.Emotes);
+        }
     }
 
     private void InitWheels()
@@ -109,6 +140,9 @@ public class EmoteWheelsController : MonoBehaviour
     {
         if (wheelContainer is null)
             return;
+
+        var wheel = GetCurrentWheel();
+        wheel.gameObject.SetActive(true);
         
         wheelContainer.gameObject.SetActive(true);
 
@@ -122,15 +156,35 @@ public class EmoteWheelsController : MonoBehaviour
     {
         if (wheelContainer is null)
             return;
+
+        foreach (var wheel in _wheels)
+            wheel.gameObject.SetActive(false);
         
         wheelContainer.gameObject.SetActive(false);
         
         if (string.IsNullOrEmpty(_selectedEmote))
             return;
         
-        EmoteWheelManager.EmoteSelected(_selectedEmote);
-        _selectedEmote = EmoteWheelManager.EmoteNone;
+        EmoteUiManager.PlayEmote(_selectedEmote);
+        _selectedEmote = "none";
 
+        if (wheelLabel is null)
+            return;
+        
+        wheelLabel.gameObject.SetActive(false);
+    }
+
+    public void CloseGracefully()
+    {
+        if (wheelContainer is null)
+            return;
+
+        foreach (var wheel in _wheels)
+            wheel.gameObject.SetActive(false);
+        
+        wheelContainer.gameObject.SetActive(false);
+        _selectedEmote = "";
+        
         if (wheelLabel is null)
             return;
         
@@ -140,6 +194,11 @@ public class EmoteWheelsController : MonoBehaviour
     private EmoteWheel GetCurrentWheel()
     {
         return _wheels[_currentWheelIndex];
+    }
+
+    private EmoteWheelData GetCurrentWheelData()
+    {
+        return _wheelSetData!.EmoteWheels[_currentWheelIndex];
     }
 
     private void UpdateWheelState()
