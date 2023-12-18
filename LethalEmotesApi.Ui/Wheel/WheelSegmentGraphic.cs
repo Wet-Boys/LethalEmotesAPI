@@ -1,7 +1,6 @@
 using System;
 using LethalEmotesApi.Ui.Animation;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Wheel;
@@ -44,8 +43,10 @@ public class WheelSegmentGraphic : Graphic
         Vector3 minLeft = CosSin(currentRad, minRadius);
         Vector3 minRight = CosSin(currentRad + (degPer), minRadius);
         Vector3 offset = -Vector3.Lerp(minLeft, minRight, 0.5f);
+
+        var max = (degPer + step / 2) - step;
         
-        for (float i = 0; i + step < degPer + step / 2; i += step)
+        for (float i = 0; i < max; i += step)
         {
             float rad = currentRad + i;
             Vector3 curMin = CosSin(rad, minRadius) + offset;
@@ -55,10 +56,13 @@ public class WheelSegmentGraphic : Graphic
             Vector3 nextMin = CosSin(rad, minRadius) + offset;
             Vector3 nextMax = CosSin(rad, maxRadius) + offset;
             
-            vh.AddVert(curMin, vertColor, new Vector2(0, 0));
-            vh.AddVert(curMax, vertColor, new Vector2(0, 1));
-            vh.AddVert(nextMin, vertColor, new Vector2(1, 0));
-            vh.AddVert(nextMax, vertColor, new Vector2(1, 1));
+            var curU = i / max;
+            var nextU = (i + step) / max;
+            
+            vh.AddVert(curMin, vertColor, new Vector2(curU, 0));
+            vh.AddVert(curMax, vertColor, new Vector2(curU, 1));
+            vh.AddVert(nextMin, vertColor, new Vector2(nextU, 0));
+            vh.AddVert(nextMax, vertColor, new Vector2(nextU, 1));
             
             vh.AddTriangle(vertIndex + 2, vertIndex + 1, vertIndex);
             vh.AddTriangle(vertIndex + 3, vertIndex + 1, vertIndex + 2);

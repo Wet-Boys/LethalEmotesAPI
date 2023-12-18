@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ public static class EmoteUiManager
         {
             _stateController?.PlayEmote(emoteKey);
         }
-        catch (Exception e)
+        catch
         {
             Debug.Log("Emote selected might not exist");
         }
@@ -46,6 +47,21 @@ public static class EmoteUiManager
     {
         _stateController?.UnlockPlayerInput();
     }
+
+    internal static void PlayAnimationOn(Animator animator, string emoteKey)
+    {
+        _stateController?.PlayAnimationOn(animator, emoteKey);
+    }
+
+    internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteKeys;
+
+    internal static string GetEmoteName(string emoteKey) => _stateController!.GetEmoteName(emoteKey);
+    
+    internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
+    
+    internal static void AddToRandomPoolBlacklist(string emoteKey) => _stateController?.AddToRandomPoolBlacklist(emoteKey);
+
+    internal static void RemoveFromRandomPoolBlacklist(string emoteKey) => _stateController?.RemoveFromRandomPoolBlacklist(emoteKey);
 
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
@@ -131,5 +147,35 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.CloseGracefully();
+    }
+
+    public static float EmoteVolume
+    {
+        get => _stateController!.EmoteVolume;
+        set => _stateController!.EmoteVolume = value;
+    }
+
+    public static bool HideJoinSpots
+    {
+        get => _stateController!.HideJoinSpots;
+        set => _stateController!.HideJoinSpots = value;
+    }
+
+    public static int RootMotionType
+    {
+        get => _stateController!.RootMotionType;
+        set => _stateController!.RootMotionType = value;
+    }
+
+    public static bool EmotesAlertEnemies
+    {
+        get => _stateController!.EmotesAlertEnemies;
+        set => _stateController!.EmotesAlertEnemies = value;
+    }
+
+    public static int DmcaFree
+    {
+        get => _stateController!.DmcaFree;
+        set => _stateController!.DmcaFree = value;
     }
 }

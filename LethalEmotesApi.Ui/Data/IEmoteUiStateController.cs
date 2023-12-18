@@ -1,4 +1,7 @@
-﻿namespace LethalEmotesApi.Ui.Data;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace LethalEmotesApi.Ui.Data;
 
 public interface IEmoteUiStateController
 {
@@ -13,6 +16,18 @@ public interface IEmoteUiStateController
     public void UnlockPlayerInput();
 
     public bool CanOpenEmoteUi();
+
+    public void PlayAnimationOn(Animator animator, string emoteKey);
+
+    public IReadOnlyCollection<string> EmoteKeys { get; }
+
+    public string GetEmoteName(string emoteKey);
+
+    public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
+
+    public void AddToRandomPoolBlacklist(string emoteKey);
+
+    public void RemoveFromRandomPoolBlacklist(string emoteKey);
     
     #region Loading Config Data
 
@@ -25,4 +40,10 @@ public interface IEmoteUiStateController
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave);
 
     #endregion
+    
+    public float EmoteVolume { get; set; }
+    public bool HideJoinSpots { get; set; }
+    public int RootMotionType { get; set; }
+    public bool EmotesAlertEnemies { get; set; }
+    public int DmcaFree { get; set; }
 }
