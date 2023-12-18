@@ -143,4 +143,34 @@ public static class EmoteUiManager
         
         EmoteUiInstance.CloseGracefully();
     }
+
+    public static float EmoteVolume
+    {
+        get => _stateController!.EmoteVolume;
+        set => _stateController!.EmoteVolume = value;
+    }
+
+    public static bool HideJoinSpots
+    {
+        get => _stateController!.HideJoinSpots;
+        set => _stateController!.HideJoinSpots = value;
+    }
+
+    public static int RootMotionType
+    {
+        get => _stateController!.RootMotionType;
+        set => _stateController!.RootMotionType = value;
+    }
+
+    public static bool EmotesAlertEnemies
+    {
+        get => _stateController!.EmotesAlertEnemies;
+        set => _stateController!.EmotesAlertEnemies = value;
+    }
+
+    public static int DmcaFree
+    {
+        get => _stateController!.DmcaFree;
+        set => _stateController!.DmcaFree = value;
+    }
 }

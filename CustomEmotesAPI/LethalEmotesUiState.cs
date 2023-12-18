@@ -71,4 +71,34 @@ public class LethalEmotesUiState : IEmoteUiStateController
     {
         Settings.EmoteWheelSetDataEntry.Value = dataToSave;
     }
+
+    public float EmoteVolume
+    {
+        get => Settings.EmotesVolume.Value;
+        set => Settings.EmotesVolume.Value = value;
+    }
+
+    public bool HideJoinSpots
+    {
+        get => Settings.HideJoinSpots.Value;
+        set => Settings.HideJoinSpots.Value = value;
+    }
+
+    public int RootMotionType
+    {
+        get => (int)Settings.rootMotionType.Value;
+        set => Settings.rootMotionType.Value = (RootMotionType)value;
+    }
+
+    public bool EmotesAlertEnemies
+    {
+        get => Settings.EmotesAlertEnemies.Value;
+        set => Settings.EmotesAlertEnemies.Value = value;
+    }
+
+    public int DmcaFree
+    {
+        get => (int)Settings.DMCAFree.Value;
+        set => Settings.DMCAFree.Value = (DMCAType)value;
+    }
 }
