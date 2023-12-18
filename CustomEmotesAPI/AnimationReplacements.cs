@@ -1349,12 +1349,12 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            if (!Settings.NoEmotesHaveRootMotion.Value &&
-                (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.AllEmotesHaveRootMotion.Value || currentClip.lockType == AnimationClipParams.LockType.lockHead))
+            if (Settings.rootMotionType.Value != RootMotionType.None &&
+                (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
                 cameraConstraint.ActivateConstraints();
             }
-            else if (Settings.AllowHeadBobbing.Value && currentClip.lockType == AnimationClipParams.LockType.headBobbing)
+            else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
             {
                 cameraConstraint.ActivateConstraints();
                 cameraConstraint.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on

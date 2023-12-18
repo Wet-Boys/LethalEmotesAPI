@@ -10,15 +10,26 @@ using UnityEngine.Events;
 
 namespace EmotesAPI
 {
+    public enum DMCAType
+    {
+        Normal,
+        Friendly,
+        Mute,
+        AllOff
+    }
+    public enum RootMotionType
+    {
+        Normal,
+        All,
+        None
+    }
     public static class Settings
     {
         public static ConfigEntry<float> EmotesVolume;
         public static ConfigEntry<bool> HideJoinSpots;
-        public static ConfigEntry<bool> AllEmotesHaveRootMotion;
-        public static ConfigEntry<bool> NoEmotesHaveRootMotion;
-        public static ConfigEntry<bool> AllowHeadBobbing;
+        public static ConfigEntry<RootMotionType> rootMotionType;
         public static ConfigEntry<bool> EmotesAlertEnemies;
-        public static ConfigEntry<int> DMCAFree;
+        public static ConfigEntry<DMCAType> DMCAFree;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
         public static ConfigEntry<EmoteWheelSetData> EmoteWheelSetDataEntry;
@@ -75,14 +86,12 @@ namespace EmotesAPI
             }
 
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
-            AllEmotesHaveRootMotion = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "All Emotes Have Root Motion", false, "If turned on, all emotes will have root motion, even if not specified by the emote itself");
-            NoEmotesHaveRootMotion = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "No Emotes Have Root Motion", false, "If turned on, no emotes will have root motion, even if specified by the emote itself");
-            AllowHeadBobbing = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "Allow Head Bobbing Emotes", true, "Some emotes, even if they don't apply root motion, might have head bobbing, this can turn that off.");
+            rootMotionType = CustomEmotesAPI.instance.Config.Bind<RootMotionType>("Controls", "Camera Lock Settings", RootMotionType.Normal, "Switch head locking between all emotes, no emotes, or let each emote decide.");
             EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", true, "If turned on, emotes will alert enemies like other sound sources.");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
-            DMCAFree = CustomEmotesAPI.instance.Config.Bind<int>("Misc", "DMCA Free Songs", 0, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will be muted if DMCA is listed. 3: All songs will use DMCA friendly versions or none at all");
+            DMCAFree = CustomEmotesAPI.instance.Config.Bind<DMCAType>("Misc", "DMCA Free Songs", DMCAType.Normal, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will be muted if DMCA is listed. 3: All songs will use DMCA friendly versions or none at all");
             EmoteWheelSetDataEntry = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default(), "Json data of emote wheel");
-            RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key");
+            RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key, probably don't want to touch this here");
 
             //TODO settings ROO
             //ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));
@@ -95,23 +104,6 @@ namespace EmotesAPI
             //ModSettingsManager.AddOption(new KeyBindOption(JoinEmote));
             EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
             HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
-            AllEmotesHaveRootMotion.SettingChanged += AllEmotesLock_SettingChanged;
-            NoEmotesHaveRootMotion.SettingChanged += NoEmotesLock_SettingChanged;
-        }
-
-        private static void AllEmotesLock_SettingChanged(object sender, EventArgs e)
-        {
-            if (AllEmotesHaveRootMotion.Value)
-            {
-                NoEmotesHaveRootMotion.Value = false;
-            }
-        }
-        private static void NoEmotesLock_SettingChanged(object sender, EventArgs e)
-        {
-            if (NoEmotesHaveRootMotion.Value)
-            {
-                AllEmotesHaveRootMotion.Value = false;
-            }
         }
         private static void HideJoinSpots_SettingChanged(object sender, EventArgs e)
         {
