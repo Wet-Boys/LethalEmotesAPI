@@ -20,6 +20,12 @@ public interface IEmoteUiStateController
     public void PlayAnimationOn(Animator animator, string emoteKey);
 
     public IReadOnlyCollection<string> GetAllEmoteNames();
+
+    public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
+
+    public void AddToRandomPoolBlacklist(string emoteKey);
+
+    public void RemoveFromRandomPoolBlacklist(string emoteKey);
     
     #region Loading Config Data
 

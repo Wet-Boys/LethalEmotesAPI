@@ -53,10 +53,13 @@ public static class EmoteUiManager
         _stateController?.PlayAnimationOn(animator, emoteKey);
     }
 
-    internal static IReadOnlyCollection<string> GetAllEmoteNames()
-    {
-        return _stateController!.GetAllEmoteNames();
-    }
+    internal static IReadOnlyCollection<string> AllEmoteNames => _stateController!.GetAllEmoteNames();
+    
+    internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
+    
+    internal static void AddToRandomPoolBlacklist(string emoteKey) => _stateController?.AddToRandomPoolBlacklist(emoteKey);
+
+    internal static void RemoveFromRandomPoolBlacklist(string emoteKey) => _stateController?.RemoveFromRandomPoolBlacklist(emoteKey);
 
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {

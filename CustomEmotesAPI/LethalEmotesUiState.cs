@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using EmotesAPI;
 using LethalEmotesApi.Ui.Data;
+using LethalEmotesAPI.Utils;
 using UnityEngine;
 
 namespace LethalEmotesAPI;
@@ -60,6 +61,18 @@ public class LethalEmotesUiState : IEmoteUiStateController
     public IReadOnlyCollection<string> GetAllEmoteNames()
     {
         return CustomEmotesAPI.allClipNames;
+    }
+
+    public IReadOnlyCollection<string> RandomPoolBlacklist => BlacklistSettings.emotesExcludedFromRandom;
+    
+    public void AddToRandomPoolBlacklist(string emoteKey)
+    {
+        BlacklistSettings.AddToExcludeList(emoteKey);
+    }
+
+    public void RemoveFromRandomPoolBlacklist(string emoteKey)
+    {
+        BlacklistSettings.RemoveFromExcludeList(emoteKey);
     }
 
     public EmoteWheelSetData LoadEmoteWheelSetData()
