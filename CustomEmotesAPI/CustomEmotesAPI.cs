@@ -402,10 +402,10 @@ namespace EmotesAPI
                 Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
                 return;
             }
-            if (animationClipParams.rootBonesToIgnore == null)
-                animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
-            if (animationClipParams.soloBonesToIgnore == null)
-                animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
+            //if (animationClipParams.rootBonesToIgnore == null)
+            //    animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
+            //if (animationClipParams.soloBonesToIgnore == null)
+            //    animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
 
 
             if (animationClipParams._primaryAudioClips == null)
@@ -433,7 +433,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips/*, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore*/, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA);
             if (animationClipParams.visible)
             {
                 allClipNames.Add(animationClipParams.customName);
