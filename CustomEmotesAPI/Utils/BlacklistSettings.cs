@@ -15,22 +15,22 @@ namespace LethalEmotesAPI.Utils
             CustomEmotesAPI.randomClipList.Remove(emoteName);
             if (emotesExcludedFromRandom.Contains(emoteName))
                 return;
-            
+
             emotesExcludedFromRandom.Add(emoteName);
             SaveExcludeListToBepinSex(Settings.RandomEmoteBlacklist);
         }
-        
+
         public static void RemoveFromExcludeList(string emoteName)
         {
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
             emotesExcludedFromRandom.Remove(emoteName);
             if (CustomEmotesAPI.randomClipList.Contains(emoteName))
                 return;
-            
+
             CustomEmotesAPI.randomClipList.Add(emoteName);
             SaveExcludeListToBepinSex(Settings.RandomEmoteBlacklist);
         }
-        
+
         public static void LoadExcludeListFromBepinSex(ConfigEntry<string> list)
         {
             string csvList = list.Value;
@@ -39,7 +39,7 @@ namespace LethalEmotesAPI.Utils
                 AddToExcludeList(item);
             }
         }
-        
+
         public static void SaveExcludeListToBepinSex(ConfigEntry<string> list)
         {
             StringBuilder sb = new StringBuilder();
@@ -47,7 +47,10 @@ namespace LethalEmotesAPI.Utils
             {
                 sb.Append($"{item}ඞ");
             }
-            sb.Remove(sb.Length - 1, 1);
+            if (sb.ToString().EndsWith('ඞ'))
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
             list.Value = sb.ToString();
         }
     }
