@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace LethalEmotesApi.Ui.Data;
 
@@ -17,6 +18,8 @@ public interface IEmoteUiStateController
     public bool CanOpenEmoteUi();
 
     public void PlayAnimationOn(Animator animator, string emoteKey);
+
+    public IReadOnlyCollection<string> GetAllEmoteNames();
     
     #region Loading Config Data
 

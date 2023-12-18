@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using EmotesAPI;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
@@ -54,6 +55,11 @@ public class LethalEmotesUiState : IEmoteUiStateController
     public void PlayAnimationOn(Animator animator, string emoteKey)
     {
         BoneMapper.PreviewAnimations(animator, emoteKey);
+    }
+
+    public IReadOnlyCollection<string> GetAllEmoteNames()
+    {
+        return CustomEmotesAPI.allClipNames;
     }
 
     public EmoteWheelSetData LoadEmoteWheelSetData()

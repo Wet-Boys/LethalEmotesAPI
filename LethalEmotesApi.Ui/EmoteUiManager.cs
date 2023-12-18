@@ -1,4 +1,5 @@
-﻿using LethalEmotesApi.Ui.Data;
+﻿using System.Collections.Generic;
+using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 
 namespace LethalEmotesApi.Ui;
@@ -41,6 +42,11 @@ public static class EmoteUiManager
     internal static void PlayAnimationOn(Animator animator, string emoteKey)
     {
         _stateController?.PlayAnimationOn(animator, emoteKey);
+    }
+
+    internal static IReadOnlyCollection<string> GetAllEmoteNames()
+    {
+        return _stateController!.GetAllEmoteNames();
     }
 
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
