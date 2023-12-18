@@ -165,6 +165,13 @@ namespace EmotesAPI
             orig(self, playerObjectNumber, clientId);
         }
         private static Hook startOfRoundOnPlayerDCHook;
+        
+        private void BeginUsingTerminal(Action<Terminal>orig, Terminal self)
+        {
+            orig(self);
+            InTerminal();
+        }
+        private static Hook BeginUsingTerminalHook;      
 
 
         private static bool buttonLock = false;
@@ -231,6 +238,9 @@ namespace EmotesAPI
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(StartOfRoundOnPlayerDC), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             startOfRoundOnPlayerDCHook = new Hook(targetMethod, destMethod, this);
 
+            targetMethod = typeof(Terminal).GetMethod("BeginUsingTerminal", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(BeginUsingTerminal), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            BeginUsingTerminalHook = new Hook(targetMethod, destMethod, this);
 
             AnimationReplacements.RunAll();
 
@@ -259,7 +269,13 @@ namespace EmotesAPI
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
-
+            
+            // Scroll Functionality 
+            var ScrollU = new InputAction("ScrollUP",binding: "<Mouse>/Scroll/Up");
+            var ScrollD = new InputAction("ScrollDOWN",binding: "<Mouse>/Scroll/Down");
+            ScrollU.Enable();
+            ScrollD.Enable();
+            
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
             EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
@@ -267,6 +283,9 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
             EmotesInputSettings.Instance.Left.started += ctx => EmoteUiManager.OnLeftWheel();
             EmotesInputSettings.Instance.Right.started += ctx => EmoteUiManager.OnRightWheel();
+            ScrollU.started += ctx => EmoteUiManager.OnLeftWheel();
+            ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
+            EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
@@ -360,6 +379,11 @@ namespace EmotesAPI
 
             int rand = UnityEngine.Random.Range(0, randomClipList.Count);
             PlayAnimation(randomClipList[rand]);
+        }
+
+        private void StopEmoting_performed(InputAction.CallbackContext obj)
+        {
+            PlayAnimation("none");
         }
 
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
@@ -645,6 +669,12 @@ namespace EmotesAPI
             mapper.basePlayerModelAnimator.gameObject.SetActive(true);
             DebugClass.Log($"reenabling");
 
+        }
+        
+        public static void InTerminal() // Ends emote when opening terminal
+        {
+            var localPlayer = GameNetworkManager.Instance.localPlayerController;
+            PlayAnimation("none");
         }
     }
 }
