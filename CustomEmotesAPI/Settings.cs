@@ -54,37 +54,6 @@ namespace EmotesAPI
         internal static GameObject picker;
         private static void Yes()
         {
-            picker = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotepicker2.prefab"));
-            GameObject.DontDestroyOnLoad(picker);
-            picker.GetComponent<Canvas>().scaleFactor = 2;
-            picker.transform.Find("emotepicker").Find("EmoteContainer").gameObject.AddComponent<ScrollManager>();
-            var basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Middle");
-            for (int i = 0; i < 8; i++)
-            {
-                //TODO menu buttons
-                //GameObject nut = GameObject.Instantiate(Settings.NakedButton);
-                //nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
-                //nut.transform.localPosition = new Vector3(-80, -20, 0);
-                //nut.transform.localScale = new Vector3(.8f, .8f, .8f);
-            }
-            basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Left");
-            for (int i = 0; i < 8; i++)
-            {
-                //TODO menu buttons
-                //GameObject nut = GameObject.Instantiate(Settings.NakedButton);
-                //nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
-                //nut.transform.localPosition = new Vector3(-80, -20, 0);
-                //nut.transform.localScale = new Vector3(.8f, .8f, .8f);
-            }
-            basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Right");
-            for (int i = 0; i < 8; i++)
-            {
-                //TODO menu buttons
-                //GameObject nut = GameObject.Instantiate(Settings.NakedButton);
-                //nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
-                //nut.transform.localPosition = new Vector3(-80, -20, 0);
-                //nut.transform.localScale = new Vector3(.8f, .8f, .8f);
-            }
 
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             rootMotionType = CustomEmotesAPI.instance.Config.Bind<RootMotionType>("Controls", "Camera Lock Settings", RootMotionType.Normal, "Switch head locking between all emotes, no emotes, or let each emote decide.");
