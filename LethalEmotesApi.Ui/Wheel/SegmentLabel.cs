@@ -17,7 +17,7 @@ public class SegmentLabel : UIBehaviour
     public TextMeshProUGUI? targetText;
 
     private RectTransform? _rectTransform;
-    private string? _emote;
+    private string? _emoteKey;
 
     public RectTransform RectTransform
     {
@@ -57,18 +57,18 @@ public class SegmentLabel : UIBehaviour
         Tracker.Clear();
     }
 
-    public void SetEmote(string? emote)
+    public void SetEmote(string? emoteKey)
     {
-        _emote = emote;
+        _emoteKey = emoteKey;
         UpdateText();
     }
 
     private void UpdateText()
     {
-        if (targetText is null || _emote is null)
+        if (targetText is null || _emoteKey is null)
             return;
         
-        targetText.SetText(_emote);
+        targetText.SetText(EmoteUiManager.GetEmoteName(_emoteKey));
     }
 
     public void TweenScale(Vector3 targetScale, float duration, bool ignoreTimeScale)

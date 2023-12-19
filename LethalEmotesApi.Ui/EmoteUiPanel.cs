@@ -38,6 +38,14 @@ public class EmoteUiPanel : MonoBehaviour
             _customizeButtonLabel = customizeButton.GetComponentInChildren<TextMeshProUGUI>();
     }
 
+    public void ReloadData()
+    {
+        if(emoteWheelsController is null)
+            return;
+        
+        emoteWheelsController.ReloadWheels();
+    }
+
     public void Show()
     {
         CurrentView = UiView.EmoteWheels;

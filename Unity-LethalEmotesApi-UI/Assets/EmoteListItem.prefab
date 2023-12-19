@@ -338,6 +338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   label: {fileID: 2282145272262992105}
   blacklistToggle: {fileID: 4272890844900554996}
+  dragDropController: {fileID: 0}
 --- !u!1 &2853481375598808262
 GameObject:
   m_ObjectHideFlags: 0

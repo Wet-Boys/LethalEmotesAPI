@@ -70,7 +70,12 @@ public static class EmoteUiManager
 
     internal static void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
-        _stateController?.SaveEmoteWheelSetData(dataToSave);
+        _stateController!.SaveEmoteWheelSetData(dataToSave);
+
+        if (EmoteUiInstance is null)
+            return;
+        
+        EmoteUiInstance.ReloadData();
     }
 
     public static bool IsEmoteWheelsOpen() => EmoteUiInstance is
