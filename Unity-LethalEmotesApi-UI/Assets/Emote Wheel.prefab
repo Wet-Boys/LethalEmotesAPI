@@ -75,7 +75,6 @@ MonoBehaviour:
   segmentRotOffset: 22.5
   minRadius: 100
   maxRadius: 400
-  test: 0
   wheelSegments:
   - {fileID: 6043074316510893431}
   - {fileID: 544507829616216780}

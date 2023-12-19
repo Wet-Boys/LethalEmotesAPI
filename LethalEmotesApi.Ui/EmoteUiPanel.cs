@@ -154,6 +154,8 @@ public class EmoteUiPanel : MonoBehaviour
         if (customizePanel is null)
             return;
         
+        customizePanel.dragDropController!.CancelDrag();
+        
         customizePanel.gameObject.SetActive(false);
         EmoteUiManager.UnlockPlayerInput();
         EmoteUiManager.UnlockMouseInput();

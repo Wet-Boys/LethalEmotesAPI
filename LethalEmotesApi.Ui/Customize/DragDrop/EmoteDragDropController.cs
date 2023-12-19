@@ -6,7 +6,7 @@ namespace LethalEmotesApi.Ui.Customize.DragDrop;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RectTransform))]
-public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointerUpHandler, IPointerClickHandler, IDragHandler, IEndDragHandler
+public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointerClickHandler, IDragHandler, IEndDragHandler
 {
     public RectTransform? dragDropRectTransform;
     public DragDropItem? dragDropItem;
@@ -43,11 +43,6 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
     public void OnPointerMove(PointerEventData eventData)
     {
         UpdateDragPos(eventData);
-    }
-    
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        StopDrag();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -106,7 +101,6 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
             return;
         
         var customizeWheel = GetCustomizeWheel();
-
         if (_emoteKey is null || customizeWheel is null)
             return;
 
@@ -115,6 +109,20 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         
         customizeWheel.DropEmote(_emoteKey);
 
+        _dragDropState = DragDropState.Ready;
+    }
+
+    public void CancelDrag()
+    {
+        if (_dragDropState != DragDropState.Dragging)
+            return;
+        
+        var customizeWheel = GetCustomizeWheel();
+        if (_emoteKey is null || customizeWheel is null)
+            return;
+        
+        customizeWheel.ResetState();
+        dragDropRectTransform!.gameObject.SetActive(false);
         _dragDropState = DragDropState.Ready;
     }
 
