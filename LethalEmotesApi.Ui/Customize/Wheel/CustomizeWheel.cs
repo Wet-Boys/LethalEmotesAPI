@@ -12,7 +12,7 @@ public class CustomizeWheel : UIBehaviour
 {
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
-
+    public Material? segmentMaterial;
     public float minDist = 100f;
     public List<CustomizeWheelSegment> wheelSegments = [];
     public EmoteChangedCallback OnEmoteChanged = new();
@@ -39,6 +39,11 @@ public class CustomizeWheel : UIBehaviour
         {
             segment.colors = colors;
             segment.scaleMultiplier = scaleMultiplier;
+
+            if (segmentMaterial is not null)
+                segment.targetGraphic!.material = segmentMaterial;
+            
+            segment.ResetState();
         }
     }
     
@@ -46,20 +51,21 @@ public class CustomizeWheel : UIBehaviour
     {
         base.Start();
         
-        UpdateLabels();
+        ResetState();
     }
 
     protected override void OnEnable()
     {
         base.OnEnable();
 
-        UpdateLabels();
+        ResetState();
     }
 
     public void LoadEmoteData(string[] emoteArray)
     {
         _emoteArray = emoteArray;
-        UpdateLabels();
+        
+        ResetState();
     }
 
     public void OnDropPointMove(Vector2 mousePos)
@@ -78,7 +84,12 @@ public class CustomizeWheel : UIBehaviour
             return;
         }
         
-        _currentSegmentIndex = GetClosestSegmentIndex(mousePos);
+        var segmentIndex = GetClosestSegmentIndex(mousePos);
+        if (segmentIndex != _currentSegmentIndex && _currentSegmentIndex >= 0)
+            wheelSegments[_currentSegmentIndex].DeSelect();
+
+        _currentSegmentIndex = segmentIndex;
+        SelectSegment();
     }
 
     public void DropEmote(string emoteKey)
@@ -87,6 +98,15 @@ public class CustomizeWheel : UIBehaviour
             return;
         
         OnEmoteChanged.Invoke(_currentSegmentIndex, emoteKey);
+        wheelSegments[_currentSegmentIndex].DeSelect();
+    }
+
+    private void SelectSegment()
+    {
+        if (_currentSegmentIndex < 0)
+            return;
+        
+        wheelSegments[_currentSegmentIndex].Select();
     }
     
     public void DeSelectAll()
@@ -94,6 +114,15 @@ public class CustomizeWheel : UIBehaviour
         _currentSegmentIndex = -1;
         foreach (var segment in wheelSegments)
             segment.DeSelect();
+    }
+    
+    public void ResetState()
+    {
+        _currentSegmentIndex = -1;
+        foreach (var segment in wheelSegments)
+            segment.ResetState();
+        
+        UpdateLabels();
     }
     
     private int GetClosestSegmentIndex(Vector2 mousePos)

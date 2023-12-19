@@ -177,13 +177,6 @@ namespace Editor
             float degPer = (float)(Math.PI * 2 / wheelSegmentGen.segments);
             
             float currentRad = degPer + Mathf.Deg2Rad * wheelSegmentGen.offset;
-            float centerRad =  degPer / 2 + Mathf.Deg2Rad * wheelSegmentGen.offset;
-
-            float centerX =
-                (float)(Math.Cos(centerRad) * ((wheelSegmentGen.minRadius + wheelSegmentGen.maxRadius) / 2));
-            float centerY =
-                (float)(Math.Sin(centerRad) * ((wheelSegmentGen.minRadius + wheelSegmentGen.maxRadius) / 2));
-            Vector3 center = new Vector3(centerX, centerY, 0);
             
             List<Vector3> vertices = new List<Vector3>();
             List<Vector2> uvs = new List<Vector2>();
@@ -192,6 +185,8 @@ namespace Editor
 
             int vertIndex = 0;
             float step = (float)Math.PI / 180;
+            
+            double max = (degPer + step / 2) - step;
 
             for (float i = 0; i < degPer + step / 2; i += step)
             {
@@ -230,11 +225,14 @@ namespace Editor
                 triangles.Add(vertIndex + 3);
                 triangles.Add(vertIndex + 1);
                 triangles.Add(vertIndex + 2);
+                
+                double curU = i / max;
+                double nextU = (i + step) / max;
 
-                uvs.Add(new Vector2(0, 0)); // 0, 0
-                uvs.Add(new Vector2(0, 1)); // 0, 1
-                uvs.Add(new Vector2(1, 0)); // 1, 0
-                uvs.Add(new Vector2(1, 1)); // 1, 1
+                uvs.Add(new Vector2((float)curU, 0)); // 0, 0
+                uvs.Add(new Vector2((float)curU, 1)); // 0, 1
+                uvs.Add(new Vector2((float)nextU, 0)); // 1, 0
+                uvs.Add(new Vector2((float)nextU, 1)); // 1, 1
 
                 normals.Add(Vector3.back);
                 normals.Add(Vector3.back);

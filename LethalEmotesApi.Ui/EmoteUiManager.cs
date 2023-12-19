@@ -25,7 +25,6 @@ public static class EmoteUiManager
         {
             Debug.Log("Emote selected might not exist");
         }
-        
     }
 
     internal static void LockMouseInput()
@@ -96,8 +95,11 @@ public static class EmoteUiManager
     {
         if (EmoteUiInstance is null || EmoteUiInstance.emoteWheelsController is null)
             return;
+
+        if (!IsEmoteWheelsOpen())
+            return;
         
-        EmoteUiInstance.emoteWheelsController.NextWheel();
+        EmoteUiInstance.emoteWheelsController.PrevWheel();
     }
 
     public static void OnRightWheel()
@@ -105,7 +107,10 @@ public static class EmoteUiManager
         if (EmoteUiInstance is null || EmoteUiInstance.emoteWheelsController is null)
             return;
         
-        EmoteUiInstance.emoteWheelsController.PrevWheel();
+        if (!IsEmoteWheelsOpen())
+            return;
+        
+        EmoteUiInstance.emoteWheelsController.NextWheel();
     }
 
     public static void OpenEmoteWheels()
