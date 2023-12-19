@@ -7,7 +7,6 @@ namespace LethalEmotesApi.Ui.Customize.Wheel;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RectTransform))]
-[ExecuteAlways]
 public class CustomizeWheelSegment : UIBehaviour
 {
     public WheelSegmentGraphic? targetGraphic;
@@ -61,6 +60,12 @@ public class CustomizeWheelSegment : UIBehaviour
     {
         selected = false;
         UpdateState();
+    }
+    
+    public void ResetState()
+    {
+        selected = false;
+        UpdateState(true);
     }
     
     private Color GetColor()
