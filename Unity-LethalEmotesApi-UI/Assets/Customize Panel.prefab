@@ -400,6 +400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dragDropController: {fileID: 6270799269981641442}
+  previewController: {fileID: 426734076700814412}
 --- !u!114 &6270799269981641442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1531,6 +1532,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2161188324995826543}
+  - component: {fileID: 426734076700814412}
   m_Layer: 5
   m_Name: Preview Panel
   m_TagString: Untagged
@@ -1558,6 +1560,19 @@ RectTransform:
   m_AnchoredPosition: {x: 14.999939, y: 0}
   m_SizeDelta: {x: -30.000135, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &426734076700814412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1929130831862983204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -998099503, guid: b2c656f14b2d18f468e54fdcaa06a25c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  previewPrefab: {fileID: 6734175759076055529, guid: 98d25339293259144acbdc752672d892, type: 3}
 --- !u!1 &1998582778518232684
 GameObject:
   m_ObjectHideFlags: 0

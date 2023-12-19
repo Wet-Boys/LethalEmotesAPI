@@ -10,11 +10,9 @@ public class EmoteUiPanel : MonoBehaviour
     public EmoteWheelsController? emoteWheelsController;
     public CustomizePanel? customizePanel;
     public RectTransform? customizeButton;
-    public GameObject? previewCube;
     
     private TextMeshProUGUI? _customizeButtonLabel;
-    private static GameObject? _previewInstance;
-
+    
     public bool IsOpen { get; private set; }
     internal UiView CurrentView { get; private set; } = UiView.EmoteWheels;
 
@@ -132,21 +130,6 @@ public class EmoteUiPanel : MonoBehaviour
             return;
         
         customizePanel.gameObject.SetActive(true);
-
-        if (previewCube is null)
-            return;
-
-        if (_previewInstance is not null)
-        {
-            DestroyImmediate(_previewInstance);
-            _previewInstance = null;
-        }
-
-        _previewInstance = Instantiate(previewCube, new Vector3(0, 0, 10000f), Quaternion.Euler(0, 0, 0));
-        _previewInstance.SetActive(true);
-
-        var animator = _previewInstance.GetComponentInChildren<Animator>();
-        EmoteUiManager.PlayAnimationOn(animator, "CaliforniaGirls");
     }
 
     public void HideCustomizePanel()
@@ -159,13 +142,6 @@ public class EmoteUiPanel : MonoBehaviour
         customizePanel.gameObject.SetActive(false);
         EmoteUiManager.UnlockPlayerInput();
         EmoteUiManager.UnlockMouseInput();
-        
-        if (_previewInstance is null)
-            return;
-        
-        _previewInstance.SetActive(false);
-        DestroyImmediate(_previewInstance);
-        _previewInstance = null;
     }
 
     public void ShowCustomizeButton()

@@ -1,4 +1,5 @@
 ﻿using LethalEmotesApi.Ui.Customize.DragDrop;
+using LethalEmotesApi.Ui.Customize.Preview;
 using UnityEngine;
 
 namespace LethalEmotesApi.Ui.Customize;
@@ -8,10 +9,14 @@ namespace LethalEmotesApi.Ui.Customize;
 public class CustomizePanel : MonoBehaviour
 {
     public EmoteDragDropController? dragDropController;
+    public PreviewController? previewController;
 
     private void Awake()
     {
         if (dragDropController is null)
             dragDropController = GetComponent<EmoteDragDropController>();
+
+        if (previewController is null)
+            previewController = GetComponentInChildren<PreviewController>();
     }
 }

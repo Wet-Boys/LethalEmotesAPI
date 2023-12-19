@@ -14,10 +14,11 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
     public Texture2D? cursorGrabTex;
     public Texture2D? cursorGrabbingTex;
     public Texture2D? cursorNormalTex;
-    
-    private DragDropState _dragDropState = DragDropState.Ready;
+
     private string? _emoteKey;
     private RectTransform? _rectTransform;
+
+    public DragDropState DragState { get; private set; } = DragDropState.Ready;
 
     protected override void Awake()
     {
@@ -48,7 +49,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         if (cursorGrabTex is null)
             return;
 
-        if (_dragDropState != DragDropState.Ready)
+        if (DragState != DragDropState.Ready)
             return;
         
         Cursor.SetCursor(cursorGrabTex, Vector2.zero, CursorMode.Auto);
@@ -59,7 +60,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         if (cursorGrabbingTex is null)
             return;
 
-        if (_dragDropState != DragDropState.Dragging)
+        if (DragState != DragDropState.Dragging)
             return;
         
         Cursor.SetCursor(cursorGrabbingTex, Vector2.zero, CursorMode.Auto);
@@ -70,7 +71,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         if (cursorNormalTex is null)
             return;
 
-        if (_dragDropState != DragDropState.Ready)
+        if (DragState != DragDropState.Ready)
             return;
         
         Cursor.SetCursor(cursorNormalTex, Vector2.zero, CursorMode.Auto);
@@ -98,13 +99,13 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
     
     public void StartDrag(string emoteKey, PointerEventData eventData)
     {
-        if (_dragDropState != DragDropState.Ready)
+        if (DragState != DragDropState.Ready)
             return;
         
         if (customizeWheelController is null)
             return;
 
-        _dragDropState = DragDropState.Dragging;
+        DragState = DragDropState.Dragging;
         _emoteKey = emoteKey;
         
         dragDropItem!.SetEmoteKey(emoteKey);
@@ -117,7 +118,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
     private void UpdateDragPos(PointerEventData eventData)
     {
-        if (_dragDropState != DragDropState.Dragging)
+        if (DragState != DragDropState.Dragging)
             return;
 
         var customizeWheel = GetCustomizeWheel();
@@ -135,26 +136,26 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
     public void StopDrag()
     {
-        if (_dragDropState != DragDropState.Dragging)
+        if (DragState != DragDropState.Dragging)
             return;
         
         var customizeWheel = GetCustomizeWheel();
         if (_emoteKey is null || customizeWheel is null)
             return;
 
-        _dragDropState = DragDropState.Dropping;
+        DragState = DragDropState.Dropping;
         dragDropRectTransform!.gameObject.SetActive(false);
         
         customizeWheel.DropEmote(_emoteKey);
 
-        _dragDropState = DragDropState.Ready;
+        DragState = DragDropState.Ready;
         OnNotGrab();
     }
 
     public void CancelDrag()
     {
         OnNotGrab();
-        if (_dragDropState != DragDropState.Dragging)
+        if (DragState != DragDropState.Dragging)
             return;
         
         var customizeWheel = GetCustomizeWheel();
@@ -163,7 +164,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         
         customizeWheel.ResetState();
         dragDropRectTransform!.gameObject.SetActive(false);
-        _dragDropState = DragDropState.Ready;
+        DragState = DragDropState.Ready;
     }
 
     private CustomizeWheel? GetCustomizeWheel()
@@ -173,8 +174,8 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
         return customizeWheelController.customizeWheel;
     }
-    
-    private enum DragDropState
+
+    public enum DragDropState
     {
         Ready,
         Dragging,
