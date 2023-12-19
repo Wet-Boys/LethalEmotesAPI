@@ -39,6 +39,8 @@ public class CustomizeWheel : UIBehaviour
         {
             segment.colors = colors;
             segment.scaleMultiplier = scaleMultiplier;
+            
+            segment.ResetState();
         }
     }
     
@@ -46,20 +48,21 @@ public class CustomizeWheel : UIBehaviour
     {
         base.Start();
         
-        UpdateLabels();
+        ResetState();
     }
 
     protected override void OnEnable()
     {
         base.OnEnable();
 
-        UpdateLabels();
+        ResetState();
     }
 
     public void LoadEmoteData(string[] emoteArray)
     {
         _emoteArray = emoteArray;
-        UpdateLabels();
+        
+        ResetState();
     }
 
     public void OnDropPointMove(Vector2 mousePos)
@@ -78,7 +81,11 @@ public class CustomizeWheel : UIBehaviour
             return;
         }
         
-        _currentSegmentIndex = GetClosestSegmentIndex(mousePos);
+        var segmentIndex = GetClosestSegmentIndex(mousePos);
+        if (segmentIndex != _currentSegmentIndex && _currentSegmentIndex >= 0)
+            wheelSegments[_currentSegmentIndex].DeSelect();
+
+        _currentSegmentIndex = segmentIndex;
         SelectSegment();
     }
 
@@ -88,6 +95,7 @@ public class CustomizeWheel : UIBehaviour
             return;
         
         OnEmoteChanged.Invoke(_currentSegmentIndex, emoteKey);
+        wheelSegments[_currentSegmentIndex].DeSelect();
     }
 
     private void SelectSegment()
@@ -103,6 +111,15 @@ public class CustomizeWheel : UIBehaviour
         _currentSegmentIndex = -1;
         foreach (var segment in wheelSegments)
             segment.DeSelect();
+    }
+    
+    public void ResetState()
+    {
+        _currentSegmentIndex = -1;
+        foreach (var segment in wheelSegments)
+            segment.ResetState();
+        
+        UpdateLabels();
     }
     
     private int GetClosestSegmentIndex(Vector2 mousePos)

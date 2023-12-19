@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using LethalEmotesApi.Ui.Animation;
-using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -25,14 +24,12 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
     public float segmentRotOffset = 22.5f;
     public float minRadius = 100f;
     public float maxRadius = 300f;
-
-    public bool test = false;
     
     public List<EmoteWheelSegment> wheelSegments = [];
     public string[] emoteArray;
 
     private int _currentSegmentIndex = -1;
-    private RectTransform _rectTransform;
+    private RectTransform? _rectTransform;
     private readonly EmoteSelectedCallback _emoteSelectedCallback = new();
 
     private bool _focused;
@@ -78,9 +75,6 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
             
             segment.ResetState();
         }
-        
-        if (test)
-            LoadEmotes(EmoteWheelData.Default().Emotes);
     }
 
     private void OnEnable()
@@ -96,7 +90,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_rectTransform, eventData.position,
             eventData.enterEventCamera, out var mousePos);
 
-        var rect = _rectTransform.rect;
+        var rect = _rectTransform!.rect;
 
         var dist = Vector2.Distance(Vector2.zero, mousePos);
         if (dist < minRadius)
@@ -170,7 +164,7 @@ public class EmoteWheel : MonoBehaviour, IPointerMoveHandler
         for (var i = 0; i < wheelSegments.Count; i++)
         {
             var emoteWheelSegment = wheelSegments[i];
-            Vector2 pos = emoteWheelSegment.segmentRectTransform!.position - _rectTransform.position;
+            Vector2 pos = emoteWheelSegment.segmentRectTransform!.position - _rectTransform!.position;
 
             float distToMouse = Vector2.Distance(pos, mousePos);
             if (!(distToMouse < shortestDist))
