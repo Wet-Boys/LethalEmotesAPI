@@ -100,7 +100,7 @@ public static class EmoteUiManager
         if (!IsEmoteWheelsOpen())
             return;
         
-        EmoteUiInstance.emoteWheelsController.NextWheel();
+        EmoteUiInstance.emoteWheelsController.PrevWheel();
     }
 
     public static void OnRightWheel()
@@ -111,7 +111,7 @@ public static class EmoteUiManager
         if (!IsEmoteWheelsOpen())
             return;
         
-        EmoteUiInstance.emoteWheelsController.PrevWheel();
+        EmoteUiInstance.emoteWheelsController.NextWheel();
     }
 
     public static void OpenEmoteWheels()
