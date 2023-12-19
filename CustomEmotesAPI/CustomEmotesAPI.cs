@@ -171,8 +171,19 @@ namespace EmotesAPI
             orig(self);
             InTerminal();
         }
-        private static Hook BeginUsingTerminalHook;      
+        private static Hook BeginUsingTerminalHook;
 
+        private void TeleportPlayer(Action<PlayerControllerB, Vector3, bool, float, bool, bool> orig, PlayerControllerB self, Vector3 pos, bool withRotation = false, float rot = 0f, bool allowInteractTrigger = false, bool enableController = true)
+        {
+            BoneMapper ownerMapper = self.GetComponentInChildren<BoneMapper>();
+            if (ownerMapper && ownerMapper.parentGameObject)
+            {
+                ownerMapper.preserveParent = false;
+                PlayAnimation("none", ownerMapper);
+            }
+            orig(self, pos, withRotation, rot, allowInteractTrigger, enableController);
+        }
+        private static Hook TeleportPlayerHook;
 
         private static bool buttonLock = false;
 
@@ -240,6 +251,10 @@ namespace EmotesAPI
             targetMethod = typeof(Terminal).GetMethod("BeginUsingTerminal", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(BeginUsingTerminal), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             BeginUsingTerminalHook = new Hook(targetMethod, destMethod, this);
+
+            targetMethod = typeof(PlayerControllerB).GetMethod("TeleportPlayer", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(TeleportPlayer), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            TeleportPlayerHook = new Hook(targetMethod, destMethod, this);
 
             AnimationReplacements.RunAll();
 
