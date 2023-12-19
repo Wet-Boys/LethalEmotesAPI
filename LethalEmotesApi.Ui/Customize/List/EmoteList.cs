@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using LethalEmotesApi.Ui.Customize.DragDrop;
+using LethalEmotesApi.Ui.Data;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,15 +12,29 @@ namespace LethalEmotesApi.Ui.Customize.List;
 public class EmoteList : UIBehaviour
 {
     public RectTransform? listContentContainer;
+    public TMP_InputField? searchInputField;
     public GameObject? entryPrefab;
 
     private EmoteDragDropController? _dragDropController;
     
     private readonly List<GameObject> _listObjects = [];
+    private SearchableEmoteArray? _searchableEmoteArray;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        if (searchInputField is null)
+            return;
+        
+        searchInputField.onValueChanged.AddListener(SearchFieldUpdated); 
+    }
 
     protected override void Start()
     {
         base.Start();
+        
+        _searchableEmoteArray = new SearchableEmoteArray(EmoteUiManager.EmoteKeys.ToArray());
 
         if (_dragDropController is null)
             _dragDropController = GetComponentInParent<EmoteDragDropController>();
@@ -28,11 +45,28 @@ public class EmoteList : UIBehaviour
     protected override void OnEnable()
     {
         base.OnEnable();
+        
+        _searchableEmoteArray = new SearchableEmoteArray(EmoteUiManager.EmoteKeys.ToArray());
 
         if (_dragDropController is null)
             _dragDropController = GetComponentInParent<EmoteDragDropController>();
         
         InitList();
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+
+        if (searchInputField is null)
+            return;
+        
+        searchInputField.text = "";
+
+        if (_searchableEmoteArray is null)
+            return;
+
+        _searchableEmoteArray.Filter = "";
     }
 
     private void InitList()
@@ -43,7 +77,7 @@ public class EmoteList : UIBehaviour
         if (_listObjects.Count > 0)
             return;
         
-        var emoteKeys = EmoteUiManager.EmoteKeys;
+        var emoteKeys = _searchableEmoteArray!;
 
         foreach (var emote in emoteKeys)
         {
@@ -55,5 +89,24 @@ public class EmoteList : UIBehaviour
             
             _listObjects.Add(entryGameObject);
         }
+    }
+
+    private void ClearList()
+    {
+        foreach (var listObject in _listObjects)
+            DestroyImmediate(listObject);
+        
+        _listObjects.Clear();
+    }
+    
+    private void SearchFieldUpdated(string filter)
+    {
+        if (_searchableEmoteArray is null)
+            return;
+
+        _searchableEmoteArray.Filter = filter;
+        
+        ClearList();
+        InitList();
     }
 }

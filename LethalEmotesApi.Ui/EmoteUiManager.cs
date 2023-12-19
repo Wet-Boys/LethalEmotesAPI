@@ -25,7 +25,6 @@ public static class EmoteUiManager
         {
             Debug.Log("Emote selected might not exist");
         }
-        
     }
 
     internal static void LockMouseInput()
