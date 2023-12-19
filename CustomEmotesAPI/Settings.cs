@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using BepInEx.Configuration;
+using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace EmotesAPI
         public static ConfigEntry<DMCAType> DMCAFree;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
-        public static ConfigEntry<EmoteWheelSetData> EmoteWheelSetDataEntry;
+        public static ConfigEntry<string> EmoteWheelSetDataEntryString;
         public static ConfigEntry<string> RandomEmoteBlacklist;
 
         //TODO loading a base button
@@ -59,7 +60,7 @@ namespace EmotesAPI
             EmotesAlertEnemies = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Emotes Alert Enemies", true, "If turned on, emotes will alert enemies like other sound sources.");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
             DMCAFree = CustomEmotesAPI.instance.Config.Bind<DMCAType>("Misc", "DMCA Free Songs", DMCAType.Normal, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will be muted if DMCA is listed. 3: All songs will use DMCA friendly versions or none at all");
-            EmoteWheelSetDataEntry = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default(), "Json data of emote wheel");
+            EmoteWheelSetDataEntryString = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default().ToJson(), "Json data of emote wheel");
             RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key, probably don't want to touch this here");
 
             //TODO settings ROO

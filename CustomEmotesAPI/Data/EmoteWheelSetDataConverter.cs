@@ -5,32 +5,18 @@ using Newtonsoft.Json;
 
 namespace LethalEmotesAPI.Data;
 
-public static class EmoteWheelSetDataConverter
+internal static class EmoteWheelSetDataConverter
 {
-    internal static void Init()
+    internal static string ToJson(this EmoteWheelSetData data)
     {
-        var converter = new TypeConverter
-        {
-            ConvertToString = ConvertToString,
-            ConvertToObject = ConvertToObject
-        };
-
-        TomlTypeConverter.AddConverter(typeof(EmoteWheelSetData), converter);
-    }
-
-    private static string ConvertToString(object obj, Type type)
-    {
-        if (type != typeof(EmoteWheelSetData))
-            throw new InvalidOperationException();
-
-        return JsonConvert.SerializeObject((EmoteWheelSetData)obj, Formatting.None);
+        DebugClass.Log("I'm gonna pre serialize");
+        var text = JsonConvert.SerializeObject(data, Formatting.None);
+        DebugClass.Log(text);
+        return text;
     }
     
-    private static object ConvertToObject(string text, Type type)
+    internal static EmoteWheelSetData FromJson(string text)
     {
-        if (type != typeof(EmoteWheelSetData))
-            throw new InvalidOperationException();
-
-        return JsonConvert.DeserializeObject(text, type);
+        return (EmoteWheelSetData)JsonConvert.DeserializeObject(text, typeof(EmoteWheelSetData));
     }
 }

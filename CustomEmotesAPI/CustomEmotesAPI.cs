@@ -197,7 +197,6 @@ namespace EmotesAPI
         public void Awake()
         {
             instance = this;
-            EmoteWheelSetDataConverter.Init();
             DebugClass.SetLogger(base.Logger);
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginGUID);
 

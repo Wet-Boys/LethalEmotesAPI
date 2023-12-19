@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using EmotesAPI;
+using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
@@ -75,6 +76,9 @@ public class LethalEmotesUiState : IEmoteUiStateController
 
     public string GetEmoteName(string emoteKey)
     {
+        if (!BoneMapper.animClips.ContainsKey(emoteKey))
+            return emoteKey;
+        
         var clip = BoneMapper.animClips[emoteKey];
         return clip is null || string.IsNullOrEmpty(clip.customName) ? emoteKey : clip.customName;
     }
@@ -93,12 +97,12 @@ public class LethalEmotesUiState : IEmoteUiStateController
 
     public EmoteWheelSetData LoadEmoteWheelSetData()
     {
-        return Settings.EmoteWheelSetDataEntry.Value;
+        return EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
     }
 
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
-        Settings.EmoteWheelSetDataEntry.Value = dataToSave;
+        Settings.EmoteWheelSetDataEntryString.Value = dataToSave.ToJson();
     }
 
     public float EmoteVolume
