@@ -79,6 +79,7 @@ public class CustomizeWheel : UIBehaviour
         }
         
         _currentSegmentIndex = GetClosestSegmentIndex(mousePos);
+        SelectSegment();
     }
 
     public void DropEmote(string emoteKey)
@@ -87,6 +88,14 @@ public class CustomizeWheel : UIBehaviour
             return;
         
         OnEmoteChanged.Invoke(_currentSegmentIndex, emoteKey);
+    }
+
+    private void SelectSegment()
+    {
+        if (_currentSegmentIndex < 0)
+            return;
+        
+        wheelSegments[_currentSegmentIndex].Select();
     }
     
     public void DeSelectAll()
