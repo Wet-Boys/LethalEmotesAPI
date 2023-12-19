@@ -223,6 +223,7 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   scaleMultiplier: 1.2
+  segmentMaterial: {fileID: 0}
   minDist: 100
   wheelSegments:
   - {fileID: 466012062523222779}

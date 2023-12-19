@@ -12,7 +12,7 @@ public class CustomizeWheel : UIBehaviour
 {
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
-
+    public Material? segmentMaterial;
     public float minDist = 100f;
     public List<CustomizeWheelSegment> wheelSegments = [];
     public EmoteChangedCallback OnEmoteChanged = new();
@@ -39,6 +39,9 @@ public class CustomizeWheel : UIBehaviour
         {
             segment.colors = colors;
             segment.scaleMultiplier = scaleMultiplier;
+
+            if (segmentMaterial is not null)
+                segment.targetGraphic!.material = segmentMaterial;
             
             segment.ResetState();
         }
