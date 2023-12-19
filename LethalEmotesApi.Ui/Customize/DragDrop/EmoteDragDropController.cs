@@ -11,6 +11,9 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
     public RectTransform? dragDropRectTransform;
     public DragDropItem? dragDropItem;
     public CustomizeWheelController? customizeWheelController;
+    public Texture2D? cursorGrabTex;
+    public Texture2D? cursorGrabbingTex;
+    public Texture2D? cursorNormalTex;
     
     private DragDropState _dragDropState = DragDropState.Ready;
     private string? _emoteKey;
@@ -38,6 +41,39 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         
         if (_rectTransform is null)
             _rectTransform = GetComponent<RectTransform>();
+    }
+
+    public void OnCanGrab()
+    {
+        if (cursorGrabTex is null)
+            return;
+
+        if (_dragDropState != DragDropState.Ready)
+            return;
+        
+        Cursor.SetCursor(cursorGrabTex, Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnGrabbing()
+    {
+        if (cursorGrabbingTex is null)
+            return;
+
+        if (_dragDropState != DragDropState.Dragging)
+            return;
+        
+        Cursor.SetCursor(cursorGrabbingTex, Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnNotGrab()
+    {
+        if (cursorNormalTex is null)
+            return;
+
+        if (_dragDropState != DragDropState.Ready)
+            return;
+        
+        Cursor.SetCursor(cursorNormalTex, Vector2.zero, CursorMode.Auto);
     }
 
     public void OnPointerMove(PointerEventData eventData)
@@ -75,6 +111,8 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
         UpdateDragPos(eventData);
         dragDropRectTransform!.gameObject.SetActive(true);
+        
+        OnGrabbing();
     }
 
     private void UpdateDragPos(PointerEventData eventData)
@@ -110,10 +148,12 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         customizeWheel.DropEmote(_emoteKey);
 
         _dragDropState = DragDropState.Ready;
+        OnNotGrab();
     }
 
     public void CancelDrag()
     {
+        OnNotGrab();
         if (_dragDropState != DragDropState.Dragging)
             return;
         

@@ -415,6 +415,9 @@ MonoBehaviour:
   dragDropRectTransform: {fileID: 1638783438555037597}
   dragDropItem: {fileID: 7166667055203618213}
   customizeWheelController: {fileID: 1509810636666098244}
+  cursorGrabTex: {fileID: 2800000, guid: 0e8c70e8c585d65448930f457720e414, type: 3}
+  cursorGrabbingTex: {fileID: 2800000, guid: c166ee7d64c258143a1d13808c0eb3a0, type: 3}
+  cursorNormalTex: {fileID: 2800000, guid: 95ad5c841ce605646aca145ee3f45908, type: 3}
 --- !u!222 &845882162162178737
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3253,7 +3256,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 2
   m_Viewport: {fileID: 4983558275662211900}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 3691820470234153625}

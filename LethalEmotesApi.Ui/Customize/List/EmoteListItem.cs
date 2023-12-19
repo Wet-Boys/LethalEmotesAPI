@@ -1,10 +1,11 @@
 using LethalEmotesApi.Ui.Customize.DragDrop;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.List;
 
-public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler
+public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public TextMeshProUGUI? label;
     public EmoteBlacklistToggle? blacklistToggle;
@@ -66,5 +67,15 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler
             return;
 
         blacklistToggle.SetEmoteKey(EmoteKey);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        dragDropController!.OnCanGrab();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        dragDropController!.OnNotGrab();
     }
 }
