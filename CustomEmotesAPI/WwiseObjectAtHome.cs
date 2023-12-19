@@ -137,8 +137,8 @@ namespace LethalEmotesAPI
         }
         public void Stop()
         {
-            audioSource.Stop();
             needToContinueOnFinish = false;
+            audioSource.Stop();
         }
         public void SetAndPlayAudio(AudioClip a)
         {

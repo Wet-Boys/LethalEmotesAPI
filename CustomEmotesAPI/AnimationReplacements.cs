@@ -375,7 +375,7 @@ public class CustomAnimationClip : MonoBehaviour
         //else
         //{
         //}
-            soloIgnoredBones = new List<HumanBodyBones>();
+        soloIgnoredBones = new List<HumanBodyBones>();
 
         //if (rootBonesToIgnore.Length != 0)
         //{
@@ -384,7 +384,7 @@ public class CustomAnimationClip : MonoBehaviour
         //else
         //{
         //}
-            rootIgnoredBones = new List<HumanBodyBones>();
+        rootIgnoredBones = new List<HumanBodyBones>();
         syncronizeAnimation = syncAnim;
         syncronizeAudio = syncAudio;
         syncPos = syncTimer.Count;
@@ -540,10 +540,24 @@ public class BoneMapper : MonoBehaviour
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                 }
                 audioObject.GetComponent<AudioManager>().Stop();
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"had issue turning off audio before new audio played step 1: {e}");
+            }
+            try
+            {
                 if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
                 {
                     listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
                 }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"had issue turning off audio before new audio played step 2: {e}");
+            }
+            try
+            {
                 if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
                 {
                     CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
@@ -552,8 +566,10 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
+                DebugClass.Log($"had issue turning off audio before new audio played step 3: {e}");
             }
+
+
         }
         catch (Exception)
         {
@@ -1089,6 +1105,8 @@ public class BoneMapper : MonoBehaviour
             {
                 mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
                 mapperBody.transform.position = parentGameObject.transform.position;
+                mapperBody.ResetFallGravity();
+
             }
             if (rotationLock)
             {
