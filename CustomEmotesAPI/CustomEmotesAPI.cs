@@ -178,8 +178,9 @@ namespace EmotesAPI
             BoneMapper ownerMapper = self.GetComponentInChildren<BoneMapper>();
             if (ownerMapper && ownerMapper.parentGameObject)
             {
-                ownerMapper.preserveParent = false;
-                PlayAnimation("none", ownerMapper);
+                ownerMapper.parentGameObject.transform.position += pos - self.transform.position;
+                //ownerMapper.preserveParent = false;
+                //PlayAnimation("none", ownerMapper);
             }
             orig(self, pos, withRotation, rot, allowInteractTrigger, enableController);
         }
@@ -598,6 +599,8 @@ namespace EmotesAPI
                     mapper.prevMapperPos = mapper.transform.position;
                     mapper.prevMapperRot = mapper.transform.eulerAngles;
                 }
+                mapper.positionBeforeRootMotion = mapper.mapperBody.transform.position;
+                mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
             }
             else
             {

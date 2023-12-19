@@ -487,10 +487,13 @@ public class BoneMapper : MonoBehaviour
     public bool revertTransform = false;
     public bool oneFrameAnimatorLeeWay = false;
     public PlayerControllerB mapperBody;
+    public Transform mapperBodyTransform;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
     public EmoteConstraint cameraConstraint;
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
+    public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
+    public Quaternion rotationBeforeRootMotion = Quaternion.identity;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -866,6 +869,7 @@ public class BoneMapper : MonoBehaviour
             return;
         }
         mapperBody = transform.parent.parent.parent.GetComponent<PlayerControllerB>();
+        mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
 
         GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
@@ -1110,7 +1114,8 @@ public class BoneMapper : MonoBehaviour
             }
             if (rotationLock)
             {
-                mapperBody.transform.eulerAngles = parentGameObject.transform.eulerAngles + new Vector3(90, 0, 0);
+                //mapperBody.transform.eulerAngles = parentGameObject.transform.eulerAngles + new Vector3(90, 0, 0);
+                mapperBody.transform.rotation = parentGameObject.transform.rotation;
             }
             if (scaleLock)
             {
@@ -1166,8 +1171,20 @@ public class BoneMapper : MonoBehaviour
                     transform.position = tempPos;
                     transform.rotation = tempRot;
 
+
+                    if (positionBeforeRootMotion != new Vector3(69,69,69))
+                    {
+                        DebugClass.Log($"sex");
+                        mapperBody.transform.position = positionBeforeRootMotion;
+                        mapperBody.transform.rotation = rotationBeforeRootMotion;
+                        positionBeforeRootMotion = new Vector3(69, 69, 69);
+                    }
+                    else
+                    {
+                        DebugClass.Log($"HUHH");
+                    }
                     //tell server where we are now
-                    EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, transform.position, transform.eulerAngles);
+                    EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.NetworkObjectId, transform.position, transform.eulerAngles);
                 }
                 //or not
                 else
