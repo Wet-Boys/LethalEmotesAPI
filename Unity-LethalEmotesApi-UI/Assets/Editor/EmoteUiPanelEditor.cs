@@ -106,8 +106,8 @@ namespace Editor
                 {
                     EmoteWheels = new[]
                     {
-                        EmoteWheelData.Default(), EmoteWheelData.Default(1), EmoteWheelData.Default(2),
-                        EmoteWheelData.Default(3)
+                        EmoteWheelData.CreateDefault(), EmoteWheelData.CreateDefault(1), EmoteWheelData.CreateDefault(2),
+                        EmoteWheelData.CreateDefault(3)
                     }
                 };
 

@@ -16,6 +16,10 @@ public class LeUiButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public UnityEvent onClick = new();
 
+    public UnityEvent onEnter = new();
+
+    public UnityEvent onExit = new();
+
     private bool _selected;
     private bool _pressed;
 
@@ -28,12 +32,14 @@ public class LeUiButton : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
         _selected = true;
+        onEnter.Invoke();
         UpdateState();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _selected = false;
+        onExit.Invoke();
         UpdateState();
     }
 

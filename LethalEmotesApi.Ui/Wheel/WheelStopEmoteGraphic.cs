@@ -11,12 +11,6 @@ public class WheelStopEmoteGraphic : Graphic
 {
     public float radius = 95f;
 
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        raycastTarget = false;
-    }
-
     protected override void OnPopulateMesh(VertexHelper vh)
     {
         vh.Clear();

@@ -2,6 +2,7 @@ using LethalEmotesApi.Ui.Customize.DragDrop;
 using LethalEmotesApi.Ui.Customize.Preview;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Customize.List;
 
@@ -9,6 +10,7 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
 {
     public TextMeshProUGUI? label;
     public EmoteBlacklistToggle? blacklistToggle;
+    public Image? selectImage;
     public EmoteDragDropController? dragDropController;
     public PreviewController? previewController;
     
@@ -72,6 +74,11 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (selectImage is null)
+            return;
+
+        selectImage.enabled = true;
+        
         if (EmoteKey is null)
             return;
         
@@ -85,6 +92,11 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (selectImage is null)
+            return;
+
+        selectImage.enabled = false;
+        
         dragDropController!.OnNotGrab();
     }
 }

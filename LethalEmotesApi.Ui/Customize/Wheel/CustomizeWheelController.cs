@@ -1,5 +1,7 @@
+using System;
 using LethalEmotesApi.Ui.Data;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.Wheel;
@@ -8,12 +10,19 @@ public class CustomizeWheelController : UIBehaviour
 {
     public CustomizeWheel? customizeWheel;
     public TMP_InputField? wheelLabel;
+    public GameObject? deleteConfirmationPrefab;
+    private DeleteWheelPopup? _deleteWheelPopupInstance;
+
+    private EmoteUiPanel? _emoteUiPanel;
 
     private int _wheelIndex = -1;
 
     protected override void Awake()
     {
         base.Awake();
+
+        if (_emoteUiPanel is null)
+            _emoteUiPanel = GetComponentInParent<EmoteUiPanel>();
 
         if (customizeWheel is null)
             return;
@@ -29,6 +38,17 @@ public class CustomizeWheelController : UIBehaviour
 
         _wheelIndex = 0;
         UpdateState();
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+
+        if (_deleteWheelPopupInstance is not null)
+        {
+            DestroyImmediate(_deleteWheelPopupInstance.gameObject);
+            _deleteWheelPopupInstance = null;
+        }
     }
 
     public void NextWheel()
@@ -55,6 +75,128 @@ public class CustomizeWheelController : UIBehaviour
         UpdateState();
     }
 
+    public void NewWheel()
+    {
+        if (customizeWheel is null)
+            return;
+
+        var newIndex = _wheelIndex + 1;
+
+        var wheels = WheelSetData.EmoteWheels;
+        Array.Resize(ref wheels, wheels.Length + 1);
+        
+        wheels[newIndex] = EmoteWheelData.CreateDefault(wheels.Length - 1);
+
+        var newData = new EmoteWheelSetData()
+        {
+            EmoteWheels = wheels
+        };
+        EmoteUiManager.SaveEmoteWheelSetData(newData);
+
+        _wheelIndex = newIndex;
+        UpdateState();
+    }
+
+    public void TryDelete()
+    {
+        if (deleteConfirmationPrefab is null)
+            return;
+
+        var instance = Instantiate(deleteConfirmationPrefab, _emoteUiPanel!.transform);
+
+        _deleteWheelPopupInstance = instance.GetComponent<DeleteWheelPopup>();
+        _deleteWheelPopupInstance.customizeWheelController = this;
+    }
+
+    public void DeleteWheel()
+    {
+        _deleteWheelPopupInstance = null;
+        
+        if (customizeWheel is null)
+            return;
+
+        if (_wheelIndex < 0)
+            return;
+
+        var wheels = WheelSetData.EmoteWheels;
+        if (wheels.Length <= 0)
+            return;
+        
+        if (wheels.Length == 1)
+        {
+            wheels[0] = EmoteWheelData.CreateDefault();
+            
+            var resetData = new EmoteWheelSetData
+            {
+                EmoteWheels = wheels
+            };
+            EmoteUiManager.SaveEmoteWheelSetData(resetData);
+            _wheelIndex = 0;
+            UpdateState();
+            return;
+        }
+
+        var newWheels = new EmoteWheelData[wheels.Length - 1];
+
+        var i = 0;
+        var offset = 0;
+        do
+        {
+            if (i == _wheelIndex)
+            {
+                offset = 1;
+                i++;
+                continue;
+            }
+
+            newWheels[i - offset] = wheels[i]; 
+            i++;
+        } while (i < wheels.Length);
+
+        var newData = new EmoteWheelSetData
+        {
+            EmoteWheels = newWheels
+        };
+        EmoteUiManager.SaveEmoteWheelSetData(newData);
+        PrevWheel();
+    }
+
+    public void ToggleDefault()
+    {
+        if (_wheelIndex < 0)
+            return;
+
+        if (customizeWheel is null)
+            return;
+        
+        var wheels = WheelSetData.EmoteWheels;
+
+        var existingDefaultIndex = WheelSetData.IndexOfDefault();
+        if (existingDefaultIndex < 0)
+        {
+            wheels[_wheelIndex].IsDefault = true;
+
+            var newData = new EmoteWheelSetData
+            {
+                EmoteWheels = wheels
+            };
+            EmoteUiManager.SaveEmoteWheelSetData(newData);
+            UpdateState();
+            return;
+        }
+
+        wheels[existingDefaultIndex].IsDefault = false;
+        if (existingDefaultIndex != _wheelIndex)
+            wheels[_wheelIndex].IsDefault = true;
+        
+        var data = new EmoteWheelSetData
+        {
+            EmoteWheels = wheels
+        };
+        EmoteUiManager.SaveEmoteWheelSetData(data);
+        UpdateState();
+    }
+
     public void LoadWheelIndex(int wheelIndex)
     {
         if (customizeWheel is null)
@@ -62,7 +204,7 @@ public class CustomizeWheelController : UIBehaviour
         
         var wheelData = WheelSetData.EmoteWheels[wheelIndex];
         
-        customizeWheel.LoadEmoteData(wheelData.Emotes);
+        customizeWheel.LoadEmoteData(wheelData);
 
         if (wheelLabel is null)
             return;

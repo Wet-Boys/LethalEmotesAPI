@@ -15,12 +15,11 @@ public class EmoteWheelsController : MonoBehaviour
     public float fadeDuration = 0.5f;
     public AnimationCurve? fadeCurve;
 
-    public bool test;
-
     private EmoteWheel[] _wheels = Array.Empty<EmoteWheel>();
     private EmoteWheelSetData WheelSetData => EmoteUiManager.LoadEmoteWheelSetData();
     private int _currentWheelIndex;
     private string _selectedEmote = "";
+    private bool _wheelLock;
     
     public void Start()
     {
@@ -53,6 +52,21 @@ public class EmoteWheelsController : MonoBehaviour
         }
     }
 
+    public void LockWheels()
+    {
+        _wheelLock = true;
+
+        if (_currentWheelIndex < 0)
+            return;
+        
+        _wheels[_currentWheelIndex].DeSelectAll();
+    }
+
+    public void UnlockWheels()
+    {
+        _wheelLock = false;
+    }
+
     private void InitWheels()
     {
         if (wheelPrefab is null)
@@ -82,11 +96,19 @@ public class EmoteWheelsController : MonoBehaviour
         }
 
         _currentWheelIndex = 0;
+        
+        var defaultIndex = WheelSetData.IndexOfDefault();
+        if (defaultIndex >= 0)
+            _currentWheelIndex = defaultIndex;
+        
         UpdateWheelState();
     }
 
     public void NextWheel()
     {
+        if (_wheelLock)
+            return;
+        
         var prevWheelIndex = _currentWheelIndex;
         
         _currentWheelIndex++;
@@ -103,6 +125,9 @@ public class EmoteWheelsController : MonoBehaviour
 
     public void PrevWheel()
     {
+        if (_wheelLock)
+            return;
+        
         var prevWheelIndex = _currentWheelIndex;
         
         _currentWheelIndex--;
@@ -119,8 +144,13 @@ public class EmoteWheelsController : MonoBehaviour
 
     public void Show()
     {
+        UnlockWheels();
         if (wheelContainer is null)
             return;
+
+        var defaultIndex = WheelSetData.IndexOfDefault();
+        if (defaultIndex >= 0)
+            _currentWheelIndex = defaultIndex;
 
         var wheel = GetCurrentWheel();
         wheel.gameObject.SetActive(true);
@@ -131,10 +161,12 @@ public class EmoteWheelsController : MonoBehaviour
             return;
         
         wheelLabel.gameObject.SetActive(true);
+        UpdateWheelState();
     }
     
     public void Hide()
     {
+        UnlockWheels();
         if (wheelContainer is null)
             return;
 
