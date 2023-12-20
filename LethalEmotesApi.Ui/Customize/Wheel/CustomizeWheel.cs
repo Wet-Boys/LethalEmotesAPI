@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -13,8 +14,10 @@ public class CustomizeWheel : UIBehaviour
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
     public Material? segmentMaterial;
+    public WheelDefaultButton? defaultButton;
     public float minDist = 100f;
     public List<CustomizeWheelSegment> wheelSegments = [];
+    
     public EmoteChangedCallback OnEmoteChanged = new();
 
     private string[] _emoteArray = [];
@@ -61,9 +64,13 @@ public class CustomizeWheel : UIBehaviour
         ResetState();
     }
 
-    public void LoadEmoteData(string[] emoteArray)
+    public void LoadEmoteData(EmoteWheelData emoteData)
     {
-        _emoteArray = emoteArray;
+        if (defaultButton is null)
+            return;
+        
+        defaultButton.SetDefault(emoteData.IsDefaultWheel());
+        _emoteArray = emoteData.Emotes;
         
         ResetState();
     }

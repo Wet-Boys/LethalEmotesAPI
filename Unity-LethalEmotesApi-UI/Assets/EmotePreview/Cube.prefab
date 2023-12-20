@@ -75,9 +75,8 @@ GameObject:
   - component: {fileID: 7189708753322113937}
   - component: {fileID: 4719898456154642030}
   - component: {fileID: 6035327424170633418}
-  - component: {fileID: 1588167136132831569}
   m_Layer: 27
-  m_Name: Cube
+  m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -105,7 +104,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1026521760520968516}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 4300000, guid: b6a1e79d2549aa14989a1ec2e0b595dc, type: 2}
 --- !u!23 &6035327424170633418
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -148,27 +147,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1588167136132831569
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1026521760520968516}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1086024115913636551
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,15 +843,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3715862483799592593}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0.7071068, w: 0}
-  m_LocalPosition: {x: 0, y: -4.098, z: 0.274}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3076080515298002786}
   - {fileID: 9213334008087239882}
-  m_Father: {fileID: 4934125399953225564}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -180}
+  m_Father: {fileID: 1480879552547674346}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3556710422641069620
 Animator:
   serializedVersion: 5
@@ -939,6 +917,7 @@ GameObject:
   - component: {fileID: 2475883566042632782}
   - component: {fileID: 9123699373516056834}
   - component: {fileID: 5672204223832318081}
+  - component: {fileID: 7338007566832443087}
   m_Layer: 27
   m_Name: Camera
   m_TagString: Untagged
@@ -954,7 +933,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3748178828776328098}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22488421, y: -0.0002775856, z: -0.000000020234438, w: 0.97438544}
+  m_LocalRotation: {x: 0.060621068, y: -0.004581687, z: 0.00027826146, w: 0.99815035}
   m_LocalPosition: {x: 0.0020000022, y: -0.9110007, z: -2.6670032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1161,6 +1140,26 @@ LookAtConstraint:
   m_Sources:
   - sourceTransform: {fileID: 1280404072577990854}
     weight: 1
+--- !u!1818360608 &7338007566832443087
+PositionConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3748178828776328098}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Weight: 1
+  m_TranslationAtRest: {x: 0.0020000022, y: -0.9110007, z: -2.6670032}
+  m_TranslationOffset: {x: 0.028632052, y: 0.3802513, z: -3.1188166}
+  m_AffectTranslationX: 1
+  m_AffectTranslationY: 1
+  m_AffectTranslationZ: 1
+  m_Active: 1
+  m_IsLocked: 1
+  m_Sources:
+  - sourceTransform: {fileID: 1280404072577990854}
+    weight: 1
 --- !u!1 &3771903074266199549
 GameObject:
   m_ObjectHideFlags: 0
@@ -1350,6 +1349,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1236984441944280337}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4570738576940307686
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1480879552547674346}
+  m_Layer: 27
+  m_Name: why is this pivot so messed up
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1480879552547674346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4570738576940307686}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -0.026117066, y: -2.5291133, z: 1.6013532}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7134218930425159107}
+  m_Father: {fileID: 4934125399953225564}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &4718300027298763950
 GameObject:
   m_ObjectHideFlags: 0
@@ -1990,7 +2021,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7189708753322113937}
-  - {fileID: 7134218930425159107}
+  - {fileID: 1480879552547674346}
   - {fileID: 5920413574364906148}
   - {fileID: 5050011267244447442}
   m_Father: {fileID: 0}
@@ -2241,8 +2272,8 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.6590051
-  m_Range: 113.52
+  m_Intensity: 47.43058
+  m_Range: 32.94
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -2286,10 +2317,10 @@ Light:
   m_BounceIntensity: 0
   m_ColorTemperature: 5804
   m_UseColorTemperature: 1
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 113.52}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
-  m_ShadowRadius: 17.29
+  m_ShadowRadius: 112.5
   m_ShadowAngle: 0
 --- !u!114 &4565365908443177864
 MonoBehaviour:
@@ -2303,7 +2334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a68c43fe1f2a47cfa234b5eeaa98012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Intensity: 8.281302
+  m_Intensity: 596.0303
   m_EnableSpotReflector: 1
   m_LuxAtDistance: 1
   m_InnerSpotPercent: 0
@@ -2319,7 +2350,7 @@ MonoBehaviour:
   m_ShapeWidth: 0.5
   m_ShapeHeight: 0.5
   m_AspectRatio: 1
-  m_ShapeRadius: 17.29
+  m_ShapeRadius: 112.5
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
