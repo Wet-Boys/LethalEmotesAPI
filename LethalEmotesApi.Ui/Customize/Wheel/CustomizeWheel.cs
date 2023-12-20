@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using LethalEmotesApi.Ui.Customize.DragDrop;
+using LethalEmotesApi.Ui.Customize.Preview;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,6 +13,7 @@ namespace LethalEmotesApi.Ui.Customize.Wheel;
 [RequireComponent(typeof(RectTransform))]
 public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPointerEnterHandler, IPointerMoveHandler
 {
+    public PreviewController? previewController;
     public EmoteDragDropController? dragDropController;
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
@@ -43,6 +45,9 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
 
         if (dragDropController is null)
             dragDropController = GetComponentInParent<EmoteDragDropController>();
+
+        if (previewController is null)
+            previewController = GetComponentInParent<CustomizePanel>().previewController;
 
         foreach (var segment in wheelSegments)
         {
@@ -92,8 +97,10 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
         
         RectTransformUtility.ScreenPointToLocalPointInRectangle(RectTransform, eventData.position,
             eventData.enterEventCamera, out var mousePos);
-        
+
+        var prevSegmentIndex = _currentSegmentIndex;
         DetectSegmentFromMouse(mousePos);
+        
         if (_currentSegmentIndex < 0)
         {
             dragDropController.OnNotGrab();
@@ -101,6 +108,15 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
         }
         
         dragDropController.OnCanGrab();
+
+        if (dragDropController.DragState != EmoteDragDropController.DragDropState.Ready)
+            return;
+        if (previewController is null)
+            return;
+        if (prevSegmentIndex == _currentSegmentIndex)
+            return;
+        
+        previewController.PlayEmote(_emoteArray[_currentSegmentIndex]);
     }
 
     private void StartDrag(PointerEventData eventData)
