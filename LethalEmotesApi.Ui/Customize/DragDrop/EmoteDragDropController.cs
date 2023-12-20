@@ -44,6 +44,13 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
             _rectTransform = GetComponent<RectTransform>();
     }
 
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        
+        OnNotGrab();
+    }
+
     public void OnCanGrab()
     {
         if (cursorGrabTex is null)
