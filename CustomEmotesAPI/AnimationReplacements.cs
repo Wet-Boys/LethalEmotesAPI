@@ -638,7 +638,6 @@ public class BoneMapper : MonoBehaviour
             if (local)
             {
                 CustomEmotesAPI.hudAnimator.Play("none", -1, 0f);
-                CustomEmotesAPI.currentEmoteText.color = new Color(0,0,0,0);
             }
             twopart = false;
             prevClip = currentClip;
