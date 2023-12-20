@@ -9,9 +9,7 @@ internal static class EmoteWheelSetDataConverter
 {
     internal static string ToJson(this EmoteWheelSetData data)
     {
-        DebugClass.Log("I'm gonna pre serialize");
         var text = JsonConvert.SerializeObject(data, Formatting.None);
-        DebugClass.Log(text);
         return text;
     }
     

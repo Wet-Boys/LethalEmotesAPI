@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LethalEmotesApi.Ui.Customize.DragDrop;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,8 +10,9 @@ namespace LethalEmotesApi.Ui.Customize.Wheel;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RectTransform))]
-public class CustomizeWheel : UIBehaviour
+public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPointerEnterHandler, IPointerMoveHandler
 {
+    public EmoteDragDropController? dragDropController;
     public ColorBlock colors;
     [Range(1, 2)] public float scaleMultiplier;
     public Material? segmentMaterial;
@@ -19,6 +21,7 @@ public class CustomizeWheel : UIBehaviour
     public List<CustomizeWheelSegment> wheelSegments = [];
     
     public EmoteChangedCallback OnEmoteChanged = new();
+    public EmotesSwappedCallback OnEmotesSwapped = new();
 
     private string[] _emoteArray = [];
     private int _currentSegmentIndex = -1;
@@ -37,6 +40,9 @@ public class CustomizeWheel : UIBehaviour
     protected override void Awake()
     {
         base.Awake();
+
+        if (dragDropController is null)
+            dragDropController = GetComponentInParent<EmoteDragDropController>();
 
         foreach (var segment in wheelSegments)
         {
@@ -63,6 +69,57 @@ public class CustomizeWheel : UIBehaviour
 
         ResetState();
     }
+    
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        StartDrag(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        StartDrag(eventData);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        OnPointerMove(eventData);
+    }
+
+    public void OnPointerMove(PointerEventData eventData)
+    {
+        if (dragDropController is null)
+            return;
+        
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(RectTransform, eventData.position,
+            eventData.enterEventCamera, out var mousePos);
+        
+        DetectSegmentFromMouse(mousePos);
+        if (_currentSegmentIndex < 0)
+        {
+            dragDropController.OnNotGrab();
+            return;
+        }
+        
+        dragDropController.OnCanGrab();
+    }
+
+    private void StartDrag(PointerEventData eventData)
+    {
+        if (dragDropController is null)
+            return;
+
+        if (_currentSegmentIndex < 0)
+        {
+            dragDropController.OnNotGrab();
+            return;
+        }
+        
+        dragDropController.StartWheelGrab(_currentSegmentIndex, _emoteArray[_currentSegmentIndex], eventData);
+        
+        var go = dragDropController.gameObject;
+        eventData.pointerDrag = go;
+        ExecuteEvents.Execute(go, eventData, ExecuteEvents.dragHandler);
+    }
 
     public void LoadEmoteData(EmoteWheelData emoteData)
     {
@@ -75,7 +132,7 @@ public class CustomizeWheel : UIBehaviour
         ResetState();
     }
 
-    public void OnDropPointMove(Vector2 mousePos)
+    public void DetectSegmentFromMouse(Vector2 mousePos)
     {
         var dist = Vector2.Distance(Vector2.zero, mousePos);
         if (dist < minDist)
@@ -106,6 +163,21 @@ public class CustomizeWheel : UIBehaviour
         
         wheelSegments[_currentSegmentIndex].DeSelect();
         OnEmoteChanged.Invoke(_currentSegmentIndex, emoteKey);
+    }
+
+    public void SwapSegmentEmotes(int fromIndex)
+    {
+        if (fromIndex < 0)
+            return;
+        
+        if (_currentSegmentIndex < 0)
+        {
+            OnEmoteChanged.Invoke(fromIndex, "none");
+            return;
+        }
+
+        (_emoteArray[_currentSegmentIndex], _emoteArray[fromIndex]) = (_emoteArray[fromIndex], _emoteArray[_currentSegmentIndex]);
+        OnEmotesSwapped.Invoke(fromIndex, _currentSegmentIndex);
     }
 
     private void SelectSegment()
@@ -163,4 +235,5 @@ public class CustomizeWheel : UIBehaviour
     }
 
     public class EmoteChangedCallback : UnityEvent<int, string>;
+    public class EmotesSwappedCallback : UnityEvent<int, int>;
 }

@@ -26,7 +26,7 @@ public class SearchableEmoteArray : IReadOnlyList<string>
     {
         return emoteKeys
             .Select((key, index) => new KeyValuePair<string, int>(key, index))
-            .OrderBy(kvp => kvp.Key)
+            .OrderBy(kvp => EmoteUiManager.GetEmoteName(kvp.Key))
             .Where(kvp => MatchesFilter(kvp.Key, Filter))
             .Select(kvp => kvp.Value)
             .ToArray();

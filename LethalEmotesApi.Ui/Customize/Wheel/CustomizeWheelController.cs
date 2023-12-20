@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using LethalEmotesApi.Ui.Data;
 using TMPro;
 using UnityEngine;
@@ -31,6 +31,7 @@ public class CustomizeWheelController : UIBehaviour
             return;
         
         customizeWheel.OnEmoteChanged.AddListener(EmoteAtIndexChanged);
+        customizeWheel.OnEmotesSwapped.AddListener(EmotesSwapped);
         wheelLabel.onValueChanged.AddListener(WheelLabelChanged);
 
         if (!HasWheels)
@@ -81,15 +82,17 @@ public class CustomizeWheelController : UIBehaviour
             return;
 
         var newIndex = _wheelIndex + 1;
-
         var wheels = WheelSetData.EmoteWheels;
-        Array.Resize(ref wheels, wheels.Length + 1);
         
-        wheels[newIndex] = EmoteWheelData.CreateDefault(wheels.Length - 1);
+        var newWheel = EmoteWheelData.CreateDefault(wheels.Length);
+        
+        var newWheels = wheels[..newIndex].Concat([newWheel]);
+        if (newIndex < wheels.Length)
+            newWheels = newWheels.Concat(wheels[newIndex..]);
 
-        var newData = new EmoteWheelSetData()
+        var newData = new EmoteWheelSetData
         {
-            EmoteWheels = wheels
+            EmoteWheels = newWheels.ToArray()
         };
         EmoteUiManager.SaveEmoteWheelSetData(newData);
 
@@ -110,6 +113,10 @@ public class CustomizeWheelController : UIBehaviour
 
     public void DeleteWheel()
     {
+        if (_deleteWheelPopupInstance is null)
+            return;
+        
+        DestroyImmediate(_deleteWheelPopupInstance.gameObject);
         _deleteWheelPopupInstance = null;
         
         if (customizeWheel is null)
@@ -228,6 +235,22 @@ public class CustomizeWheelController : UIBehaviour
         wheelSetData.EmoteWheels[_wheelIndex].Emotes[segmentIndex] = emoteKey;
         
         EmoteUiManager.SaveEmoteWheelSetData(wheelSetData);
+        UpdateState();
+    }
+
+    private void EmotesSwapped(int fromIndex, int toIndex)
+    {
+        var wheels = WheelSetData.EmoteWheels;
+        var emotes = wheels[_wheelIndex].Emotes;
+        
+        (emotes[fromIndex], emotes[toIndex]) = (emotes[toIndex], emotes[fromIndex]);
+
+        wheels[_wheelIndex].Emotes = emotes;
+        var newData = new EmoteWheelSetData
+        {
+            EmoteWheels = wheels
+        };
+        EmoteUiManager.SaveEmoteWheelSetData(newData);
         UpdateState();
     }
 
