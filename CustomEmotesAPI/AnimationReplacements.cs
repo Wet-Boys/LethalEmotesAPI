@@ -524,11 +524,7 @@ public class BoneMapper : MonoBehaviour
                 DebugClass.Log($"No emote bound to the name [{s}]");
                 return;
             }
-            try
-            {
-                animClips[s].ToString();
-            }
-            catch (Exception)
+            if (animClips[s] is null)
             {
                 CustomEmotesAPI.Changed(s, this);
                 return;
@@ -758,6 +754,10 @@ public class BoneMapper : MonoBehaviour
     {
         AnimatorOverrideController animController = new AnimatorOverrideController(animator.runtimeAnimatorController);
         CustomAnimationClip customClip = animClips[GetRealAnimationName(animation)];
+        if (customClip is null)
+        {
+            return;
+        }
         int pos = 0;
         if (customClip.secondaryClip != null && customClip.secondaryClip.Length != 0)
         {
@@ -1172,7 +1172,7 @@ public class BoneMapper : MonoBehaviour
             if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
             {
                 //owner of the bonemapper
-                if (local)
+                if (local && Settings.rootMotionType.Value != RootMotionType.None)
                 {
                     //grab current BoneMapper position
                     Vector3 tempPos = transform.position;
@@ -1366,6 +1366,7 @@ public class BoneMapper : MonoBehaviour
         }
         if (!jank)
         {
+            cameraConstraint.DeactivateConstraints();
             //a1.enabled = false;
             StartCoroutine(waitForTwoFramesThenDisableA1());
             foreach (var smr in basePlayerModelSMR)
