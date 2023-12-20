@@ -359,3 +359,6 @@ MigrationBackup/
 .gameReferences/
 .env
 .tools/
+Unity-LethalEmotesApi-UI/AssetBundles/StandaloneWindows/customemotes-ui.manifest
+Unity-LethalEmotesApi-UI/AssetBundles/StandaloneWindows/StandaloneWindows
+Unity-LethalEmotesApi-UI/AssetBundles/StandaloneWindows/StandaloneWindows.manifest

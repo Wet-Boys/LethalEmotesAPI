@@ -3,12 +3,14 @@ using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.Preview;
 
-public class PreviewController : UIBehaviour
+public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
 {
     public GameObject? previewPrefab;
 
     private GameObject? _previewObjectInstance;
     private Animator? _previewAnimator;
+    private PreviewRig? _previewRig;
+    private float rotSpeed = 200.0f;
 
     protected override void Start()
     {
@@ -58,6 +60,7 @@ public class PreviewController : UIBehaviour
         _previewObjectInstance.SetActive(true);
 
         _previewAnimator = _previewObjectInstance.GetComponentInChildren<Animator>();
+        _previewRig = _previewObjectInstance.GetComponentInChildren<PreviewRig>();
     }
 
     private void DestroyPreviewInstance()
@@ -70,5 +73,20 @@ public class PreviewController : UIBehaviour
         DestroyImmediate(_previewObjectInstance);
         _previewObjectInstance = null;
         _previewAnimator = null;
+        _previewRig = null;
+    }
+
+    public void OnDrag(PointerEventData data)
+    {
+        float vInput = data.delta.y * Time.deltaTime * rotSpeed;
+        float hInput = data.delta.x * Time.deltaTime * rotSpeed;
+        
+        _previewRig.Orbit(vInput, hInput);
+    }
+    
+    public void OnScroll(PointerEventData eventData)
+    {
+        float dir = eventData.scrollDelta.y / 3;
+        _previewRig.Zoom(dir);
     }
 }
