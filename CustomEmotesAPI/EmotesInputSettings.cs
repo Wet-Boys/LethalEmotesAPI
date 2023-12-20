@@ -28,15 +28,6 @@ namespace LethalEmotesAPI
         [InputAction("<Keyboard>/b", Name = "CustomEmotesAPI: Bind Currently Playing Emote To Current Selection")]
         public InputAction SetCurrentEmoteToWheel { get; set; }
 
-        [InputAction("<Keyboard>/y", Name = "Fuck you")]
-        public InputAction TestButton { get; set; }
-
-        [InputAction("<Keyboard>/u", Name = "Fuck you")]
-        public InputAction TestButton2 { get; set; }
-
-        [InputAction("<Keyboard>/i", Name = "Fuck you")]
-        public InputAction TestButton3 { get; set; }
-
         [InputAction("", Name = "Stop emoting")]
         public InputAction StopEmoting { get; set; }
 

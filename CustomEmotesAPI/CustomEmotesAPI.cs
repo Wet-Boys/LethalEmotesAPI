@@ -297,19 +297,12 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
             EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
             EmotesInputSettings.Instance.EmoteWheel.canceled += EmoteWheelInteracted;
-            EmotesInputSettings.Instance.TestButton.started += TestButton_performed;
             EmotesInputSettings.Instance.Left.started += ctx => EmoteUiManager.OnLeftWheel();
             EmotesInputSettings.Instance.Right.started += ctx => EmoteUiManager.OnRightWheel();
             ScrollU.started += ctx => EmoteUiManager.OnLeftWheel();
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
-        }
-
-        private void TestButton_performed(InputAction.CallbackContext obj)
-        {
-            if (!LethalEmotesUiState.Instance.CanOpenEmoteUi())
-                return;
         }
 
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
