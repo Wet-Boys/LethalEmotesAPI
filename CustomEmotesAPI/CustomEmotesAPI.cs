@@ -23,6 +23,7 @@ using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem.Controls;
 using LethalEmotesAPI.Utils;
 using TMPro;
+using UnityEngine.SocialPlatforms;
 
 namespace EmotesAPI
 {
@@ -580,7 +581,6 @@ namespace EmotesAPI
             }
             if (newAnimation != "none")
             {
-
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.HideAllSpots();
@@ -599,6 +599,10 @@ namespace EmotesAPI
             }
             else
             {
+                if (mapper.local)
+                {
+                    CustomEmotesAPI.currentEmoteText.color = new Color(0,0,0,0);
+                }
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.ShowAllSpots();

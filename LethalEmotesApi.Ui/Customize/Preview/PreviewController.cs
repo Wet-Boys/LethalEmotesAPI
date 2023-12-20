@@ -1,3 +1,4 @@
+using LethalEmotesApi.Ui.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,8 +11,8 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     private GameObject? _previewObjectInstance;
     private Animator? _previewAnimator;
     private PreviewRig? _previewRig;
-    private float rotSpeed = 200.0f;
-
+    private float rotSpeed = 100.0f;
+    
     protected override void Start()
     {
         base.Start();
@@ -86,7 +87,7 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     
     public void OnScroll(PointerEventData eventData)
     {
-        float dir = eventData.scrollDelta.y / 3;
+        float dir = eventData.scrollDelta.y * 4;
         _previewRig.Zoom(dir);
     }
 }
