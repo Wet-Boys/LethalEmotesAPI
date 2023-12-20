@@ -9,7 +9,7 @@ public class DeleteWheelPopup : UIBehaviour
 
     public void Cancel()
     {
-        Destroy(gameObject, 0.25f);
+        Destroy(gameObject);
     }
 
     public void Confirm()
@@ -21,6 +21,5 @@ public class DeleteWheelPopup : UIBehaviour
         }
         
         customizeWheelController.DeleteWheel();
-        Destroy(gameObject, 0.25f);
     }
 }

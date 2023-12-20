@@ -16,6 +16,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
     public Texture2D? cursorNormalTex;
 
     private string? _emoteKey;
+    private int _segmentIndex = -1;
     private RectTransform? _rectTransform;
 
     public DragDropState DragState { get; private set; } = DragDropState.Ready;
@@ -42,6 +43,13 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         
         if (_rectTransform is null)
             _rectTransform = GetComponent<RectTransform>();
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        
+        OnNotGrab();
     }
 
     public void OnCanGrab()
@@ -106,13 +114,32 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
             return;
 
         DragState = DragDropState.Dragging;
+        _segmentIndex = -1;
         _emoteKey = emoteKey;
         
         dragDropItem!.SetEmoteKey(emoteKey);
 
         UpdateDragPos(eventData);
         dragDropRectTransform!.gameObject.SetActive(true);
+        OnGrabbing();
+    }
+
+    public void StartWheelGrab(int fromIndex, string emoteKey, PointerEventData eventData)
+    {
+        if (DragState != DragDropState.Ready)
+            return;
         
+        if (customizeWheelController is null)
+            return;
+
+        DragState = DragDropState.Dragging;
+        _segmentIndex = fromIndex;
+        _emoteKey = emoteKey;
+        
+        dragDropItem!.SetEmoteKey(emoteKey);
+        
+        UpdateDragPos(eventData);
+        dragDropRectTransform!.gameObject.SetActive(true);
         OnGrabbing();
     }
 
@@ -131,7 +158,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         RectTransformUtility.ScreenPointToLocalPointInRectangle(customizeWheel!.RectTransform, eventData.position,
             eventData.enterEventCamera, out var wheelMousePos);
         
-        customizeWheel.OnDropPointMove(wheelMousePos);
+        customizeWheel.DetectSegmentFromMouse(wheelMousePos);
     }
 
     public void StopDrag()
@@ -145,16 +172,26 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
         DragState = DragDropState.Dropping;
         dragDropRectTransform!.gameObject.SetActive(false);
-        
-        customizeWheel.DropEmote(_emoteKey);
+
+        if (_segmentIndex < 0)
+        {
+            customizeWheel.DropEmote(_emoteKey);
+        }
+        else
+        {
+            customizeWheel.SwapSegmentEmotes(_segmentIndex);
+        }
 
         DragState = DragDropState.Ready;
+        _segmentIndex = -1;
+
         OnNotGrab();
     }
 
     public void CancelDrag()
     {
         OnNotGrab();
+        
         if (DragState != DragDropState.Dragging)
             return;
         
@@ -165,6 +202,7 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
         customizeWheel.ResetState();
         dragDropRectTransform!.gameObject.SetActive(false);
         DragState = DragDropState.Ready;
+        _segmentIndex = -1;
     }
 
     private CustomizeWheel? GetCustomizeWheel()
