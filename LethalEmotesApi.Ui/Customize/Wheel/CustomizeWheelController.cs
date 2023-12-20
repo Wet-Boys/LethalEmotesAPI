@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.Wheel;
 
-public class CustomizeWheelController : UIBehaviour
+public class CustomizeWheelController : UIBehaviour, IScrollHandler
 {
     public CustomizeWheel? customizeWheel;
     public TMP_InputField? wheelLabel;
@@ -257,6 +257,23 @@ public class CustomizeWheelController : UIBehaviour
     private void UpdateState()
     {
         LoadWheelIndex(_wheelIndex);
+    }
+    
+    public void OnScroll(PointerEventData eventData)
+    {
+        if (!isActiveAndEnabled)
+            return;
+
+        var scrollDir = eventData.scrollDelta.y;
+        switch (scrollDir)
+        {
+            case > 0:
+                PrevWheel();
+                break;
+            case < 0:
+                NextWheel();
+                break;
+        }
     }
     
     private EmoteWheelSetData WheelSetData => EmoteUiManager.LoadEmoteWheelSetData();
