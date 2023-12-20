@@ -7,6 +7,7 @@
     "Unity.InputSystem.dll",
     "UnityEngine.UI.dll",
     "UnityEngine.UIModule.dll",
+    "UnityEngine.TextRenderingModule.dll",
     "Unity.TextMeshPro.dll",
     "UnityEngine.dll",
     "UnityEngine.CoreModule.dll",
