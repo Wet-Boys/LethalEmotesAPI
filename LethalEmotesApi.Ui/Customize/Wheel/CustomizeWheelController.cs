@@ -31,6 +31,7 @@ public class CustomizeWheelController : UIBehaviour
             return;
         
         customizeWheel.OnEmoteChanged.AddListener(EmoteAtIndexChanged);
+        customizeWheel.OnEmotesSwapped.AddListener(EmotesSwapped);
         wheelLabel.onValueChanged.AddListener(WheelLabelChanged);
 
         if (!HasWheels)
@@ -234,6 +235,22 @@ public class CustomizeWheelController : UIBehaviour
         wheelSetData.EmoteWheels[_wheelIndex].Emotes[segmentIndex] = emoteKey;
         
         EmoteUiManager.SaveEmoteWheelSetData(wheelSetData);
+        UpdateState();
+    }
+
+    private void EmotesSwapped(int fromIndex, int toIndex)
+    {
+        var wheels = WheelSetData.EmoteWheels;
+        var emotes = wheels[_wheelIndex].Emotes;
+        
+        (emotes[fromIndex], emotes[toIndex]) = (emotes[toIndex], emotes[fromIndex]);
+
+        wheels[_wheelIndex].Emotes = emotes;
+        var newData = new EmoteWheelSetData
+        {
+            EmoteWheels = wheels
+        };
+        EmoteUiManager.SaveEmoteWheelSetData(newData);
         UpdateState();
     }
 
