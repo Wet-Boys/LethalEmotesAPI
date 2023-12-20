@@ -14,8 +14,8 @@ public class EmoteList : UIBehaviour
     public RectTransform? listContentContainer;
     public TMP_InputField? searchInputField;
     public GameObject? entryPrefab;
-
-    private EmoteDragDropController? _dragDropController;
+    
+    private CustomizePanel? _customizePanel;
     
     private readonly List<GameObject> _listObjects = [];
     private SearchableEmoteArray? _searchableEmoteArray;
@@ -36,8 +36,8 @@ public class EmoteList : UIBehaviour
         
         _searchableEmoteArray = new SearchableEmoteArray(EmoteUiManager.EmoteKeys.ToArray());
 
-        if (_dragDropController is null)
-            _dragDropController = GetComponentInParent<EmoteDragDropController>();
+        if (_customizePanel is null)
+            _customizePanel = GetComponentInParent<CustomizePanel>();
         
         InitList();
     }
@@ -48,8 +48,8 @@ public class EmoteList : UIBehaviour
         
         _searchableEmoteArray = new SearchableEmoteArray(EmoteUiManager.EmoteKeys.ToArray());
 
-        if (_dragDropController is null)
-            _dragDropController = GetComponentInParent<EmoteDragDropController>();
+        if (_customizePanel is null)
+            _customizePanel = GetComponentInParent<CustomizePanel>();
         
         InitList();
     }
@@ -84,7 +84,8 @@ public class EmoteList : UIBehaviour
             var entryGameObject = Instantiate(entryPrefab, listContentContainer);
             var entry = entryGameObject.GetComponent<EmoteListItem>();
             
-            entry.dragDropController = _dragDropController;
+            entry.dragDropController = _customizePanel!.dragDropController;
+            entry.previewController = _customizePanel!.previewController;
             entry.SetEmoteKey(emote);
             
             _listObjects.Add(entryGameObject);

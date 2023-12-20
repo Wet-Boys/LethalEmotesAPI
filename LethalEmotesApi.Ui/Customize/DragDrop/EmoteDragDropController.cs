@@ -6,15 +6,19 @@ namespace LethalEmotesApi.Ui.Customize.DragDrop;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RectTransform))]
-public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointerUpHandler, IPointerClickHandler, IDragHandler, IEndDragHandler
+public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointerClickHandler, IDragHandler, IEndDragHandler
 {
     public RectTransform? dragDropRectTransform;
     public DragDropItem? dragDropItem;
     public CustomizeWheelController? customizeWheelController;
-    
-    private DragDropState _dragDropState = DragDropState.Ready;
+    public Texture2D? cursorGrabTex;
+    public Texture2D? cursorGrabbingTex;
+    public Texture2D? cursorNormalTex;
+
     private string? _emoteKey;
     private RectTransform? _rectTransform;
+
+    public DragDropState DragState { get; private set; } = DragDropState.Ready;
 
     protected override void Awake()
     {
@@ -40,14 +44,42 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
             _rectTransform = GetComponent<RectTransform>();
     }
 
+    public void OnCanGrab()
+    {
+        if (cursorGrabTex is null)
+            return;
+
+        if (DragState != DragDropState.Ready)
+            return;
+        
+        Cursor.SetCursor(cursorGrabTex, Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnGrabbing()
+    {
+        if (cursorGrabbingTex is null)
+            return;
+
+        if (DragState != DragDropState.Dragging)
+            return;
+        
+        Cursor.SetCursor(cursorGrabbingTex, Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnNotGrab()
+    {
+        if (cursorNormalTex is null)
+            return;
+
+        if (DragState != DragDropState.Ready)
+            return;
+        
+        Cursor.SetCursor(cursorNormalTex, Vector2.zero, CursorMode.Auto);
+    }
+
     public void OnPointerMove(PointerEventData eventData)
     {
         UpdateDragPos(eventData);
-    }
-    
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        StopDrag();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -67,24 +99,26 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
     
     public void StartDrag(string emoteKey, PointerEventData eventData)
     {
-        if (_dragDropState != DragDropState.Ready)
+        if (DragState != DragDropState.Ready)
             return;
         
         if (customizeWheelController is null)
             return;
 
-        _dragDropState = DragDropState.Dragging;
+        DragState = DragDropState.Dragging;
         _emoteKey = emoteKey;
         
         dragDropItem!.SetEmoteKey(emoteKey);
 
         UpdateDragPos(eventData);
         dragDropRectTransform!.gameObject.SetActive(true);
+        
+        OnGrabbing();
     }
 
     private void UpdateDragPos(PointerEventData eventData)
     {
-        if (_dragDropState != DragDropState.Dragging)
+        if (DragState != DragDropState.Dragging)
             return;
 
         var customizeWheel = GetCustomizeWheel();
@@ -102,20 +136,35 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
     public void StopDrag()
     {
-        if (_dragDropState != DragDropState.Dragging)
+        if (DragState != DragDropState.Dragging)
             return;
         
         var customizeWheel = GetCustomizeWheel();
-
         if (_emoteKey is null || customizeWheel is null)
             return;
 
-        _dragDropState = DragDropState.Dropping;
+        DragState = DragDropState.Dropping;
         dragDropRectTransform!.gameObject.SetActive(false);
         
         customizeWheel.DropEmote(_emoteKey);
 
-        _dragDropState = DragDropState.Ready;
+        DragState = DragDropState.Ready;
+        OnNotGrab();
+    }
+
+    public void CancelDrag()
+    {
+        OnNotGrab();
+        if (DragState != DragDropState.Dragging)
+            return;
+        
+        var customizeWheel = GetCustomizeWheel();
+        if (_emoteKey is null || customizeWheel is null)
+            return;
+        
+        customizeWheel.ResetState();
+        dragDropRectTransform!.gameObject.SetActive(false);
+        DragState = DragDropState.Ready;
     }
 
     private CustomizeWheel? GetCustomizeWheel()
@@ -125,8 +174,8 @@ public class EmoteDragDropController : UIBehaviour, IPointerMoveHandler, IPointe
 
         return customizeWheelController.customizeWheel;
     }
-    
-    private enum DragDropState
+
+    public enum DragDropState
     {
         Ready,
         Dragging,
