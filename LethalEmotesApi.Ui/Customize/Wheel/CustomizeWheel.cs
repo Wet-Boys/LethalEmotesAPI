@@ -104,8 +104,8 @@ public class CustomizeWheel : UIBehaviour
         if (_currentSegmentIndex < 0)
             return;
         
-        OnEmoteChanged.Invoke(_currentSegmentIndex, emoteKey);
         wheelSegments[_currentSegmentIndex].DeSelect();
+        OnEmoteChanged.Invoke(_currentSegmentIndex, emoteKey);
     }
 
     private void SelectSegment()
