@@ -1169,10 +1169,10 @@ public class BoneMapper : MonoBehaviour
                 return;
             }
             //only do this if current animation applies root motion
-            if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
+            if (currentClip.lockType == AnimationClipParams.LockType.rootMotion && Settings.rootMotionType.Value != RootMotionType.None)
             {
                 //owner of the bonemapper
-                if (local && Settings.rootMotionType.Value != RootMotionType.None)
+                if (local)
                 {
                     //grab current BoneMapper position
                     Vector3 tempPos = transform.position;
