@@ -20,6 +20,7 @@ using UnityEngine.Audio;
 using System.Globalization;
 using LethalEmotesApi.Ui;
 using LethalEmotesAPI.Utils;
+using TMPro;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -316,8 +317,9 @@ public class CustomAnimationClip : MonoBehaviour
     public bool vulnerableEmote = false;
     public AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none;
     public bool willGetClaimed = false;
+    public float audioLevel = .5f;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null/*, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null*/, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null/*, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null*/, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f)
     {
         //if (rootBonesToIgnore == null)
         //    rootBonesToIgnore = new HumanBodyBones[0];
@@ -413,6 +415,7 @@ public class CustomAnimationClip : MonoBehaviour
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
         this.lockType = lockType;
         this.willGetClaimed = willGetClaimed;
+        this.audioLevel = audioLevel;
     }
     private static GameObject audioLoader;
 }
@@ -494,6 +497,7 @@ public class BoneMapper : MonoBehaviour
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
     public Quaternion rotationBeforeRootMotion = Quaternion.identity;
+    public float currentAudioLevel = 0;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -634,6 +638,7 @@ public class BoneMapper : MonoBehaviour
             if (local)
             {
                 CustomEmotesAPI.hudAnimator.Play("none", -1, 0f);
+                CustomEmotesAPI.currentEmoteText.color = new Color(0,0,0,0);
             }
             twopart = false;
             prevClip = currentClip;
@@ -680,6 +685,7 @@ public class BoneMapper : MonoBehaviour
                     currentClip.customPostEventCodeNoSync.Invoke(this);
                 }
             }
+            currentAudioLevel = currentClip.audioLevel;
             audioObject.GetComponent<AudioManager>().Play(currentClip.syncPos, currEvent, currentClip.looping, currentClip.syncronizeAudio, currentClip.willGetClaimed);
             if (currentClip.syncronizeAudio && primaryAudioClips[currentClip.syncPos][currEvent] != null)
             {
@@ -692,7 +698,15 @@ public class BoneMapper : MonoBehaviour
         {
             CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
             StartAnimations(hudAnimController, pos, CustomEmotesAPI.hudAnimator);
-
+            CustomEmotesAPI.currentEmoteText.color = new Color(.5f, .5f, .5f, .5f);
+            if (currentClip.customName != "")
+            {
+                CustomEmotesAPI.currentEmoteText.text = currentClip.customName;
+            }
+            else
+            {
+                CustomEmotesAPI.currentEmoteText.text = currentClipName;
+            }
         }
         twopart = false;
         NewAnimation(currentClip.joinSpots);
@@ -1030,6 +1044,7 @@ public class BoneMapper : MonoBehaviour
                             CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
                         }
                         CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
+                        CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
                     }
                 }
             }
@@ -1172,16 +1187,11 @@ public class BoneMapper : MonoBehaviour
                     transform.rotation = tempRot;
 
 
-                    if (positionBeforeRootMotion != new Vector3(69,69,69))
+                    if (positionBeforeRootMotion != new Vector3(69, 69, 69))
                     {
-                        DebugClass.Log($"sex");
                         mapperBody.transform.position = positionBeforeRootMotion;
                         mapperBody.transform.rotation = rotationBeforeRootMotion;
                         positionBeforeRootMotion = new Vector3(69, 69, 69);
-                    }
-                    else
-                    {
-                        DebugClass.Log($"HUHH");
                     }
                     //tell server where we are now
                     EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.NetworkObjectId, transform.position, transform.eulerAngles);

@@ -22,6 +22,7 @@ using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem.Controls;
 using LethalEmotesAPI.Utils;
+using TMPro;
 
 namespace EmotesAPI
 {
@@ -137,6 +138,7 @@ namespace EmotesAPI
         public static GameObject hudObject;
         public static GameObject baseHUDObject;
         public static GameObject selfRedHUDObject;
+        public static TextMeshPro currentEmoteText;
         private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
         {
             orig(self);
@@ -471,7 +473,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips/*, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore*/, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips/*, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore*/, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")
