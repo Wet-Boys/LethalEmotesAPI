@@ -12,7 +12,7 @@
     "UnityEngine.CoreModule.dll",
     "Newtonsoft.Json.dll"
   ],
-  "ProjectFile": "./CustomEmotesApi/LethalEmotesApi.csproj",
+  "ProjectFile": "./CustomEmotesAPI/LethalEmotesApi.csproj",
   "UiProjectFile": "./LethalEmotesApi.Ui/LethalEmotesApi.Ui.csproj",
   "UiUnityDir": "./Unity-LethalEmotesApi-UI/",
   "ManifestAuthor": "Gemmumoddo",
