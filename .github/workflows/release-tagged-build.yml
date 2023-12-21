@@ -23,6 +23,18 @@ jobs:
       if: endsWith(github.event.base_ref, 'main') == false
       run: exit -1
 
+    - name: Get prior latest release on GitHub
+      run: |
+        export "LATEST_RELEASE_TAG=$(gh release view latest | tail -1 | grep -Go "tag/[0-9]\.[0-9]\.[0-9]")"
+        echo "${LATEST_RELEASE_TAG}" | grep -Go "[0-9]\.[0-9]\.[0-9]" || exit -1
+        echo "LATEST_RELEASE_TAG=${LATEST_RELEASE_TAG}" >> "$GITHUB_ENV"
+      shell: bash
+      continue-on-error: true
+
+    - name: Validate changelog has changed
+      if: ${{ env.LATEST_RELEASE_TAG != '' }}
+      run: git diff --quiet tags/${LATEST_RELEASE_TAG} HEAD -- CHANGELOG.md || exit -1
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -30,6 +42,9 @@ jobs:
 
     - name: Grant execute permissions for build script
       run: chmod +x build.sh
+
+    - name: Validate Thunderstore package and version
+      run: ./build.sh --configuration=Release --target=ThunderstoreChecklist
 
     - name: Build Thunderstore Package
       run: ./build.sh --configuration=Release --target=BuildThunderstore

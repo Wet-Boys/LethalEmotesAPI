@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using build.Utils;
 using Cake.Common;
 using Cake.Common.IO;
@@ -12,6 +13,7 @@ using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
 using Cake.Core;
+using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using dotenv.net;
 
@@ -392,6 +394,88 @@ public sealed class DebugMod : FrostingTask<BuildContext>
 
         startGame.Start();
         startGame.WaitForExit();
+    }
+}
+
+[TaskName("ThunderstoreChecklist")]
+public sealed class ThunderstoreChecklist : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        bool throwOnFail = string.Equals(context.MsBuildConfiguration, "release",
+            StringComparison.InvariantCultureIgnoreCase);
+
+        var warnMsg = "\nThis will cause the build to fail under the `Release` configuration!";
+
+        if (context.Version is null)
+        {
+            var msg = "Environment Variable `RELEASE_VERSION` must be set!";
+            if (throwOnFail)
+                throw new InvalidOperationException(msg);
+
+            context.Log.Error($"{msg}{warnMsg}");
+            return;
+        }
+
+        if (!PluginVersionValidate(context))
+        {
+            var msg = "Plugin Version failed to validate!";
+            if (throwOnFail)
+                throw new InvalidOperationException(msg);
+            
+            context.Log.Error($"{msg}{warnMsg}");
+            return;
+        }
+
+        if (!ManifestVersionValidate(context))
+        {
+            var msg = "Manifest Version failed to validate!";
+            if (throwOnFail)
+                throw new InvalidOperationException(msg);
+            
+            context.Log.Error($"{msg}{warnMsg}");
+            return;
+        }
+        
+        context.Log.Information("Thunnderstore Checklist passed!");
+    }
+
+    private bool PluginVersionValidate(BuildContext context)
+    {
+        var versionRegex =
+            new Regex("\\s*public\\s+const\\s+string\\s+VERSION\\s+=\\s+\"(?<version>\\d\\.\\d\\.\\d)\";");
+        var pluginPath = context.Project.Directory / "CustomEmotesAPI.cs";
+
+        using var fileStream = File.OpenRead(pluginPath);
+        using var streamReader = new StreamReader(fileStream);
+
+        string? pluginVersion = null;
+        do
+        {
+            var lineRead = streamReader.ReadLine();
+            if (lineRead is null)
+                return false;
+            
+            var match = versionRegex.Match(lineRead);
+            if (!match.Success)
+                continue;
+
+            pluginVersion = match.Groups["version"].Value;
+            
+        } while (pluginVersion is null);
+
+        return pluginVersion == context.Version;
+    }
+
+    private bool ManifestVersionValidate(BuildContext context)
+    {
+        AbsolutePath manifestFile = "manifest.json";
+        
+        var manifest = JsonSerializer.Deserialize<ThunderStoreManifest>(File.ReadAllText("../" / manifestFile));
+        if (manifest is null)
+            return false;
+
+        return manifest.version_number == context.Version;
     }
 }
 
