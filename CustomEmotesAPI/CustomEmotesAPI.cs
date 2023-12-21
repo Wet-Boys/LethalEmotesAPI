@@ -34,7 +34,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.0.1";
+        public const string VERSION = "1.0.2";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -179,11 +179,11 @@ namespace EmotesAPI
         private void TeleportPlayer(Action<PlayerControllerB, Vector3, bool, float, bool, bool> orig, PlayerControllerB self, Vector3 pos, bool withRotation = false, float rot = 0f, bool allowInteractTrigger = false, bool enableController = true)
         {
             BoneMapper ownerMapper = self.GetComponentInChildren<BoneMapper>();
-            if (ownerMapper && ownerMapper.parentGameObject)
+            if (ownerMapper && ownerMapper.parentGameObject && ownerMapper.positionLock)
             {
-                ownerMapper.parentGameObject.transform.position += pos - self.transform.position;
-                //ownerMapper.preserveParent = false;
-                //PlayAnimation("none", ownerMapper);
+                //ownerMapper.parentGameObject.transform.position += pos - self.transform.position;
+                ownerMapper.preserveParent = false;
+                PlayAnimation("none", ownerMapper);
             }
             orig(self, pos, withRotation, rot, allowInteractTrigger, enableController);
         }

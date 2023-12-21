@@ -998,7 +998,7 @@ public class BoneMapper : MonoBehaviour
 
     }
     public GameObject parentGameObject;
-    bool positionLock, rotationLock, scaleLock;
+    public bool positionLock, rotationLock, scaleLock;
     public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale, bool scaleAsScavenger = true, bool disableCollider = true)
     {
         if (parentGameObject)
