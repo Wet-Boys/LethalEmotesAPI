@@ -1,20 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using build.Utils;
 using Cake.Common;
 using Cake.Common.IO;
 using Cake.Common.Net;
-using Cake.Common.Solution;
-using Cake.Common.Solution.Project;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
 using Cake.Core;
-using Cake.Core.IO;
 using Cake.Frosting;
 using dotenv.net;
 
@@ -26,6 +23,7 @@ public static class Build
     {
         return new CakeHost()
             .UseContext<BuildContext>()
+            .UseLifetime<BuildLifetime>()
             .Run(args);
     }
 }
@@ -66,6 +64,7 @@ public class BuildContext : FrostingContext
     public readonly AbsolutePath GameReferencesDir = new AbsolutePath("../") / ".gameReferences";
     public readonly AbsolutePath ToolsDir = new AbsolutePath("../") / ".tools";
     public AbsolutePath PatcherDir { get; }
+    public readonly AbsolutePath StubbedLibsDir = new AbsolutePath("../") / "libs";
     public readonly AbsolutePath StubbedFilesPath = new AbsolutePath("../") / "libs" / "stubbed-files.zip";
     public AbsolutePath BuildDir { get; }
     public AbsolutePath UiBuildDir { get; }
@@ -127,11 +126,16 @@ public class BuildContext : FrostingContext
 [TaskName("FetchRefs")]
 public sealed class FetchReferences : FrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context)
+    public override bool ShouldRun(BuildContext context)
     {
         if (context.UseStubbedLibs)
-            return;
-        
+            return false;
+
+        return context.References.Any(reference => !File.Exists(context.GameReferencesDir / reference));
+    }
+
+    public override void Run(BuildContext context)
+    {
         if (!Directory.Exists(context.GameReferencesDir))
             Directory.CreateDirectory(context.GameReferencesDir);
         
@@ -144,6 +148,43 @@ public sealed class FetchReferences : FrostingTask<BuildContext>
             
             File.Copy(srcFile, dstFile, true);
         }
+    }
+}
+
+[TaskName("FetchStubbedLibs")]
+public sealed class FetchStubbedLibs : FrostingTask<BuildContext>
+{
+    public override bool ShouldRun(BuildContext context)
+    {
+        if (!context.UseStubbedLibs)
+            return false;
+
+        return context.References.Any(reference => !File.Exists(context.StubbedLibsDir / reference));
+    }
+
+    public override void Run(BuildContext context)
+    {
+        if (!File.Exists(context.StubbedFilesPath))
+            throw new InvalidOperationException();
+
+        var refsToFind = new List<string>(context.References);
+
+        using var archive = ZipFile.OpenRead(context.StubbedFilesPath);
+        foreach (var entry in archive.Entries)
+        {
+            var foundRefName = refsToFind
+                .SingleOrDefault(reference => entry.Name == reference);
+
+            if (string.IsNullOrEmpty(foundRefName))
+                continue;
+            
+            entry.ExtractToFile(context.StubbedLibsDir / foundRefName, true);
+
+            refsToFind.Remove(foundRefName);
+        }
+
+        if (refsToFind.Count != 0)
+            throw new InvalidOperationException();
     }
 }
 
@@ -214,6 +255,7 @@ public sealed class UpdateAssetBundles : FrostingTask<BuildContext>
 [TaskName("Build")]
 [IsDependentOn(typeof(RestoreTask))]
 [IsDependentOn(typeof(FetchReferences))]
+[IsDependentOn(typeof(FetchStubbedLibs))]
 [IsDependentOn(typeof(UpdateAssetBundles))]
 public sealed class BuildTask : FrostingTask<BuildContext>
 {
