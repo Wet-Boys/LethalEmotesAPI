@@ -552,12 +552,43 @@ public class BoneMapper : MonoBehaviour
             {
                 if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
                 {
-                    listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                    try
+                    {
+                        listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                    }
+                    catch (Exception e)
+                    {
+                        DebugClass.Log($"had issue turning off audio before new audio played step 2: {e}");
+                        try
+                        {
+                            DebugClass.Log($"{prevClip.syncPos}");
+                            DebugClass.Log($"{currentClip.syncPos}");
+                            DebugClass.Log(listOfCurrentEmoteAudio[currentClip.syncPos]);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        try
+                        {
+                            DebugClass.Log($"going to try a brute force method to avoid audio desync issues");
+                            foreach (var item in listOfCurrentEmoteAudio)
+                            {
+                                if (item.Contains(audioObject.GetComponent<AudioSource>()))
+                                {
+                                    item.Remove(audioObject.GetComponent<AudioSource>());
+                                }
+                            }
+                        }
+                        catch (Exception e2)
+                        {
+                            DebugClass.Log($"wow {e2}");
+                        }
+                    }
                 }
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played step 2: {e}");
+                DebugClass.Log($"had issue turning off audio before new audio played step 3: {primaryAudioClips[currentClip.syncPos]} {currentClip.syncPos} {currEvent} {e}");
             }
             try
             {
@@ -569,7 +600,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played step 3: {e}");
+                DebugClass.Log($"had issue turning off audio before new audio played step 4: {e}");
             }
 
 
@@ -1168,41 +1199,42 @@ public class BoneMapper : MonoBehaviour
                 return;
             }
             //only do this if current animation applies root motion
-            if (currentClip.lockType == AnimationClipParams.LockType.rootMotion && Settings.rootMotionType.Value != RootMotionType.None)
+            if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
             {
                 //owner of the bonemapper
                 if (local)
                 {
-                    //grab current BoneMapper position
-                    Vector3 tempPos = transform.position;
-                    Quaternion tempRot = transform.rotation;
-
-                    //move player body
-                    mapperBody.transform.position = new Vector3(emoteSkeletonSMR.rootBone.position.x, mapperBody.transform.position.y, emoteSkeletonSMR.rootBone.position.z);
-                    mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
-
-                    //revert self to current BoneMapper position from earlier
-                    transform.position = tempPos;
-                    transform.rotation = tempRot;
-
-
-                    if (positionBeforeRootMotion != new Vector3(69, 69, 69))
+                    if (Settings.rootMotionType.Value != RootMotionType.None)
                     {
-                        mapperBody.transform.position = positionBeforeRootMotion;
-                        mapperBody.transform.rotation = rotationBeforeRootMotion;
-                        positionBeforeRootMotion = new Vector3(69, 69, 69);
+                        //grab current BoneMapper position
+                        Vector3 tempPos = transform.position;
+                        Quaternion tempRot = transform.rotation;
+
+                        //move player body
+                        mapperBody.transform.position = new Vector3(emoteSkeletonSMR.rootBone.position.x, mapperBody.transform.position.y, emoteSkeletonSMR.rootBone.position.z);
+                        mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
+
+                        //revert self to current BoneMapper position from earlier
+                        transform.position = tempPos;
+                        transform.rotation = tempRot;
+
+
+                        if (positionBeforeRootMotion != new Vector3(69, 69, 69))
+                        {
+                            mapperBody.transform.position = positionBeforeRootMotion;
+                            mapperBody.transform.rotation = rotationBeforeRootMotion;
+                            positionBeforeRootMotion = new Vector3(69, 69, 69);
+                        }
                     }
                     //tell server where we are now
                     EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.NetworkObjectId, transform.position, transform.eulerAngles);
                 }
-                //or not
                 else
                 {
                     //move bonemapper to last synced position
                     transform.position = prevMapperPos;
                     transform.eulerAngles = prevMapperRot;
                 }
-
             }
         }
         catch (Exception)

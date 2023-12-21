@@ -200,6 +200,7 @@ namespace LethalEmotesAPI
             }
             if (desiredSampler.timeSamples != receiverSampler.timeSamples)
             {
+                receiverSampler.volume = 0;
                 receiverSampler.timeSamples = desiredSampler.timeSamples;
                 success = 0;
             }
@@ -208,6 +209,7 @@ namespace LethalEmotesAPI
                 success++;
                 if (success == 3)
                 {
+                    receiverSampler.volume = Settings.EmotesVolume.Value / 100f;
                     DestroyImmediate(this);
                 }
             }
