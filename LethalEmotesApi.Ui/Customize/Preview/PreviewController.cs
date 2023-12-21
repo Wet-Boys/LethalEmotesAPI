@@ -11,7 +11,7 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     private GameObject? _previewObjectInstance;
     private Animator? _previewAnimator;
     private PreviewRig? _previewRig;
-    private float rotSpeed = 100.0f;
+    private float rotSpeed = 25.0f;
     
     protected override void Start()
     {
