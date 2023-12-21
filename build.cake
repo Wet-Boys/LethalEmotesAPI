@@ -34,6 +34,11 @@ Task("DeployUnity")
    StartProcess("dotnet", "run --project ./build/Build.csproj --target=DeployUnity");
 });
 
+Task("BuildThunderstore")
+.Does(() => {
+   StartProcess("dotnet", "run --project ./build/Build.csproj --target=BuildThunderstore");
+});
+
 Task("Default")
 .Does(() => {
    StartProcess("dotnet", "run --project ./build/Build.csproj --target=Default");

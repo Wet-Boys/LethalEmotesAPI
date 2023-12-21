@@ -362,6 +362,7 @@ public sealed class BuildThunderstorePackage : FrostingTask<BuildContext>
         AbsolutePath manifestFile = "manifest.json";
         AbsolutePath iconFile = "icon.png";
         AbsolutePath readmeFile = "README.md";
+        AbsolutePath changelogFile = "CHANGELOG.md";
         
         var project = context.Project;
         
@@ -376,15 +377,12 @@ public sealed class BuildThunderstorePackage : FrostingTask<BuildContext>
         Directory.CreateDirectory(modDir);
             
         context.BuildDir.GlobFiles("*.dll")
-            .ForEach(file =>
-            {
-                var destFile = modDir / file.Name;
-                File.Copy(file, destFile, true);
-            });
+            .CopyFilesTo(modDir);
             
         File.Copy("../" / manifestFile, publishDir / manifestFile, true);
         File.Copy("../" / iconFile, publishDir / iconFile, true);
         File.Copy("../" / readmeFile, publishDir / readmeFile, true);
+        File.Copy("../" / changelogFile, publishDir / changelogFile, true);
 
         var manifest = JsonSerializer.Deserialize<ThunderStoreManifest>(File.ReadAllText(publishDir / manifestFile));
 
