@@ -1,6 +1,6 @@
 # IMPORTANT
 
-- This does nothing on without other mods. Please don't download this on its own and complain to me unless you really want to.
+- This does nothing without other mods. Please don't download this on its own and complain to me unless you really want to.
 
 - If you are unsure how to do animations, hold C in game (default keybind) and click settings in the top right
 
