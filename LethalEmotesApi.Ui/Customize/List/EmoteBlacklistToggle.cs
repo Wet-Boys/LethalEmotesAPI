@@ -6,8 +6,9 @@ using UnityEngine.UI;
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteBlacklistToggle : UIBehaviour
+public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    public EmoteListItem? emoteListItem;
     public Image? toggleImage;
 
     private string? _emoteKey;
@@ -58,5 +59,22 @@ public class EmoteBlacklistToggle : UIBehaviour
 
         toggleImage.enabled = InBlacklist;
     }
-    
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        emoteListItem!.OnPointerExit(eventData);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        emoteListItem!.OnPointerEnter(eventData);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+        
+        Toggle();
+    }
 }

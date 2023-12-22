@@ -170,7 +170,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25.85
+  m_fontSize: 16
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 2282145272262992105}
-  blacklistToggle: {fileID: 4272890844900554996}
+  blacklistToggle: {fileID: 5326279805958892969}
   selectImage: {fileID: 6255788805227424473}
   dragDropController: {fileID: 0}
   previewController: {fileID: 0}
@@ -353,7 +353,8 @@ GameObject:
   m_Component:
   - component: {fileID: 513828420318434799}
   - component: {fileID: 8768612977691403129}
-  - component: {fileID: 3318401387108974989}
+  - component: {fileID: 5326279805958892969}
+  - component: {fileID: 3595406878814683715}
   m_Layer: 5
   m_Name: Toggle
   m_TagString: Untagged
@@ -401,7 +402,21 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &3318401387108974989
+--- !u!114 &5326279805958892969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2853481375598808262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -917987198, guid: b2c656f14b2d18f468e54fdcaa06a25c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emoteListItem: {fileID: 5559504937275200181}
+  toggleImage: {fileID: 4159377674058410878}
+--- !u!114 &3595406878814683715
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -449,7 +464,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1.9999995, y: 2}
+  m_SizeDelta: {x: 3, y: 3.0000002}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7800145182623401630
 CanvasRenderer:
@@ -488,7 +503,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 20
+  m_PixelsPerUnitMultiplier: 10
 --- !u!1 &3996984364441321880
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,9 +738,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5268519630612851562}
-  - component: {fileID: 2258144492517516492}
   - component: {fileID: 2399238976494168639}
-  - component: {fileID: 4272890844900554996}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -754,63 +767,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2258144492517516492
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8618555912451555876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4272890844900554996}
-        m_TargetAssemblyTypeName: LethalEmotesApi.Ui.Customize.List.EmoteBlacklistToggle,
-          LethalEmotesApi.Ui
-        m_MethodName: Toggle
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 12
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &2399238976494168639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -837,16 +793,3 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
---- !u!114 &4272890844900554996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8618555912451555876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -917987198, guid: b2c656f14b2d18f468e54fdcaa06a25c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  toggleImage: {fileID: 4159377674058410878}
