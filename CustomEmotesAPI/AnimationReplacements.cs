@@ -1194,8 +1194,21 @@ public class BoneMapper : MonoBehaviour
         }
         TwoPartThing();
         Health();
+        SetDeltaPosition();
         RootMotion();
     }
+    public Vector3 deltaPos = new Vector3(0,0,0);
+    public Quaternion deltaRot = Quaternion.identity;
+    public Vector3 prevPosition = Vector3.zero;
+    public Quaternion prevRotation = Quaternion.identity;
+    private void SetDeltaPosition()
+    {
+        deltaPos = transform.position - prevPosition;
+        deltaRot = transform.rotation * Quaternion.Inverse(prevRotation);
+        prevPosition = transform.position;
+        prevRotation = transform.rotation;
+    }
+
     public Vector3 prevMapperPos = new Vector3(69, 69, 69);
     public Vector3 prevMapperRot = new Vector3();
     public bool justSwitched = false;
@@ -1234,7 +1247,6 @@ public class BoneMapper : MonoBehaviour
                         transform.position = tempPos;
                         transform.rotation = tempRot;
 
-
                         if (positionBeforeRootMotion != new Vector3(69, 69, 69))
                         {
                             mapperBody.transform.position = positionBeforeRootMotion;
@@ -1243,8 +1255,11 @@ public class BoneMapper : MonoBehaviour
                             positionBeforeRootMotion = new Vector3(69, 69, 69);
                         }
                     }
-                    //tell server where we are now
-                    EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.NetworkObjectId, transform.position, transform.eulerAngles);
+                    if (deltaPos != Vector3.zero || deltaRot != Quaternion.identity)
+                    {
+                        //tell server where we are now
+                        EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.NetworkObjectId, transform.position, transform.eulerAngles);
+                    }
                 }
                 else
                 {
