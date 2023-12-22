@@ -16,6 +16,6 @@
 
 - Backend/Emote code - nunchuk
 
-- UI code - rune
+- Backend/UI code - rune
 
 - Modeling/Animation - github.com
