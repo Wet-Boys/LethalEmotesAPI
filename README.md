@@ -19,3 +19,5 @@
 - Backend/UI code - rune
 
 - Modeling/Animation - github.com
+
+- Code fixes/preview window - tillytanker
