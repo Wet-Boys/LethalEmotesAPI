@@ -47,6 +47,53 @@ public static class PlayerControllerPatches
         }
     }
     
+    [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
+    public static class LateUpdatePatch
+    {
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var matcher = new CodeMatcher(instructions);
+
+            var localVisorFieldInfo =
+                AccessTools.Field(typeof(PlayerControllerB), nameof(PlayerControllerB.localVisor));
+            var localVisorTargetPointFieldInfo = AccessTools.Field(typeof(PlayerControllerB),
+                nameof(PlayerControllerB.localVisorTargetPoint));
+
+            // localVisor.position = localVisorTargetPoint.position;
+            matcher.MatchForward(true,
+                new CodeMatch(code => code.IsLdarg(0)),
+                new CodeMatch(code => code.LoadsField(localVisorFieldInfo)),
+                new CodeMatch(code => code.IsLdarg(0)),
+                new CodeMatch(code => code.LoadsField(localVisorTargetPointFieldInfo)),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt));
+            
+            // localVisor.rotation = Quaternion.Lerp(localVisor.rotation, localVisorTargetPoint.rotation, 53f * Mathf.Clamp(Time.deltaTime, 0.0167f, 20f));
+            matcher.MatchForward(true,
+                new CodeMatch(code => code.IsLdarg(0)),
+                new CodeMatch(code => code.LoadsField(localVisorFieldInfo)),
+                new CodeMatch(code => code.IsLdarg(0)),
+                new CodeMatch(code => code.LoadsField(localVisorFieldInfo)),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                new CodeMatch(code => code.IsLdarg(0)),
+                new CodeMatch(code => code.LoadsField(localVisorTargetPointFieldInfo)),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                new CodeMatch(code => code.opcode == OpCodes.Ldc_R4),
+                new CodeMatch(code => code.opcode == OpCodes.Call),
+                new CodeMatch(code => code.opcode == OpCodes.Ldc_R4),
+                new CodeMatch(code => code.opcode == OpCodes.Ldc_R4),
+                new CodeMatch(code => code.opcode == OpCodes.Call),
+                new CodeMatch(code => code.opcode == OpCodes.Mul),
+                new CodeMatch(code => code.opcode == OpCodes.Call),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt));
+            
+            // TODO do emote constraint patching here!
+            matcher.InsertAndAdvance();
+
+            return matcher.InstructionEnumeration();
+        }
+    }
+    
     [HarmonyPatch(typeof(PlayerControllerB), "Interact_performed")]
     public static class InteractPerformedPatch
     {

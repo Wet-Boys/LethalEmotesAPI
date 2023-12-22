@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LethalEmotesApi.Ui.Animation;
 
-internal class TweenRunner<T> where T : struct, ITweenValue
+public class TweenRunner<T> where T : struct, ITweenValue
 {
     protected MonoBehaviour? CoroutineContainer;
     protected IEnumerator? Tween;

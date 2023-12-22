@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LethalEmotesApi.Ui.Animation;
 
-internal class DelayedActionRunner<T> where T : struct, IDelayedAction
+public class DelayedActionRunner<T> where T : struct, IDelayedAction
 {
     protected MonoBehaviour? CoroutineContainer;
     protected IEnumerator? Coroutine;
