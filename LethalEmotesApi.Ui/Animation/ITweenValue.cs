@@ -1,6 +1,6 @@
 namespace LethalEmotesApi.Ui.Animation;
 
-internal interface ITweenValue
+public interface ITweenValue
 {
     void TweenValue(float percentage);
     

@@ -1,6 +1,6 @@
 ﻿namespace LethalEmotesApi.Ui.Animation;
 
-internal interface IDelayedAction
+public interface IDelayedAction
 {
     void Invoke();
     
