@@ -11,3 +11,11 @@
 - [Code Documentation](https://github.com/Wet-Boys/LethalEmotesAPI/wiki/Documentation)
 
 - GUID com.weliveinasociety.CustomEmotesAPI
+
+## Discord Handles
+
+- Backend/Emote code - nunchuk
+
+- UI code - rune
+
+- Modeling/Animation - github.com
