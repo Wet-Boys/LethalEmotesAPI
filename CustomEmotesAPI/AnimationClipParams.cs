@@ -14,8 +14,8 @@ namespace EmotesAPI
         public AudioClip[] _secondaryAudioClips = null; //secondary list of audio clips, if these are specified, the primary clip will never loop and the secondary clip that plays will always loop
         public AudioClip[] _primaryDMCAFreeAudioClips = null; //same as _primaryAudioClips but will be played if DMCA settings allow it (if normal audio clips exist, and dmca clips do not, the dmca clips will simply be silence)
         public AudioClip[] _secondaryDMCAFreeAudioClips = null; //same as _secondaryAudioClips but will be played if DMCA settings allow it
-        //public HumanBodyBones[] rootBonesToIgnore = null; //TODO find a solution later, I don't think this has worked in a long time but no one ever used it so there was no one to fact check it :KEKW:
-        //public HumanBodyBones[] soloBonesToIgnore = null; 
+        public HumanBodyBones[] rootBonesToIgnore = null; 
+        public HumanBodyBones[] soloBonesToIgnore = null; 
         public bool dimWhenClose = false; // Unused in Lethal Company
         public bool stopWhenMove = false; // If on, will turn off the emote when the player starts moving (very lame, do not use)
         public bool stopWhenAttack = false; // Unused in Lethal Company

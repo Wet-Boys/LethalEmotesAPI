@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using LethalEmotesApi.Ui;
 using LethalEmotesAPI.Utils;
+using UnityEngine;
 
 namespace LethalEmotesAPI.Patches;
 
@@ -86,9 +87,12 @@ public static class PlayerControllerPatches
                 new CodeMatch(code => code.opcode == OpCodes.Mul),
                 new CodeMatch(code => code.opcode == OpCodes.Call),
                 new CodeMatch(code => code.opcode == OpCodes.Callvirt));
-            
+
             // TODO do emote constraint patching here!
-            matcher.InsertAndAdvance();
+            matcher
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldfld, localVisorFieldInfo))
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomEmotesAPI), nameof(CustomEmotesAPI.LocalVisor), new[] { typeof(Transform) })));
 
             return matcher.InstructionEnumeration();
         }

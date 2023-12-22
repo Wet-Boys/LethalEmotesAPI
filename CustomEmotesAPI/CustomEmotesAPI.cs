@@ -34,7 +34,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.0.2";
+        public const string VERSION = "1.0.3";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -143,12 +143,15 @@ namespace EmotesAPI
         private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
         {
             orig(self);
-            hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarimage2.prefab"));
-            hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
-            baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
-            selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
-            CustomEmotesAPI.hudObject.transform.localPosition = baseHUDObject.transform.localPosition;
-
+            Transform selfTransform = self.PlayerInfo.canvasGroup.transform.Find("Self");
+            if (selfTransform is not null)
+            {
+                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarimage2.prefab"));
+                hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
+                baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
+                selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+                CustomEmotesAPI.hudObject.transform.localPosition = baseHUDObject.transform.localPosition;
+            }
             var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote ui.prefab"),
                 self.PlayerInfo.canvasGroup.transform.parent.parent);
         }
@@ -157,7 +160,10 @@ namespace EmotesAPI
         private void HUDManagerUpdateHealthUI(Action<HUDManager, int, bool> orig, HUDManager self, int health, bool hurtPlayer = true)
         {
             orig(self, health, hurtPlayer);
-            hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+            if (hudObject is not null)
+            {
+                hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+            }
         }
         private static Hook hudManagerUpdateHealthUIHook;
 
@@ -168,8 +174,8 @@ namespace EmotesAPI
             orig(self, playerObjectNumber, clientId);
         }
         private static Hook startOfRoundOnPlayerDCHook;
-        
-        private void BeginUsingTerminal(Action<Terminal>orig, Terminal self)
+
+        private void BeginUsingTerminal(Action<Terminal> orig, Terminal self)
         {
             orig(self);
             InTerminal();
@@ -206,6 +212,16 @@ namespace EmotesAPI
                     {
                         player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
                     }
+                }
+            }
+        }
+        internal static void LocalVisor(Transform transform)
+        {
+            if (localMapper is not null && localMapper.currentClip is not null)
+            {
+                foreach (var item in localMapper.cameraConstraint)
+                {
+                    item.ActUponConstraints();
                 }
             }
         }
@@ -287,13 +303,13 @@ namespace EmotesAPI
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
-            
+
             // Scroll Functionality 
-            var ScrollU = new InputAction("ScrollUP",binding: "<Mouse>/Scroll/Up");
-            var ScrollD = new InputAction("ScrollDOWN",binding: "<Mouse>/Scroll/Down");
+            var ScrollU = new InputAction("ScrollUP", binding: "<Mouse>/Scroll/Up");
+            var ScrollD = new InputAction("ScrollDOWN", binding: "<Mouse>/Scroll/Down");
             ScrollU.Enable();
             ScrollD.Enable();
-            
+
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
             EmotesInputSettings.Instance.EmoteWheel.performed += EmoteWheelInteracted;
@@ -436,10 +452,10 @@ namespace EmotesAPI
                 Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
                 return;
             }
-            //if (animationClipParams.rootBonesToIgnore == null)
-            //    animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
-            //if (animationClipParams.soloBonesToIgnore == null)
-            //    animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
+            if (animationClipParams.rootBonesToIgnore == null)
+                animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
+            if (animationClipParams.soloBonesToIgnore == null)
+                animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
 
 
             if (animationClipParams._primaryAudioClips == null)
@@ -467,7 +483,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips/*, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore*/, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")
@@ -548,17 +564,20 @@ namespace EmotesAPI
             {
                 //TODO emote wheel continue playing button (TMPUGUI is the issue)
                 //EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
-                if (newAnimation == "none")
+                if (hudObject is not null)
                 {
-                    hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
-                    baseHUDObject.SetActive(true);
-                    selfRedHUDObject.SetActive(true);
-                }
-                else
-                {
-                    hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
-                    baseHUDObject.SetActive(false);
-                    selfRedHUDObject.SetActive(false);
+                    if (newAnimation == "none")
+                    {
+                        hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
+                        baseHUDObject.SetActive(true);
+                        selfRedHUDObject.SetActive(true);
+                    }
+                    else
+                    {
+                        hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
+                        baseHUDObject.SetActive(false);
+                        selfRedHUDObject.SetActive(false);
+                    }
                 }
             }
             foreach (var item in EmoteLocation.emoteLocations)
@@ -585,10 +604,6 @@ namespace EmotesAPI
                 {
                     EmoteLocation.HideAllSpots();
                 }
-                if (mapper.transform.name == "templar")
-                {
-                    mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
-                }
                 if (mapper.currentClip.lockType == AnimationClipParams.LockType.rootMotion)
                 {
                     mapper.prevMapperPos = mapper.transform.position;
@@ -596,20 +611,17 @@ namespace EmotesAPI
                 }
                 mapper.positionBeforeRootMotion = mapper.mapperBody.transform.position;
                 mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
+                mapper.justSwitched = true;
             }
             else
             {
-                if (mapper.local)
+                if (mapper.local && hudObject is not null)
                 {
-                    CustomEmotesAPI.currentEmoteText.color = new Color(0,0,0,0);
+                    CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0);
                 }
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.ShowAllSpots();
-                }
-                if (mapper.transform.name == "templar")
-                {
-                    mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
                 }
                 mapper.transform.localPosition = Vector3.zero;
                 mapper.transform.localEulerAngles = new Vector3(90, 0, 0);
@@ -692,7 +704,7 @@ namespace EmotesAPI
             DebugClass.Log($"reenabling");
 
         }
-        
+
         public static void InTerminal() // Ends emote when opening terminal
         {
             var localPlayer = GameNetworkManager.Instance.localPlayerController;

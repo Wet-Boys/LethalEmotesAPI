@@ -15,7 +15,11 @@ public class EmoteConstraint : MonoBehaviour
     bool firstTime = true;
     bool hasEverActivatedConstraints = false;
     public bool onlyY = false;
-    void Update()
+    void LateUpdate()
+    {
+        ActUponConstraints();
+    }
+    public void ActUponConstraints()
     {
         if (constraintActive)
         {
@@ -64,8 +68,11 @@ public class EmoteConstraint : MonoBehaviour
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
     }
+    internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target)
+    {
+        EmoteConstraint constraint = gameObject.AddComponent<EmoteConstraint>();
+        constraint.AddSource(gameObject.transform, target);
+        constraint.revertTransform = mapper.revertTransform;
+        return constraint;
+    }
 }
-
-
-
-//PLAYING MORE THAN ONE EMOTE WITHOUT GOING TO "none" FIRST CAUSES THE ARMS TO BREAK, LOOK INTO IT?

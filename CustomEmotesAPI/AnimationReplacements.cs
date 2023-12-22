@@ -319,12 +319,12 @@ public class CustomAnimationClip : MonoBehaviour
     public bool willGetClaimed = false;
     public float audioLevel = .5f;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null/*, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null*/, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f)
     {
-        //if (rootBonesToIgnore == null)
-        //    rootBonesToIgnore = new HumanBodyBones[0];
-        //if (soloBonesToIgnore == null)
-        //    soloBonesToIgnore = new HumanBodyBones[0];
+        if (rootBonesToIgnore == null)
+            rootBonesToIgnore = new HumanBodyBones[0];
+        if (soloBonesToIgnore == null)
+            soloBonesToIgnore = new HumanBodyBones[0];
         clip = _clip;
         secondaryClip = _secondaryClip;
         looping = _loop;
@@ -370,23 +370,23 @@ public class CustomAnimationClip : MonoBehaviour
             BoneMapper.secondaryDMCAFreeAudioClips.Add(secondaryDMCAFreeAudioClips);
         }
 
-        //if (soloBonesToIgnore.Length != 0)
-        //{
-        //    soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
-        //}
-        //else
-        //{
-        //}
-        soloIgnoredBones = new List<HumanBodyBones>();
+        if (soloBonesToIgnore.Length != 0)
+        {
+            soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
+        }
+        else
+        {
+            soloIgnoredBones = new List<HumanBodyBones>();
+        }
 
-        //if (rootBonesToIgnore.Length != 0)
-        //{
-        //    rootIgnoredBones = new List<HumanBodyBones>(rootBonesToIgnore);
-        //}
-        //else
-        //{
-        //}
-        rootIgnoredBones = new List<HumanBodyBones>();
+        if (rootBonesToIgnore.Length != 0)
+        {
+            rootIgnoredBones = new List<HumanBodyBones>(rootBonesToIgnore);
+        }
+        else
+        {
+            rootIgnoredBones = new List<HumanBodyBones>();
+        }
         syncronizeAnimation = syncAnim;
         syncronizeAudio = syncAudio;
         syncPos = syncTimer.Count;
@@ -493,7 +493,7 @@ public class BoneMapper : MonoBehaviour
     public Transform mapperBodyTransform;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
-    public EmoteConstraint cameraConstraint;
+    public List<EmoteConstraint> cameraConstraint = new List<EmoteConstraint>();
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
     public Quaternion rotationBeforeRootMotion = Quaternion.identity;
@@ -662,7 +662,7 @@ public class BoneMapper : MonoBehaviour
         if (s == "none")
         {
             emoteSkeletonAnimator.Play("none", -1, 0f);
-            if (local)
+            if (local && CustomEmotesAPI.hudObject is not null)
             {
                 CustomEmotesAPI.hudAnimator.Play("none", -1, 0f);
             }
@@ -676,7 +676,11 @@ public class BoneMapper : MonoBehaviour
         }
 
         AnimatorOverrideController animController = new AnimatorOverrideController(emoteSkeletonAnimator.runtimeAnimatorController);
-        AnimatorOverrideController hudAnimController = new AnimatorOverrideController(CustomEmotesAPI.hudAnimator.runtimeAnimatorController);
+        AnimatorOverrideController hudAnimController = new AnimatorOverrideController();
+        if (local && CustomEmotesAPI.hudObject is not null)
+        {
+            hudAnimController = new AnimatorOverrideController(CustomEmotesAPI.hudAnimator.runtimeAnimatorController);
+        }
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
@@ -720,7 +724,7 @@ public class BoneMapper : MonoBehaviour
         }
         SetAnimationSpeed(1);
         StartAnimations(animController, pos, emoteSkeletonAnimator);
-        if (local)
+        if (local && CustomEmotesAPI.hudObject is not null)
         {
             CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
             StartAnimations(hudAnimController, pos, CustomEmotesAPI.hudAnimator);
@@ -964,13 +968,6 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        Camera c = mapperBody.GetComponentInChildren<Camera>();
-        if (c)
-        {
-            cameraConstraint = c.transform.parent.gameObject.AddComponent<EmoteConstraint>();
-            cameraConstraint.AddSource(c.transform.parent, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head));
-            cameraConstraint.revertTransform = revertTransform;
-        }
         if (jank)
         {
             foreach (var smr in basePlayerModelSMR)
@@ -1060,7 +1057,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-                    if (CustomEmotesAPI.hudAnimator == null)
+                    if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
                     {
                         GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
                         info.transform.SetParent(mapperBody.transform.parent);
@@ -1076,11 +1073,23 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                         CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
                     }
+                    Camera c = mapperBody.GetComponentInChildren<Camera>();
+                    if (c is not null)
+                    {
+                        cameraConstraint.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
+                        GameObject cameraRotationObjectLmao = new GameObject();
+                        cameraRotationObjectLmao.transform.SetParent(c.transform);
+                        cameraRotationObjectLmao.transform.localPosition = new Vector3(0.01f, -0.048f, -0.053f);
+                        cameraRotationObjectLmao.transform.localEulerAngles = new Vector3(270f, 0, 0);
+
+                        cameraConstraint.Add(EmoteConstraint.AddConstraint(StartOfRound.Instance.localPlayerController.localVisor.gameObject, this, cameraRotationObjectLmao.transform));
+                    }
                 }
             }
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            DebugClass.Log(e);
         }
     }
     void TwoPartThing()
@@ -1189,6 +1198,7 @@ public class BoneMapper : MonoBehaviour
     }
     public Vector3 prevMapperPos = new Vector3(69, 69, 69);
     public Vector3 prevMapperRot = new Vector3();
+    public bool justSwitched = false;
     public void RootMotion()
     {
         try
@@ -1196,6 +1206,12 @@ public class BoneMapper : MonoBehaviour
             //just skip it all if we aren't playing anything
             if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
             {
+                return;
+            }
+            if (justSwitched)
+            {
+                //this is kinda stupid but it works
+                justSwitched = false;
                 return;
             }
             //only do this if current animation applies root motion
@@ -1211,7 +1227,7 @@ public class BoneMapper : MonoBehaviour
                         Quaternion tempRot = transform.rotation;
 
                         //move player body
-                        mapperBody.transform.position = new Vector3(emoteSkeletonSMR.rootBone.position.x, mapperBody.transform.position.y, emoteSkeletonSMR.rootBone.position.z);
+                        mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
                         mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
 
                         //revert self to current BoneMapper position from earlier
@@ -1223,6 +1239,7 @@ public class BoneMapper : MonoBehaviour
                         {
                             mapperBody.transform.position = positionBeforeRootMotion;
                             mapperBody.transform.rotation = rotationBeforeRootMotion;
+
                             positionBeforeRootMotion = new Vector3(69, 69, 69);
                         }
                     }
@@ -1314,7 +1331,7 @@ public class BoneMapper : MonoBehaviour
     internal IEnumerator waitForTwoFramesThenDisableA1()
     {
         yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
-        basePlayerModelAnimator.enabled = false;
+        //basePlayerModelAnimator.enabled = false;
     }
     void OnDestroy()
     {
@@ -1354,7 +1371,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void UnlockBones(bool animatorEnabled = true)
     {
-        transform.position = Vector3.zero;
+        transform.localPosition = Vector3.zero;
         transform.localEulerAngles = new Vector3(90, 0, 0);
         foreach (var smr in basePlayerModelSMR)
         {
@@ -1373,7 +1390,10 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        cameraConstraint.DeactivateConstraints();
+        foreach (var item in cameraConstraint)
+        {
+            item.DeactivateConstraints();
+        }
         basePlayerModelAnimator.enabled = animatorEnabled;
     }
     public void LockBones()
@@ -1397,7 +1417,10 @@ public class BoneMapper : MonoBehaviour
         }
         if (!jank)
         {
-            cameraConstraint.DeactivateConstraints();
+            foreach (var item in cameraConstraint)
+            {
+                item.DeactivateConstraints();
+            }
             //a1.enabled = false;
             StartCoroutine(waitForTwoFramesThenDisableA1());
             foreach (var smr in basePlayerModelSMR)
@@ -1426,12 +1449,21 @@ public class BoneMapper : MonoBehaviour
             if (Settings.rootMotionType.Value != RootMotionType.None &&
                 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
-                cameraConstraint.ActivateConstraints();
+                foreach (var item in cameraConstraint)
+                {
+                    item.ActivateConstraints();
+                }
             }
             else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
             {
-                cameraConstraint.ActivateConstraints();
-                cameraConstraint.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                foreach (var item in cameraConstraint)
+                {
+                    item.ActivateConstraints();
+                    if (item != cameraConstraint[cameraConstraint.Count - 1])
+                    {
+                        item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                    }
+                }
             }
         }
         else
@@ -1454,34 +1486,5 @@ public class BonePair
     public void test()
     {
 
-    }
-}
-
-internal static class Pain
-{
-    internal static Transform FindBone(SkinnedMeshRenderer mr, string name)
-    {
-        foreach (var item in mr.bones)
-        {
-            if (item.name == name)
-            {
-                return item;
-            }
-        }
-        DebugClass.Log($"couldnt find bone [{name}]");
-        return mr.bones[0];
-    }
-
-    internal static Transform FindBone(List<Transform> bones, string name)
-    {
-        foreach (var item in bones)
-        {
-            if (item.name == name)
-            {
-                return item;
-            }
-        }
-        DebugClass.Log($"couldnt find bone [{name}]");
-        return bones[0];
     }
 }
