@@ -2,7 +2,7 @@
 
 namespace LethalEmotesApi.Ui.Animation;
 
-internal struct AnimCurveTween<T> : ITweenValue
+public struct AnimCurveTween<T> : ITweenValue
     where T : struct, ITweenValue
 {
     public T WrappedTweenValue { get; set; }
