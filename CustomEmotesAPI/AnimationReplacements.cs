@@ -493,7 +493,7 @@ public class BoneMapper : MonoBehaviour
     public Transform mapperBodyTransform;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
-    public EmoteConstraint cameraConstraint;
+    public List<EmoteConstraint> cameraConstraint = new List<EmoteConstraint>();
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
     public Quaternion rotationBeforeRootMotion = Quaternion.identity;
@@ -967,9 +967,8 @@ public class BoneMapper : MonoBehaviour
         Camera c = mapperBody.GetComponentInChildren<Camera>();
         if (c)
         {
-            cameraConstraint = c.transform.parent.gameObject.AddComponent<EmoteConstraint>();
-            cameraConstraint.AddSource(c.transform.parent, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head));
-            cameraConstraint.revertTransform = revertTransform;
+            cameraConstraint.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
+            cameraConstraint.Add(EmoteConstraint.AddConstraint(c.transform.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
         }
         if (jank)
         {
@@ -1076,6 +1075,8 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                         CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
                     }
+                    GameObject helmet = StartOfRound.Instance.localPlayerController.localVisor.gameObject;
+                    cameraConstraint.Add(EmoteConstraint.AddConstraint(helmet, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
                 }
             }
         }
@@ -1314,7 +1315,7 @@ public class BoneMapper : MonoBehaviour
     internal IEnumerator waitForTwoFramesThenDisableA1()
     {
         yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
-        basePlayerModelAnimator.enabled = false;
+        //basePlayerModelAnimator.enabled = false;
     }
     void OnDestroy()
     {
@@ -1373,7 +1374,10 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        cameraConstraint.DeactivateConstraints();
+        foreach (var item in cameraConstraint)
+        {
+            item.DeactivateConstraints();
+        }
         basePlayerModelAnimator.enabled = animatorEnabled;
     }
     public void LockBones()
@@ -1397,7 +1401,10 @@ public class BoneMapper : MonoBehaviour
         }
         if (!jank)
         {
-            cameraConstraint.DeactivateConstraints();
+            foreach (var item in cameraConstraint)
+            {
+                item.DeactivateConstraints();
+            }
             //a1.enabled = false;
             StartCoroutine(waitForTwoFramesThenDisableA1());
             foreach (var smr in basePlayerModelSMR)
@@ -1426,12 +1433,18 @@ public class BoneMapper : MonoBehaviour
             if (Settings.rootMotionType.Value != RootMotionType.None &&
                 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
-                cameraConstraint.ActivateConstraints();
+                foreach (var item in cameraConstraint)
+                {
+                    item.ActivateConstraints();
+                }
             }
             else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
             {
-                cameraConstraint.ActivateConstraints();
-                cameraConstraint.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                foreach (var item in cameraConstraint)
+                {
+                    item.ActivateConstraints();
+                    item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                }
             }
         }
         else
@@ -1454,34 +1467,5 @@ public class BonePair
     public void test()
     {
 
-    }
-}
-
-internal static class Pain
-{
-    internal static Transform FindBone(SkinnedMeshRenderer mr, string name)
-    {
-        foreach (var item in mr.bones)
-        {
-            if (item.name == name)
-            {
-                return item;
-            }
-        }
-        DebugClass.Log($"couldnt find bone [{name}]");
-        return mr.bones[0];
-    }
-
-    internal static Transform FindBone(List<Transform> bones, string name)
-    {
-        foreach (var item in bones)
-        {
-            if (item.name == name)
-            {
-                return item;
-            }
-        }
-        DebugClass.Log($"couldnt find bone [{name}]");
-        return bones[0];
     }
 }
