@@ -17,6 +17,10 @@ public class EmoteConstraint : MonoBehaviour
     public bool onlyY = false;
     void LateUpdate()
     {
+        ActUponConstraints();
+    }
+    public void ActUponConstraints()
+    {
         if (constraintActive)
         {
             if (onlyY)
