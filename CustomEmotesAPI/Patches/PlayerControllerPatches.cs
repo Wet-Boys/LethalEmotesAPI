@@ -169,7 +169,34 @@ public static class PlayerControllerPatches
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            return new CodeMatcher(instructions, generator)
+            var matcher = new CodeMatcher(instructions, generator);
+            
+            // else if (!base.IsOwner || (!isPlayerControlled && !isPlayerDead) || (base.IsServer && !isHostPlayerObject))
+            matcher.MatchForward(true,
+                    // (!base.IsOwner ||
+                    new CodeMatch(code => code.IsLdarg(0)),
+                    new CodeMatch(code => code.opcode == OpCodes.Call),
+                    new CodeMatch(code => code.opcode == OpCodes.Brfalse),
+                    // (!isPlayerControlled && 
+                    new CodeMatch(code => code.IsLdarg(0)),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                    new CodeMatch(code => code.opcode == OpCodes.Brtrue),
+                    // !isPlayerDead) ||
+                    new CodeMatch(code => code.IsLdarg(0)),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                    new CodeMatch(code => code.opcode == OpCodes.Brfalse),
+                    // (base.IsServer &&
+                    new CodeMatch(code => code.IsLdarg(0)),
+                    new CodeMatch(code => code.opcode == OpCodes.Call),
+                    new CodeMatch(code => code.opcode == OpCodes.Brfalse),
+                    // !isHostPlayerObject))
+                    new CodeMatch(code => code.IsLdarg(0)),
+                    new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                    new CodeMatch(code => code.opcode == OpCodes.Brtrue),
+                    // return;
+                    new CodeMatch(code => code.opcode == OpCodes.Ret));
+            
+            return matcher
                 .CloseEmoteUi()
                 .InstructionEnumeration();
         } 
