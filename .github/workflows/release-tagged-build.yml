@@ -47,7 +47,7 @@ jobs:
       run: ./build.sh --configuration=Release --target=ThunderstoreChecklist
 
     - name: Build Thunderstore Package
-      run: ./build.sh --configuration=Release --target=BuildThunderstore
+      run: ./build.sh --target=BuildThunderstore
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
