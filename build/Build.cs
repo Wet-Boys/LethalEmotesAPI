@@ -308,7 +308,7 @@ public sealed class PatchNetcode : FrostingTask<BuildContext>
         patcherPluginsDir.GlobFiles("*_original.*")
             .DeleteFiles();
         
-        patcherPluginsDir.GlobFiles($"{context.Project.Name}.dll", $"{context.Project.Name}.dll")
+        patcherPluginsDir.GlobFiles("*.dll", "*.pdb")
             .CopyFilesTo(context.BuildDir);
     }
 }
