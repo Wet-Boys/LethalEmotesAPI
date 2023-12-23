@@ -32,5 +32,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: thunderstore-package
-        path: CustomEmotesAPI/bin/Release/netstandard2.1/upload/
+        path: CustomEmotesAPI/bin/Debug/netstandard2.1/upload/
         retention-days: 15
