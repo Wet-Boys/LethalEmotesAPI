@@ -280,12 +280,6 @@ namespace EmotesAPI
 
             CreateBaseNameTokenPairs();
 
-            //TODO setup ui buttons somewhere early on?
-            //if (allClipNames != null)
-            //{
-            //    ScrollManager.SetupButtons(allClipNames);
-            //}
-
 
             var types = Assembly.GetExecutingAssembly().GetTypes();
             foreach (var type in types)
@@ -562,8 +556,6 @@ namespace EmotesAPI
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
-                //TODO emote wheel continue playing button (TMPUGUI is the issue)
-                //EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
                 if (hudObject is not null)
                 {
                     if (newAnimation == "none")

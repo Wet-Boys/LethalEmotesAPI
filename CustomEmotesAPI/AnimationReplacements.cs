@@ -29,60 +29,6 @@ internal static class AnimationReplacements
     internal static void RunAll()
     {
         ChangeAnims();
-        //TODO hud awake, adding the emote wheel
-        //On.RoR2.UI.HUD.Awake += (orig, self) =>
-        //{
-        //    orig(self);
-        //    g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
-        //    foreach (var item in g.GetComponentsInChildren<TextMeshProUGUI>())
-        //    {
-        //        var money = self.moneyText.targetText;
-        //        item.font = money.font;
-        //        item.fontMaterial = money.fontMaterial;
-        //        item.fontSharedMaterial = money.fontSharedMaterial;
-        //    }
-        //    g.transform.SetParent(self.mainContainer.transform);
-        //    g.transform.localPosition = new Vector3(0, 0, 0);
-        //    var s = g.AddComponent<EmoteWheel>();
-        //    foreach (var item in g.GetComponentsInChildren<Transform>())
-        //    {
-        //        if (item.gameObject.name.StartsWith("Emote"))
-        //        {
-        //            s.gameObjects.Add(item.gameObject);
-        //        }
-        //        if (item.gameObject.name.StartsWith("MousePos"))
-        //        {
-        //            s.text = item.gameObject;
-        //        }
-        //        if (item.gameObject.name == "Center")
-        //        {
-        //            s.joy = item.gameObject.GetComponent<UnityEngine.UI.Image>();
-        //        }
-        //        if (item.gameObject.name == "CurrentEmote")
-        //        {
-        //            EmoteWheel.dontPlayButton = item.gameObject;
-        //        }
-        //    }
-
-
-        //    if (CustomEmotesAPI.audioContainers.Count == 0)
-        //    {
-        //        GameObject audioContainerHolder = new GameObject();
-        //        audioContainerHolder.name = "Audio Container Holder";
-        //        UnityEngine.Object.DontDestroyOnLoad(audioContainerHolder);
-        //        foreach (var item in BoneMapper.startEvents)
-        //        {
-        //            GameObject aObject = new GameObject();
-        //            if (item[0] != "")
-        //            {
-        //                aObject.name = $"{item[0]}_AudioContainer";
-        //            }
-        //            var container = aObject.AddComponent<AudioContainer>();
-        //            aObject.transform.SetParent(audioContainerHolder.transform);
-        //            CustomEmotesAPI.audioContainers.Add(aObject);
-        //        }
-        //    }
-        //};
     }
     internal static bool setup = false;
     internal static void Import(GameObject prefab, string skeleton, int[] pos, bool hidemesh = true)
@@ -515,6 +461,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void PlayAnim(string s, int pos)
     {
+        ranSinceLastAnim = false;
         s = GetRealAnimationName(s);
         prevClipName = currentClipName;
         if (s != "none")
@@ -1092,16 +1039,18 @@ public class BoneMapper : MonoBehaviour
             DebugClass.Log(e);
         }
     }
+    bool ranSinceLastAnim = false; //this is probably really jank but it's been 2 years since I touched this part and I'm afraid to break something, I should come back to this later though...
     void TwoPartThing()
     {
         if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
         {
-            if (!twopart)
+            if (!twopart && !ranSinceLastAnim) 
             {
                 twopart = true;
             }
             else
             {
+                ranSinceLastAnim = true;
                 if (emoteSkeletonAnimator.enabled)
                 {
                     if (!jank)
