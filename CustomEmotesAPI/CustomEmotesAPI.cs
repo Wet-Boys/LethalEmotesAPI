@@ -219,7 +219,7 @@ namespace EmotesAPI
         {
             if (localMapper is not null && localMapper.currentClip is not null)
             {
-                foreach (var item in localMapper.cameraConstraint)
+                foreach (var item in localMapper.cameraConstraints)
                 {
                     item.ActUponConstraints();
                 }

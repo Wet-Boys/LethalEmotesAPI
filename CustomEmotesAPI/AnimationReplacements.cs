@@ -439,7 +439,8 @@ public class BoneMapper : MonoBehaviour
     public Transform mapperBodyTransform;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
-    public List<EmoteConstraint> cameraConstraint = new List<EmoteConstraint>();
+    public List<EmoteConstraint> cameraConstraints = new List<EmoteConstraint>();
+    public List<EmoteConstraint> additionalConstraints = new List<EmoteConstraint>();
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
     public Quaternion rotationBeforeRootMotion = Quaternion.identity;
@@ -939,7 +940,17 @@ public class BoneMapper : MonoBehaviour
         }
         transform.localPosition = Vector3.zero;
         CustomEmotesAPI.MapperCreated(this);
-
+        StartCoroutine(SetupHandConstraint());
+    }
+    public IEnumerator SetupHandConstraint()
+    {
+        while (!CustomEmotesAPI.localMapper)
+        {
+            yield return new WaitForEndOfFrame();
+            DebugClass.Log($"needed to wait");
+        }
+        additionalConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand)));
+        additionalConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand)));
     }
     public GameObject parentGameObject;
     public bool positionLock, rotationLock, scaleLock;
@@ -1023,13 +1034,25 @@ public class BoneMapper : MonoBehaviour
                     Camera c = mapperBody.GetComponentInChildren<Camera>();
                     if (c is not null)
                     {
-                        cameraConstraint.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
+                        if (temp3PersonCameraBool)
+                        {
+                            GameObject g = new GameObject();
+                            g.transform.SetParent(c.transform.parent.parent.parent.parent);
+                            g.transform.localPosition = new Vector3(0.35f, 3f, -1.5f);
+                            g.transform.localEulerAngles = Vector3.zero;
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, g.transform));
+                        }
+                        else
+                        {
+
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
+                        }
                         GameObject cameraRotationObjectLmao = new GameObject();
                         cameraRotationObjectLmao.transform.SetParent(c.transform);
                         cameraRotationObjectLmao.transform.localPosition = new Vector3(0.01f, -0.048f, -0.053f);
                         cameraRotationObjectLmao.transform.localEulerAngles = new Vector3(270f, 0, 0);
 
-                        cameraConstraint.Add(EmoteConstraint.AddConstraint(StartOfRound.Instance.localPlayerController.localVisor.gameObject, this, cameraRotationObjectLmao.transform));
+                        cameraConstraints.Add(EmoteConstraint.AddConstraint(StartOfRound.Instance.localPlayerController.localVisor.gameObject, this, cameraRotationObjectLmao.transform));
                     }
                 }
             }
@@ -1044,7 +1067,7 @@ public class BoneMapper : MonoBehaviour
     {
         if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
         {
-            if (!twopart && !ranSinceLastAnim) 
+            if (!twopart && !ranSinceLastAnim)
             {
                 twopart = true;
             }
@@ -1146,7 +1169,7 @@ public class BoneMapper : MonoBehaviour
         SetDeltaPosition();
         RootMotion();
     }
-    public Vector3 deltaPos = new Vector3(0,0,0);
+    public Vector3 deltaPos = new Vector3(0, 0, 0);
     public Quaternion deltaRot = Quaternion.identity;
     public Vector3 prevPosition = Vector3.zero;
     public Quaternion prevRotation = Quaternion.identity;
@@ -1354,12 +1377,24 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        foreach (var item in cameraConstraint)
+        foreach (var item in cameraConstraints)
         {
             item.DeactivateConstraints();
         }
+        foreach (var item in additionalConstraints)
+        {
+            item.DeactivateConstraints();
+        }
+        if (local)
+        {
+            mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
+            mapperBody.grabDistance = 3f;
+        }
         basePlayerModelAnimator.enabled = animatorEnabled;
     }
+    bool temp3PersonCameraBool = true;
     public void LockBones()
     {
         UnlockBones();
@@ -1381,10 +1416,6 @@ public class BoneMapper : MonoBehaviour
         }
         if (!jank)
         {
-            foreach (var item in cameraConstraint)
-            {
-                item.DeactivateConstraints();
-            }
             //a1.enabled = false;
             StartCoroutine(waitForTwoFramesThenDisableA1());
             foreach (var smr in basePlayerModelSMR)
@@ -1410,22 +1441,37 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            if (Settings.rootMotionType.Value != RootMotionType.None &&
-                (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
+            foreach (var item in additionalConstraints)
             {
-                foreach (var item in cameraConstraint)
-                {
-                    item.ActivateConstraints();
-                }
+                item.ActivateConstraints();
             }
-            else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
+            if (temp3PersonCameraBool)
             {
-                foreach (var item in cameraConstraint)
+                mapperBody.localVisor.localScale = Vector3.zero;
+                mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                mapperBody.grabDistance = 6f;
+                cameraConstraints[0].ActivateConstraints();
+            }
+            else
+            {
+                if (Settings.rootMotionType.Value != RootMotionType.None &&
+    (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
                 {
-                    item.ActivateConstraints();
-                    if (item != cameraConstraint[cameraConstraint.Count - 1])
+                    foreach (var item in cameraConstraints)
                     {
-                        item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                        item.ActivateConstraints();
+                    }
+                }
+                else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
+                {
+                    foreach (var item in cameraConstraints)
+                    {
+                        item.ActivateConstraints();
+                        if (item != cameraConstraints[cameraConstraints.Count - 1])
+                        {
+                            item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                        }
                     }
                 }
             }
