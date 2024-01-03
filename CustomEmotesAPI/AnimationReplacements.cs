@@ -1065,7 +1065,6 @@ public class BoneMapper : MonoBehaviour
 
                         cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
 
-
                         GameObject cameraRotationObjectLmao = new GameObject();
                         cameraRotationObjectLmao.transform.SetParent(c.transform);
                         cameraRotationObjectLmao.transform.localPosition = new Vector3(0.01f, -0.048f, -0.053f);
@@ -1195,7 +1194,12 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        return currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on);
+        bool yes = currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on);
+        //if (local)
+        //{
+        //    DebugClass.Log(yes);
+        //}
+        return yes;
     }
     public void CameraControls()
     {
@@ -1500,7 +1504,7 @@ public class BoneMapper : MonoBehaviour
             {
                 item.ActivateConstraints();
             }
-            LockCameraStuff(local && ThirdPersonCheck() && mapperBody.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On);
+            LockCameraStuff(local && ThirdPersonCheck());
         }
         else
         {

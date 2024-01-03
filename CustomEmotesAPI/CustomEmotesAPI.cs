@@ -201,7 +201,7 @@ namespace EmotesAPI
         {
             float prevY = self.thisPlayerBody.eulerAngles.y;
             orig(self);
-            if (localMapper is not null && localMapper.ThirdPersonCheck() && self.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
+            if (localMapper is not null && localMapper.ThirdPersonCheck())
             {
                 localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
                 self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
@@ -212,7 +212,7 @@ namespace EmotesAPI
         private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (localMapper is not null && localMapper.ThirdPersonCheck() && self.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
+            if (localMapper is not null && localMapper.ThirdPersonCheck())
             {
                 self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
                 float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
@@ -233,7 +233,7 @@ namespace EmotesAPI
         private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (localMapper is not null && localMapper.ThirdPersonCheck() && self.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
+            if (localMapper is not null && localMapper.ThirdPersonCheck())
             {
                 self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
                 float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
@@ -266,7 +266,7 @@ namespace EmotesAPI
                     {
                         player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
                     }
-                    if (originalIsNotZero && localMapper.ThirdPersonCheck() && player.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
+                    if (originalIsNotZero && localMapper.ThirdPersonCheck())
                     {
                         player.thisPlayerBody.eulerAngles = new Vector3(player.thisPlayerBody.eulerAngles.x, localMapper.rotationPoint.transform.eulerAngles.y, player.thisPlayerBody.eulerAngles.z);
                         localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
@@ -399,6 +399,9 @@ namespace EmotesAPI
                 {
                     case TempThirdPerson.none:
                         localMapper.temporarilyThirdPerson = localMapper.currentClip.thirdPerson ? TempThirdPerson.off : TempThirdPerson.on;
+
+                        localMapper.UnlockCameraStuff();
+                        localMapper.LockCameraStuff(localMapper.temporarilyThirdPerson == TempThirdPerson.on);
                         break;
                     case TempThirdPerson.on:
                         localMapper.temporarilyThirdPerson = TempThirdPerson.off;
@@ -661,7 +664,7 @@ namespace EmotesAPI
             {
                 if (newAnimation == "none")
                 {
-                    localMapper.temporarilyThirdPerson = 0;
+                    localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
                     if (hudObject is not null)
                     {
