@@ -195,8 +195,45 @@ namespace EmotesAPI
         }
         private static Hook TeleportPlayerHook;
 
-        private static bool buttonLock = false;
+        private void PlayerLookInput(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            float prevY = self.thisPlayerBody.eulerAngles.y;
+            orig(self);
+            if (BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+            {
+                localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
+                self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
+            }
+        }
+        private static Hook PlayerLookInputHook;
 
+        private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
+        {
+            orig(self, inputVector);
+            if (BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+            {
+                self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
+                float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
+                cameraLookDir -= inputVector.y;
+                //cameraLookDir = Mathf.Clamp(cameraLookDir, -80f, 80f);
+                localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
+            }
+        }
+        private static Hook CalculateSmoothLookingInputHook;
+
+        private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
+        {
+            orig(self, inputVector);
+            if (BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+            {
+                self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
+                float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
+                cameraLookDir -= inputVector.y;
+                //cameraLookDir = Mathf.Clamp(cameraLookDir, -80f, 80f);
+                localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
+            }
+        }
+        private static Hook CalculateNormalLookingInputHook;
 
         private static GameObject emoteNetworker;
 
@@ -208,9 +245,15 @@ namespace EmotesAPI
             {
                 if (localMapper)
                 {
+                    bool originalIsNotZero = player.moveInputVector != Vector2.zero;
                     if (localMapper.autoWalkSpeed != 0)
                     {
                         player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
+                    }
+                    if (originalIsNotZero && BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+                    {
+                        player.thisPlayerBody.eulerAngles = new Vector3(player.thisPlayerBody.eulerAngles.x, localMapper.rotationPoint.transform.eulerAngles.y, player.thisPlayerBody.eulerAngles.z);
+                        localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
                     }
                 }
             }
@@ -224,6 +267,13 @@ namespace EmotesAPI
                     item.ActUponConstraints();
                 }
             }
+        }
+
+        public void SetupHook(Type targetClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook)
+        {
+            MethodInfo targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
+            MethodInfo destMethod = typeof(CustomEmotesAPI).GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            hook = new Hook(targetMethod, destMethod, this);
         }
         public void Awake()
         {
@@ -275,6 +325,14 @@ namespace EmotesAPI
             targetMethod = typeof(PlayerControllerB).GetMethod("TeleportPlayer", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(TeleportPlayer), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             TeleportPlayerHook = new Hook(targetMethod, destMethod, this);
+
+            targetMethod = typeof(PlayerControllerB).GetMethod("PlayerLookInput", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerLookInput), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            PlayerLookInputHook = new Hook(targetMethod, destMethod, this);
+
+            SetupHook(typeof(PlayerControllerB), "CalculateSmoothLookingInput", BindingFlags.NonPublic, nameof(CalculateSmoothLookingInput), CalculateSmoothLookingInputHook);
+            SetupHook(typeof(PlayerControllerB), "CalculateNormalLookingInput", BindingFlags.NonPublic, nameof(CalculateNormalLookingInput), CalculateNormalLookingInputHook);
+
 
             AnimationReplacements.RunAll();
 
@@ -556,21 +614,26 @@ namespace EmotesAPI
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
-                if (hudObject is not null)
+                if (newAnimation == "none")
                 {
-                    if (newAnimation == "none")
+                    localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
+                    if (hudObject is not null)
                     {
                         hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
                         baseHUDObject.SetActive(true);
                         selfRedHUDObject.SetActive(true);
                     }
-                    else
+                }
+                else
+                {
+                    if (hudObject is not null)
                     {
                         hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
                         baseHUDObject.SetActive(false);
                         selfRedHUDObject.SetActive(false);
                     }
                 }
+
             }
             foreach (var item in EmoteLocation.emoteLocations)
             {

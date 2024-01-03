@@ -947,7 +947,6 @@ public class BoneMapper : MonoBehaviour
         while (!CustomEmotesAPI.localMapper)
         {
             yield return new WaitForEndOfFrame();
-            DebugClass.Log($"needed to wait");
         }
         additionalConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand)));
         additionalConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand)));
@@ -1005,6 +1004,7 @@ public class BoneMapper : MonoBehaviour
         {
         }
     }
+    public GameObject rotationPoint;
     void GetLocal()
     {
         try
@@ -1036,9 +1036,14 @@ public class BoneMapper : MonoBehaviour
                     {
                         if (temp3PersonCameraBool)
                         {
+                            rotationPoint = new GameObject();
+                            rotationPoint.transform.SetParent(c.transform.parent.parent.parent.parent);
+                            rotationPoint.transform.localPosition = new Vector3(0, .8f, 0);
+                            rotationPoint.transform.localEulerAngles = Vector3.zero;
+
                             GameObject g = new GameObject();
-                            g.transform.SetParent(c.transform.parent.parent.parent.parent);
-                            g.transform.localPosition = new Vector3(0.35f, 3f, -1.5f);
+                            g.transform.SetParent(rotationPoint.transform);
+                            g.transform.localPosition = new Vector3(0.3f, 1.0f, -3f);
                             g.transform.localEulerAngles = Vector3.zero;
                             cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, g.transform));
                         }
@@ -1213,7 +1218,10 @@ public class BoneMapper : MonoBehaviour
 
                         //move player body
                         mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
-                        mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
+                        if (!temp3PersonCameraBool)
+                        {
+                            mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
+                        }
 
                         //revert self to current BoneMapper position from earlier
                         transform.position = tempPos;
@@ -1394,7 +1402,7 @@ public class BoneMapper : MonoBehaviour
         }
         basePlayerModelAnimator.enabled = animatorEnabled;
     }
-    bool temp3PersonCameraBool = true;
+    public static bool temp3PersonCameraBool = true;
     public void LockBones()
     {
         UnlockBones();
@@ -1450,7 +1458,7 @@ public class BoneMapper : MonoBehaviour
                 mapperBody.localVisor.localScale = Vector3.zero;
                 mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
                 mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                mapperBody.grabDistance = 6f;
+                mapperBody.grabDistance = 4.65f;
                 cameraConstraints[0].ActivateConstraints();
             }
             else
