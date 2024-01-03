@@ -264,8 +264,9 @@ public class CustomAnimationClip : MonoBehaviour
     public AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none;
     public bool willGetClaimed = false;
     public float audioLevel = .5f;
+    public bool thirdPerson = false;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f, bool thirdPerson = false)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -362,6 +363,7 @@ public class CustomAnimationClip : MonoBehaviour
         this.lockType = lockType;
         this.willGetClaimed = willGetClaimed;
         this.audioLevel = audioLevel;
+        this.thirdPerson = thirdPerson;
     }
     private static GameObject audioLoader;
 }
@@ -374,6 +376,12 @@ public struct WorldProp
         prop = _prop;
         joinSpots = _joinSpots;
     }
+}
+public enum TempThirdPerson
+{
+    none,
+    on,
+    off
 }
 public class AudioObject : MonoBehaviour
 {
@@ -441,10 +449,12 @@ public class BoneMapper : MonoBehaviour
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
     public List<EmoteConstraint> cameraConstraints = new List<EmoteConstraint>();
     public List<EmoteConstraint> additionalConstraints = new List<EmoteConstraint>();
+    public EmoteConstraint thirdPersonConstraint;
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
     public Quaternion rotationBeforeRootMotion = Quaternion.identity;
     public float currentAudioLevel = 0;
+    public TempThirdPerson temporarilyThirdPerson = TempThirdPerson.none;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -1005,6 +1015,8 @@ public class BoneMapper : MonoBehaviour
         }
     }
     public GameObject rotationPoint;
+    public GameObject desiredCameraPos;
+    public GameObject realCameraPos;
     void GetLocal()
     {
         try
@@ -1034,24 +1046,26 @@ public class BoneMapper : MonoBehaviour
                     Camera c = mapperBody.GetComponentInChildren<Camera>();
                     if (c is not null)
                     {
-                        if (temp3PersonCameraBool)
-                        {
-                            rotationPoint = new GameObject();
-                            rotationPoint.transform.SetParent(c.transform.parent.parent.parent.parent);
-                            rotationPoint.transform.localPosition = new Vector3(0, .8f, 0);
-                            rotationPoint.transform.localEulerAngles = Vector3.zero;
+                        rotationPoint = new GameObject();
+                        rotationPoint.transform.SetParent(c.transform.parent.parent.parent.parent);
+                        rotationPoint.transform.localPosition = new Vector3(0, .8f, 0);
+                        rotationPoint.transform.localEulerAngles = Vector3.zero;
 
-                            GameObject g = new GameObject();
-                            g.transform.SetParent(rotationPoint.transform);
-                            g.transform.localPosition = new Vector3(0.3f, 1.0f, -3f);
-                            g.transform.localEulerAngles = Vector3.zero;
-                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, g.transform));
-                        }
-                        else
-                        {
+                        desiredCameraPos = new GameObject();
+                        desiredCameraPos.transform.SetParent(rotationPoint.transform);
+                        desiredCameraPos.transform.localPosition = new Vector3(0.3f, 1.0f, -3f);
+                        desiredCameraPos.transform.localEulerAngles = Vector3.zero;
+                        realCameraPos = new GameObject();
+                        realCameraPos.transform.SetParent(desiredCameraPos.transform);
+                        realCameraPos.transform.localPosition = Vector3.zero;
+                        realCameraPos.transform.localEulerAngles = Vector3.zero;
+                        thirdPersonConstraint = EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, realCameraPos.transform);
 
-                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
-                        }
+
+
+                        cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
+
+
                         GameObject cameraRotationObjectLmao = new GameObject();
                         cameraRotationObjectLmao.transform.SetParent(c.transform);
                         cameraRotationObjectLmao.transform.localPosition = new Vector3(0.01f, -0.048f, -0.053f);
@@ -1072,49 +1086,53 @@ public class BoneMapper : MonoBehaviour
     {
         if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
         {
-            if (!twopart && !ranSinceLastAnim)
+            if (!ranSinceLastAnim)
             {
-                twopart = true;
-            }
-            else
-            {
-                ranSinceLastAnim = true;
-                if (emoteSkeletonAnimator.enabled)
+                if (!twopart)
                 {
-                    if (!jank)
-                    {
-                        UnlockBones();
-                    }
+                    twopart = true;
                 }
-                //DebugClass.Log($"----------{a1}");
-                if (!ragdolling)
+                else
                 {
-                    basePlayerModelAnimator.enabled = true;
-                    oneFrameAnimatorLeeWay = true;
-                }
-                emoteSkeletonAnimator.enabled = false;
-                try
-                {
-                    currentClip.clip.ToString();
-                    CustomEmotesAPI.Changed("none", this);
-                    NewAnimation(null);
-                    if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+                    DebugClass.Log($"two part thing");
+                    ranSinceLastAnim = true;
+                    if (emoteSkeletonAnimator.enabled)
                     {
-                        CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
-                    }
-                    if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
-                    {
-                        audioObject.GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
-                        if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
+                        if (!jank)
                         {
-                            listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                            UnlockBones();
                         }
                     }
-                    prevClip = currentClip;
-                    currentClip = null;
-                }
-                catch (Exception)
-                {
+                    //DebugClass.Log($"----------{a1}");
+                    if (!ragdolling)
+                    {
+                        basePlayerModelAnimator.enabled = true;
+                        oneFrameAnimatorLeeWay = true;
+                    }
+                    emoteSkeletonAnimator.enabled = false;
+                    try
+                    {
+                        currentClip.clip.ToString();
+                        CustomEmotesAPI.Changed("none", this);
+                        NewAnimation(null);
+                        if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+                        {
+                            CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                        }
+                        if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
+                        {
+                            audioObject.GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
+                            if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
+                            {
+                                listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                            }
+                        }
+                        prevClip = currentClip;
+                        currentClip = null;
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }
@@ -1173,6 +1191,32 @@ public class BoneMapper : MonoBehaviour
         Health();
         SetDeltaPosition();
         RootMotion();
+        CameraControls();
+    }
+    internal bool ThirdPersonCheck()
+    {
+        return currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on);
+    }
+    public void CameraControls()
+    {
+        if (local && ThirdPersonCheck() && mapperBody.grabDistance == 5.65f)
+        {
+            //just copying this from the unity docs/spectator camera KEKW
+            Ray ray = new Ray(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position, desiredCameraPos.transform.position - emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position);
+            RaycastHit hit;//                       v PlayerControlerB.walkableSurfacesNoPlayersMask... but it's private and I don't feel like publicizing it lmao
+            if (Physics.Raycast(ray, out hit, 10f, 268437761, QueryTriggerInteraction.Ignore))
+            {
+                realCameraPos.transform.position = ray.GetPoint(hit.distance - 0.25f);
+            }
+            else
+            {
+                realCameraPos.transform.position = ray.GetPoint(10.0f);
+            }
+            if (Vector3.Distance(realCameraPos.transform.position, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position) > Vector3.Distance(desiredCameraPos.transform.position, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position))
+            {
+                realCameraPos.transform.position = desiredCameraPos.transform.position;
+            }
+        }
     }
     public Vector3 deltaPos = new Vector3(0, 0, 0);
     public Quaternion deltaRot = Quaternion.identity;
@@ -1218,7 +1262,7 @@ public class BoneMapper : MonoBehaviour
 
                         //move player body
                         mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
-                        if (!temp3PersonCameraBool)
+                        if (mapperBody.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
                         {
                             mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
                         }
@@ -1393,16 +1437,19 @@ public class BoneMapper : MonoBehaviour
         {
             item.DeactivateConstraints();
         }
-        if (local)
+        if (thirdPersonConstraint is not null)
+        {
+            thirdPersonConstraint.DeactivateConstraints();
+        }
+        if (local && mapperBody.grabDistance == 5.65f)
         {
             mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
             mapperBody.grabDistance = 3f;
         }
-        basePlayerModelAnimator.enabled = animatorEnabled;
+        //basePlayerModelAnimator.enabled = animatorEnabled;
     }
-    public static bool temp3PersonCameraBool = true;
     public void LockBones()
     {
         UnlockBones();
@@ -1425,7 +1472,7 @@ public class BoneMapper : MonoBehaviour
         if (!jank)
         {
             //a1.enabled = false;
-            StartCoroutine(waitForTwoFramesThenDisableA1());
+            //StartCoroutine(waitForTwoFramesThenDisableA1());
             foreach (var smr in basePlayerModelSMR)
             {
                 for (int i = 0; i < smr.bones.Length; i++)
@@ -1453,42 +1500,61 @@ public class BoneMapper : MonoBehaviour
             {
                 item.ActivateConstraints();
             }
-            if (temp3PersonCameraBool)
-            {
-                mapperBody.localVisor.localScale = Vector3.zero;
-                mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-                mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                mapperBody.grabDistance = 4.65f;
-                cameraConstraints[0].ActivateConstraints();
-            }
-            else
-            {
-                if (Settings.rootMotionType.Value != RootMotionType.None &&
-    (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
-                {
-                    foreach (var item in cameraConstraints)
-                    {
-                        item.ActivateConstraints();
-                    }
-                }
-                else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
-                {
-                    foreach (var item in cameraConstraints)
-                    {
-                        item.ActivateConstraints();
-                        if (item != cameraConstraints[cameraConstraints.Count - 1])
-                        {
-                            item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
-                        }
-                    }
-                }
-            }
+            LockCameraStuff(local && ThirdPersonCheck() && mapperBody.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On);
         }
         else
         {
             //a1.enabled = false;
 
             StartCoroutine(waitForTwoFramesThenDisableA1());
+        }
+    }
+    public void LockCameraStuff(bool thirdPersonLock)
+    {
+        if (thirdPersonLock)
+        {
+            mapperBody.localVisor.localScale = Vector3.zero;
+            mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            mapperBody.grabDistance = 5.65f;
+            thirdPersonConstraint.ActivateConstraints();
+        }
+        else
+        {
+            if (Settings.rootMotionType.Value != RootMotionType.None &&
+(currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
+            {
+                foreach (var item in cameraConstraints)
+                {
+                    item.ActivateConstraints();
+                }
+            }
+            else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
+            {
+                foreach (var item in cameraConstraints)
+                {
+                    item.ActivateConstraints();
+                    if (item != cameraConstraints[cameraConstraints.Count - 1])
+                    {
+                        item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+                    }
+                }
+            }
+        }
+    }
+    public void UnlockCameraStuff()
+    {
+        foreach (var item in cameraConstraints)
+        {
+            item.DeactivateConstraints();
+        }
+        thirdPersonConstraint.DeactivateConstraints();
+        if (local && mapperBody.grabDistance == 5.65f)
+        {
+            mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
+            mapperBody.grabDistance = 3f;
         }
     }
 }

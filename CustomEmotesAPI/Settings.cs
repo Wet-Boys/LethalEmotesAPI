@@ -24,6 +24,12 @@ namespace EmotesAPI
         All,
         None
     }
+    public enum ThirdPersonType
+    {
+        Normal,
+        All,
+        None
+    }
     public static class Settings
     {
         public static ConfigEntry<float> EmotesVolume;
@@ -31,6 +37,7 @@ namespace EmotesAPI
         public static ConfigEntry<RootMotionType> rootMotionType;
         public static ConfigEntry<bool> EmotesAlertEnemies;
         public static ConfigEntry<DMCAType> DMCAFree;
+        public static ConfigEntry<ThirdPersonType> thirdPersonType;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
         public static ConfigEntry<string> EmoteWheelSetDataEntryString;
@@ -53,6 +60,7 @@ namespace EmotesAPI
             DMCAFree = CustomEmotesAPI.instance.Config.Bind<DMCAType>("Misc", "DMCA Free Songs", DMCAType.Normal, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will be muted if DMCA is listed. 3: All songs will use DMCA friendly versions or none at all");
             EmoteWheelSetDataEntryString = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default().ToJson(), "Json data of emote wheel");
             RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key, probably don't want to touch this here");
+            thirdPersonType = CustomEmotesAPI.instance.Config.Bind<ThirdPersonType>("Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");
 
             HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
         }

@@ -201,7 +201,7 @@ namespace EmotesAPI
         {
             float prevY = self.thisPlayerBody.eulerAngles.y;
             orig(self);
-            if (BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+            if (localMapper is not null && localMapper.ThirdPersonCheck() && self.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
             {
                 localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
                 self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
@@ -212,12 +212,19 @@ namespace EmotesAPI
         private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+            if (localMapper is not null && localMapper.ThirdPersonCheck() && self.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
             {
                 self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
                 float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
                 cameraLookDir -= inputVector.y;
-                //cameraLookDir = Mathf.Clamp(cameraLookDir, -80f, 80f);
+                if (cameraLookDir > 200)
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                }
+                else
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
+                }
                 localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
             }
         }
@@ -226,12 +233,19 @@ namespace EmotesAPI
         private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+            if (localMapper is not null && localMapper.ThirdPersonCheck() && self.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
             {
                 self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
                 float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
                 cameraLookDir -= inputVector.y;
-                //cameraLookDir = Mathf.Clamp(cameraLookDir, -80f, 80f);
+                if (cameraLookDir > 200)
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                }
+                else
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
+                }
                 localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
             }
         }
@@ -252,7 +266,7 @@ namespace EmotesAPI
                     {
                         player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
                     }
-                    if (originalIsNotZero && BoneMapper.temp3PersonCameraBool && localMapper is not null && localMapper.emoteSkeletonAnimator.enabled && localMapper.rotationPoint is not null)
+                    if (originalIsNotZero && localMapper.ThirdPersonCheck() && player.thisPlayerModel.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.On)
                     {
                         player.thisPlayerBody.eulerAngles = new Vector3(player.thisPlayerBody.eulerAngles.x, localMapper.rotationPoint.transform.eulerAngles.y, player.thisPlayerBody.eulerAngles.z);
                         localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
@@ -373,7 +387,36 @@ namespace EmotesAPI
             ScrollU.started += ctx => EmoteUiManager.OnLeftWheel();
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
+            EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+        }
+
+        private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
+        {
+            if (localMapper is not null && localMapper.currentClip is not null)
+            {
+                switch (localMapper.temporarilyThirdPerson)
+                {
+                    case TempThirdPerson.none:
+                        localMapper.temporarilyThirdPerson = localMapper.currentClip.thirdPerson ? TempThirdPerson.off : TempThirdPerson.on;
+                        break;
+                    case TempThirdPerson.on:
+                        localMapper.temporarilyThirdPerson = TempThirdPerson.off;
+
+                        localMapper.UnlockCameraStuff();
+                        localMapper.LockCameraStuff(false);
+                        break;
+                    case TempThirdPerson.off:
+                        localMapper.temporarilyThirdPerson = TempThirdPerson.on;
+
+                        localMapper.UnlockCameraStuff();
+                        localMapper.LockCameraStuff(true);
+
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
@@ -537,7 +580,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")
@@ -618,6 +661,7 @@ namespace EmotesAPI
             {
                 if (newAnimation == "none")
                 {
+                    localMapper.temporarilyThirdPerson = 0;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
                     if (hudObject is not null)
                     {

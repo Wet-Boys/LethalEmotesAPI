@@ -31,5 +31,8 @@ namespace LethalEmotesAPI
         [InputAction("", Name = "Stop emoting")]
         public InputAction StopEmoting { get; set; }
 
+        [InputAction("<Mouse>/middleButton", Name = "CustomEmotesAPI: Third Person Toggle")]
+        public InputAction ThirdPersonToggle { get; set; }
+
     }
 }
