@@ -17,6 +17,7 @@ using Unity.Netcode;
 using UnityEngine.Networking;
 using UnityEngine.Experimental.Audio;
 using HarmonyLib;
+using LethalCompanyInputUtils;
 using LethalEmotesAPI;
 using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui;
@@ -28,6 +29,7 @@ using UnityEngine.SocialPlatforms;
 namespace EmotesAPI
 {
     [BepInPlugin(PluginGUID, PluginName, VERSION)]
+    [BepInDependency(LethalCompanyInputUtilsPlugin.ModId)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";

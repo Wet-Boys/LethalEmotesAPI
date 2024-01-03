@@ -12,10 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       USE_STUBBED_LIBS: 1
-      RELEASE_VERSION: ${{ github.ref_name }}
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
+
+    - name: Output Short Sha Commit
+      run: |
+        export SHORT_SHA=$(git rev-parse --short ${{ github.sha }})
+        echo "RELEASE_VERSION=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}-${SHORT_SHA}" >> "$GITHUB_ENV"
+      shell: bash
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -26,11 +31,11 @@ jobs:
       run: chmod +x build.sh
 
     - name: Build
-      run: ./build.sh --configuration=Release --target=BuildThunderstore
+      run: ./build.sh --target=BuildThunderstore
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: thunderstore-package
-        path: CustomEmotesAPI/bin/Release/netstandard2.1/upload/
+        path: CustomEmotesAPI/bin/Debug/netstandard2.1/upload/
         retention-days: 15
