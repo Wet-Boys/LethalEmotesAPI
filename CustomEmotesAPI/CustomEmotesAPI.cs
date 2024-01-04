@@ -24,12 +24,16 @@ using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem.Controls;
 using LethalEmotesAPI.Utils;
 using TMPro;
-using UnityEngine.SocialPlatforms;
+using System.Linq;
+using BepInEx.Bootstrap;
+using ModelReplacement.Modules;
 
 namespace EmotesAPI
 {
     [BepInPlugin(PluginGUID, PluginName, VERSION)]
     [BepInDependency(LethalCompanyInputUtilsPlugin.ModId)]
+    [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
@@ -63,6 +67,8 @@ namespace EmotesAPI
         public static List<string> allClipNames = new List<string>();
         public static List<string> randomClipList = new List<string>();
         public static List<int> blacklistedClips = new List<int>();
+        public static bool LCThirdPersonPresent;
+        public static bool ModelReplacementAPIPresent;
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -197,8 +203,71 @@ namespace EmotesAPI
         }
         private static Hook TeleportPlayerHook;
 
-        private static bool buttonLock = false;
+        private void PlayerLookInput(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            float prevY = self.thisPlayerBody.eulerAngles.y;
+            orig(self);
+            if (localMapper is not null && localMapper.ThirdPersonCheck())
+            {
+                localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
+                self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
+            }
+        }
+        private static Hook PlayerLookInputHook;
 
+        private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
+        {
+            orig(self, inputVector);
+            if (localMapper is not null && localMapper.ThirdPersonCheck())
+            {
+                self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
+                float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
+                cameraLookDir -= inputVector.y;
+                if (cameraLookDir > 200)
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                }
+                else
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
+                }
+                localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
+            }
+        }
+        private static Hook CalculateSmoothLookingInputHook;
+
+        private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
+        {
+            orig(self, inputVector);
+            if (localMapper is not null && localMapper.ThirdPersonCheck())
+            {
+                self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
+                float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
+                cameraLookDir -= inputVector.y;
+                if (cameraLookDir > 200)
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                }
+                else
+                {
+                    cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
+                }
+                localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
+            }
+        }
+        private static Hook CalculateNormalLookingInputHook;
+
+
+        private void SetHoverTipAndCurrentInteractTrigger(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            //this needs to be done now, since constraints generally only fire in LateUpdate. But this is firing in Update after the original animator has tried to take back control of the camera
+            if (localMapper is not null && localMapper.thirdPersonConstraint is not null)
+            {
+                localMapper.thirdPersonConstraint.ActUponConstraints();
+            }
+            orig(self);
+        }
+        private static Hook SetHoverTipAndCurrentInteractTriggerHook;
 
         private static GameObject emoteNetworker;
 
@@ -210,9 +279,15 @@ namespace EmotesAPI
             {
                 if (localMapper)
                 {
+                    bool originalIsNotZero = player.moveInputVector != Vector2.zero;
                     if (localMapper.autoWalkSpeed != 0)
                     {
                         player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
+                    }
+                    if (originalIsNotZero && localMapper.ThirdPersonCheck())
+                    {
+                        player.thisPlayerBody.eulerAngles = new Vector3(player.thisPlayerBody.eulerAngles.x, localMapper.rotationPoint.transform.eulerAngles.y, player.thisPlayerBody.eulerAngles.z);
+                        localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
                     }
                 }
             }
@@ -221,12 +296,30 @@ namespace EmotesAPI
         {
             if (localMapper is not null && localMapper.currentClip is not null)
             {
-                foreach (var item in localMapper.cameraConstraint)
+                foreach (var item in localMapper.cameraConstraints)
                 {
                     item.ActUponConstraints();
                 }
             }
         }
+
+        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook)
+        {
+            MethodInfo targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
+            MethodInfo destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            hook = new Hook(targetMethod, destMethod, this);
+
+        }
+
+        //private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
+        //{
+        //    if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)
+        //    {
+        //        return ViewState.ThirdPerson;
+        //    }
+        //    return orig(self);
+        //}
+        //internal static Hook GetViewStateHook;
         public void Awake()
         {
             instance = this;
@@ -238,6 +331,11 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("enemyskeletons");
             CustomEmotesAPI.LoadResource("scavbody");
             LoadResource("customemotes-ui");
+
+
+            LCThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("LCThirdPerson");
+            ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
+
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -278,28 +376,41 @@ namespace EmotesAPI
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(TeleportPlayer), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             TeleportPlayerHook = new Hook(targetMethod, destMethod, this);
 
+            targetMethod = typeof(PlayerControllerB).GetMethod("PlayerLookInput", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerLookInput), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            PlayerLookInputHook = new Hook(targetMethod, destMethod, this);
+
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "CalculateSmoothLookingInput", BindingFlags.NonPublic, nameof(CalculateSmoothLookingInput), CalculateSmoothLookingInputHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "CalculateNormalLookingInput", BindingFlags.NonPublic, nameof(CalculateNormalLookingInput), CalculateNormalLookingInputHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "SetHoverTipAndCurrentInteractTrigger", BindingFlags.NonPublic, nameof(SetHoverTipAndCurrentInteractTrigger), SetHoverTipAndCurrentInteractTriggerHook);
+            if (ModelReplacementAPIPresent)
+            {
+                ModelReplacementAPICompat.SetupViewStateHook();
+            }
+
+
             AnimationReplacements.RunAll();
 
             CreateBaseNameTokenPairs();
-
-            //TODO setup ui buttons somewhere early on?
-            //if (allClipNames != null)
-            //{
-            //    ScrollManager.SetupButtons(allClipNames);
-            //}
 
 
             var types = Assembly.GetExecutingAssembly().GetTypes();
             foreach (var type in types)
             {
-                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                foreach (var method in methods)
+                try
                 {
-                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
-                    if (attributes.Length > 0)
+                    var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                    foreach (var method in methods)
                     {
-                        method.Invoke(null, null);
+                        var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+                        if (attributes.Length > 0)
+                        {
+                            method.Invoke(null, null);
+                        }
                     }
+                }
+                catch (Exception e)
+                {
                 }
             }
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
@@ -321,7 +432,39 @@ namespace EmotesAPI
             ScrollU.started += ctx => EmoteUiManager.OnLeftWheel();
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
+            EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+        }
+
+        private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
+        {
+            if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
+            {
+                switch (localMapper.temporarilyThirdPerson)
+                {
+                    case TempThirdPerson.none:
+                        localMapper.temporarilyThirdPerson = localMapper.currentClip.thirdPerson ? TempThirdPerson.off : TempThirdPerson.on;
+
+                        localMapper.UnlockCameraStuff();
+                        localMapper.LockCameraStuff(localMapper.temporarilyThirdPerson == TempThirdPerson.on);
+                        break;
+                    case TempThirdPerson.on:
+                        localMapper.temporarilyThirdPerson = TempThirdPerson.off;
+
+                        localMapper.UnlockCameraStuff();
+                        localMapper.LockCameraStuff(false);
+                        break;
+                    case TempThirdPerson.off:
+                        localMapper.temporarilyThirdPerson = TempThirdPerson.on;
+
+                        localMapper.UnlockCameraStuff();
+                        localMapper.LockCameraStuff(true);
+
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
@@ -485,7 +628,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")
@@ -564,23 +707,27 @@ namespace EmotesAPI
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
-                //TODO emote wheel continue playing button (TMPUGUI is the issue)
-                //EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
-                if (hudObject is not null)
+                if (newAnimation == "none")
                 {
-                    if (newAnimation == "none")
+                    localMapper.temporarilyThirdPerson = TempThirdPerson.none;
+                    localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
+                    if (hudObject is not null)
                     {
                         hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
                         baseHUDObject.SetActive(true);
                         selfRedHUDObject.SetActive(true);
                     }
-                    else
+                }
+                else
+                {
+                    if (hudObject is not null)
                     {
                         hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
                         baseHUDObject.SetActive(false);
                         selfRedHUDObject.SetActive(false);
                     }
                 }
+
             }
             foreach (var item in EmoteLocation.emoteLocations)
             {

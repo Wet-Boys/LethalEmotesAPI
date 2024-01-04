@@ -24,6 +24,12 @@ namespace EmotesAPI
         All,
         None
     }
+    public enum ThirdPersonType
+    {
+        Normal,
+        All,
+        None
+    }
     public static class Settings
     {
         public static ConfigEntry<float> EmotesVolume;
@@ -31,26 +37,18 @@ namespace EmotesAPI
         public static ConfigEntry<RootMotionType> rootMotionType;
         public static ConfigEntry<bool> EmotesAlertEnemies;
         public static ConfigEntry<DMCAType> DMCAFree;
+        public static ConfigEntry<ThirdPersonType> thirdPersonType;
         //public static ConfigEntry<bool> RemoveAutoWalk;
 
         public static ConfigEntry<string> EmoteWheelSetDataEntryString;
         public static ConfigEntry<string> RandomEmoteBlacklist;
 
-        //TODO loading a base button
-        //public static GameObject NakedButton = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/UI/NakedButton.prefab").WaitForCompletion();
+
         public static void RunAll()
         {
-            //TODO base button
-            //UnityEngine.Object.DestroyImmediate(NakedButton.GetComponentInChildren<LanguageTextMeshController>());
-            Setup();
             Yes();
         }
-        private static void Setup()
-        {
-            //TODO settings ROO
-            //ModSettingsManager.SetModDescription($"Made by Metrosexual Fruitcake#6969\n\nVersion {CustomEmotesAPI.VERSION}");
-            //ModSettingsManager.SetModIcon(Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/icon.png"));
-        }
+
         internal static GameObject picker;
         private static void Yes()
         {
@@ -62,17 +60,8 @@ namespace EmotesAPI
             DMCAFree = CustomEmotesAPI.instance.Config.Bind<DMCAType>("Misc", "DMCA Free Songs", DMCAType.Normal, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will be muted if DMCA is listed. 3: All songs will use DMCA friendly versions or none at all");
             EmoteWheelSetDataEntryString = CustomEmotesAPI.instance.Config.Bind("No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default().ToJson(), "Json data of emote wheel");
             RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key, probably don't want to touch this here");
+            thirdPersonType = CustomEmotesAPI.instance.Config.Bind<ThirdPersonType>("Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");
 
-            //TODO settings ROO
-            //ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));
-            //ModSettingsManager.AddOption(new KeyBindOption(EmoteWheel));
-            //ModSettingsManager.AddOption(new KeyBindOption(SetCurrentEmoteToWheel));
-            //ModSettingsManager.AddOption(new KeyBindOption(Left));
-            //ModSettingsManager.AddOption(new KeyBindOption(Right));
-            //ModSettingsManager.AddOption(new SliderOption(EmotesVolume));
-            //ModSettingsManager.AddOption(new KeyBindOption(RandomEmote));
-            //ModSettingsManager.AddOption(new KeyBindOption(JoinEmote));
-            EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
             HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
         }
         private static void HideJoinSpots_SettingChanged(object sender, EventArgs e)
@@ -81,12 +70,6 @@ namespace EmotesAPI
             {
                 EmoteLocation.ShowAllSpots();
             }
-        }
-
-        private static void EmotesVolume_SettingChanged(object sender, EventArgs e)
-        {
-            //TODO audio settings ROO
-            //AkSoundEngine.SetRTPCValue("Volume_Emotes", EmotesVolume.Value);
         }
 
         internal static void PressButton()

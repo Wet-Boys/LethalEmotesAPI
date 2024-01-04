@@ -32,6 +32,7 @@ namespace EmotesAPI
         public LockType lockType = LockType.none; // determines the lock type of your emote, none, headBobbing, lockHead, or rootMotion
         public bool willGetClaimedByDMCA = false; // Lets you mark if your normal set of audio will get claimed by DMCA
         public float audioLevel = .5f; // determines the volume of the emote in terms of alerting enemies, 0 is nothing, 1 is max
+        public bool thirdPerson = false;
 
         public enum LockType
         {
