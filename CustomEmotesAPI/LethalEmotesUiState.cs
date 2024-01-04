@@ -134,4 +134,10 @@ public class LethalEmotesUiState : IEmoteUiStateController
         get => (int)Settings.DMCAFree.Value;
         set => Settings.DMCAFree.Value = (DMCAType)value;
     }
+
+    public int ThirdPerson
+    {
+        get => (int)Settings.thirdPersonType.Value;
+        set => Settings.thirdPersonType.Value = (ThirdPersonType)value;
+    }
 }
