@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 
-namespace EmotesAPI
+namespace LethalEmotesAPI.Patches
 {
     internal class ModelReplacementAPICompat
     {
