@@ -46,4 +46,5 @@ public interface IEmoteUiStateController
     public int RootMotionType { get; set; }
     public bool EmotesAlertEnemies { get; set; }
     public int DmcaFree { get; set; }
+    public int ThirdPerson { get; set; }
 }
