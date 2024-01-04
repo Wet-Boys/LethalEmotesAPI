@@ -188,4 +188,10 @@ public static class EmoteUiManager
         get => _stateController!.DmcaFree;
         set => _stateController!.DmcaFree = value;
     }
+
+    public static int ThirdPerson
+    {
+        get => _stateController!.ThirdPerson;
+        set => _stateController!.ThirdPerson = value;
+    }
 }
