@@ -8,6 +8,10 @@ using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.Data;
 using UnityEngine;
 using UnityEngine.Events;
+using LethalConfig.ConfigItems.Options;
+using LethalConfig.ConfigItems;
+using LethalConfig;
+using LethalEmotesAPI.Utils;
 
 namespace EmotesAPI
 {
@@ -48,6 +52,7 @@ namespace EmotesAPI
         public static void RunAll()
         {
             Yes();
+            LethalConfig();
         }
 
         internal static GameObject picker;
@@ -107,6 +112,22 @@ namespace EmotesAPI
             }
             sb.Append("\n\n");
             DebugClass.Log(sb.ToString());
+        }
+        internal static void LethalConfig()
+        {
+            var aVeryCoolIconAsset = Assets.Load<Sprite>("lethalconfigicon.png");
+            LethalConfigManager.SetModIcon(aVeryCoolIconAsset);
+            LethalConfigManager.SetModDescription("API for importing animations to Lethal Company");
+
+
+            LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<RootMotionType>(rootMotionType, false));
+            LethalConfigManager.AddConfigItem(new FloatSliderConfigItem(EmotesVolume, new FloatSliderOptions { Min = 0, Max = 100, RequiresRestart = false}));
+            LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<DMCAType>(DMCAFree, false));
+            LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<ThirdPersonType>(thirdPersonType, false));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(EmotesAlertEnemies, false));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
+
         }
 
     }

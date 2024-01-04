@@ -33,6 +33,7 @@ namespace EmotesAPI
 {
     [BepInPlugin(PluginGUID, PluginName, VERSION)]
     [BepInDependency(LethalCompanyInputUtilsPlugin.ModId)]
+    [BepInDependency("ainavt.lc.lethalconfig", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
@@ -41,7 +42,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.1.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
