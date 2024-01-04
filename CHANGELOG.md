@@ -1,3 +1,5 @@
+- Version 1.1.3: Fixed an issue with the third person camera's culling mask sometimes showing purple hitboxes. Fixed items not sticking to your hands when emoting
+
 - Version 1.1.2: Fixed an error with third person settings causing camera locking when using the hotswap button.
 
 - Version 1.1.1: Added LethalConfig as a dependency cause it just makes sense
