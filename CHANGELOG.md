@@ -1,3 +1,5 @@
+- Version 1.1.2: Fixed an error with third person settings causing camera locking when using the hotswap button.
+
 - Version 1.1.1: Added LethalConfig as a dependency cause it just makes sense
 
 - Version 1.1.0: Added third person camera options, emotes can decide on their default, but you can override this in the emote customization menu, if LCThirdperson is installed, emotesapi will NEVER enter third person camera to avoid conflicts. Change the lock settings when joining other emotes, if you are an emote creator and have emotes that lock players to other players, please consider assigning BoneMapper.currentlyLockedBoneMapper when locking players (if you notice and don't like it, you can revert it in the config). Fixed healthbar not resetting its color on death. Probably fixed hitting escape in the wheel customization menu pulling up the pause menu.
