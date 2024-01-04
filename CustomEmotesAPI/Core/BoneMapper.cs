@@ -823,7 +823,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void CameraControls()
     {
-        if (local && ThirdPersonCheck() && mapperBody.grabDistance == 5.65f)
+        if (local && isInThirdPerson)
         {
             //just copying this from the unity docs/spectator camera KEKW
             Ray ray = new Ray(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position, desiredCameraPos.transform.position - emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position);

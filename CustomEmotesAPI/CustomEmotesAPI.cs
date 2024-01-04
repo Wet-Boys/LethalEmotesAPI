@@ -42,7 +42,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.1";
+        public const string VERSION = "1.1.2";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -209,7 +209,7 @@ namespace EmotesAPI
         {
             float prevY = self.thisPlayerBody.eulerAngles.y;
             orig(self);
-            if (localMapper is not null && localMapper.ThirdPersonCheck())
+            if (localMapper is not null && localMapper.isInThirdPerson)
             {
                 localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
                 self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
@@ -220,7 +220,7 @@ namespace EmotesAPI
         private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (localMapper is not null && localMapper.ThirdPersonCheck())
+            if (localMapper is not null && localMapper.isInThirdPerson)
             {
                 self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
                 float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
@@ -241,7 +241,7 @@ namespace EmotesAPI
         private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (localMapper is not null && localMapper.ThirdPersonCheck())
+            if (localMapper is not null && localMapper.isInThirdPerson)
             {
                 self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
                 float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
@@ -445,7 +445,7 @@ namespace EmotesAPI
                 switch (localMapper.temporarilyThirdPerson)
                 {
                     case TempThirdPerson.none:
-                        localMapper.temporarilyThirdPerson = localMapper.currentClip.thirdPerson ? TempThirdPerson.off : TempThirdPerson.on;
+                        localMapper.temporarilyThirdPerson = localMapper.isInThirdPerson ? TempThirdPerson.off : TempThirdPerson.on;
 
                         localMapper.UnlockCameraStuff();
                         localMapper.LockCameraStuff(localMapper.temporarilyThirdPerson == TempThirdPerson.on);
