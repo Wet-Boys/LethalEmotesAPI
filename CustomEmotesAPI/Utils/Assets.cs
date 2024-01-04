@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 
-namespace EmotesAPI
+namespace LethalEmotesAPI.Utils
 {
     public static class Assets
     {

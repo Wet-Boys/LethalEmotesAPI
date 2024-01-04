@@ -27,6 +27,7 @@ using TMPro;
 using System.Linq;
 using BepInEx.Bootstrap;
 using ModelReplacement.Modules;
+using LethalEmotesAPI.Patches;
 
 namespace EmotesAPI
 {
