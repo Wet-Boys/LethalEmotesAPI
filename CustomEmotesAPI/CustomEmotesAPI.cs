@@ -303,22 +303,23 @@ namespace EmotesAPI
             }
         }
 
-        public void SetupHook(Type targetClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook)
+        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook)
         {
             MethodInfo targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
-            MethodInfo destMethod = typeof(CustomEmotesAPI).GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            MethodInfo destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             hook = new Hook(targetMethod, destMethod, this);
+
         }
 
-        private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
-        {
-            if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)
-            {
-                return ViewState.ThirdPerson;
-            }
-            return orig(self);
-        }
-        internal static Hook GetViewStateHook;
+        //private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
+        //{
+        //    if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)
+        //    {
+        //        return ViewState.ThirdPerson;
+        //    }
+        //    return orig(self);
+        //}
+        //internal static Hook GetViewStateHook;
         public void Awake()
         {
             instance = this;
@@ -379,17 +380,12 @@ namespace EmotesAPI
             destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerLookInput), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             PlayerLookInputHook = new Hook(targetMethod, destMethod, this);
 
-            SetupHook(typeof(PlayerControllerB), "CalculateSmoothLookingInput", BindingFlags.NonPublic, nameof(CalculateSmoothLookingInput), CalculateSmoothLookingInputHook);
-            SetupHook(typeof(PlayerControllerB), "CalculateNormalLookingInput", BindingFlags.NonPublic, nameof(CalculateNormalLookingInput), CalculateNormalLookingInputHook);
-            SetupHook(typeof(PlayerControllerB), "SetHoverTipAndCurrentInteractTrigger", BindingFlags.NonPublic, nameof(SetHoverTipAndCurrentInteractTrigger), SetHoverTipAndCurrentInteractTriggerHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "CalculateSmoothLookingInput", BindingFlags.NonPublic, nameof(CalculateSmoothLookingInput), CalculateSmoothLookingInputHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "CalculateNormalLookingInput", BindingFlags.NonPublic, nameof(CalculateNormalLookingInput), CalculateNormalLookingInputHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "SetHoverTipAndCurrentInteractTrigger", BindingFlags.NonPublic, nameof(SetHoverTipAndCurrentInteractTrigger), SetHoverTipAndCurrentInteractTriggerHook);
             if (ModelReplacementAPIPresent)
             {
-                DebugClass.Log($"we need to patch view state");
                 ModelReplacementAPICompat.SetupViewStateHook();
-                SetupHook(typeof(ViewStateManager), "GetViewState", BindingFlags.Public, nameof(GetViewState), GetViewStateHook);
-            }
-            else
-            {
             }
 
 
@@ -401,14 +397,20 @@ namespace EmotesAPI
             var types = Assembly.GetExecutingAssembly().GetTypes();
             foreach (var type in types)
             {
-                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                foreach (var method in methods)
+                try
                 {
-                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
-                    if (attributes.Length > 0)
+                    var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                    foreach (var method in methods)
                     {
-                        method.Invoke(null, null);
+                        var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+                        if (attributes.Length > 0)
+                        {
+                            method.Invoke(null, null);
+                        }
                     }
+                }
+                catch (Exception e)
+                {
                 }
             }
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });

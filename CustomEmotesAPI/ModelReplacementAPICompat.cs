@@ -16,7 +16,7 @@ namespace EmotesAPI
     {
         public static void SetupViewStateHook()
         {
-            CustomEmotesAPI.instance.SetupHook(typeof(ViewStateManager), "GetViewState", BindingFlags.Public, nameof(GetViewState), GetViewStateHook);
+            CustomEmotesAPI.instance.SetupHook(typeof(ViewStateManager), typeof(ModelReplacementAPICompat), "GetViewState", BindingFlags.Public, nameof(GetViewState), GetViewStateHook);
         }
 
         private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
@@ -28,5 +28,6 @@ namespace EmotesAPI
             return orig(self);
         }
         internal static Hook GetViewStateHook;
+
     }
 }

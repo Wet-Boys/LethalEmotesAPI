@@ -22,7 +22,6 @@ using LethalEmotesApi.Ui;
 using LethalEmotesAPI.Utils;
 using TMPro;
 using BepInEx.Bootstrap;
-using ModelReplacement;
 using System.Reflection.Emit;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
@@ -1528,11 +1527,6 @@ public class BoneMapper : MonoBehaviour
             mapperBody.localVisor.localScale = Vector3.zero;
             mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            //ModelReplacementAPICompat.ChangeViewStateManagerLayer(mapperBody, 0);
-            DebugClass.Log($"setting layer from {mapperBody.thisPlayerModel.gameObject.layer} to 0");
-            mapperBody.thisPlayerModel.gameObject.layer = 0;
-            //mapperBody.GetComponent<ViewStateManager>().modelLayer = 0; //set to 3 when turning off
-            //mapperBody.GetComponent<BodyReplacementBase>().viewState.view = 0;
             mapperBody.grabDistance = 5.65f;
             mapperBody.gameplayCamera.cullingMask = 960174079;
             thirdPersonConstraint.ActivateConstraints();
