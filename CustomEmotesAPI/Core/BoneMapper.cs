@@ -763,6 +763,10 @@ public class BoneMapper : MonoBehaviour
         {
             UnlockBones(enableAnimatorOnDeath);
             GameObject.Destroy(gameObject);
+            if (CustomEmotesAPI.hudObject is not null)
+            {
+                CustomEmotesAPI.hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", 100f / 100f);
+            }
         }
     }
     void WorldPropAndParent()
