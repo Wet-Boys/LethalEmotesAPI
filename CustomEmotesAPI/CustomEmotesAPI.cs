@@ -42,7 +42,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.2";
+        public const string VERSION = "1.1.3";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -271,6 +271,24 @@ namespace EmotesAPI
         }
         private static Hook SetHoverTipAndCurrentInteractTriggerHook;
 
+
+        private void GrabbableObjectLateUpdate(Action<GrabbableObject> orig, GrabbableObject self)
+        {
+            if (self.playerHeldBy is not null)
+            {
+                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy];
+                if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
+                {
+                    foreach (var item in mapper.itemHolderConstraints)
+                    {
+                        item.ActUponConstraints();
+                    }
+                }
+            }
+            orig(self);
+        }
+        private static Hook GrabbableObjectLateUpdateHook;
+
         private static GameObject emoteNetworker;
 
 
@@ -289,7 +307,7 @@ namespace EmotesAPI
                     if (originalIsNotZero && localMapper.ThirdPersonCheck())
                     {
                         player.thisPlayerBody.eulerAngles = new Vector3(player.thisPlayerBody.eulerAngles.x, localMapper.rotationPoint.transform.eulerAngles.y, player.thisPlayerBody.eulerAngles.z);
-                        localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
+                        localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, 0);
                     }
                 }
             }
@@ -389,6 +407,7 @@ namespace EmotesAPI
             {
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
+            SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
 
 
             AnimationReplacements.RunAll();
@@ -712,7 +731,7 @@ namespace EmotesAPI
                 if (newAnimation == "none")
                 {
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
-                    localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, localMapper.rotationPoint.transform.eulerAngles.z);
+                    localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, 0);
                     if (hudObject is not null)
                     {
                         hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);

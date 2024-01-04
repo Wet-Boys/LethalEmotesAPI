@@ -64,7 +64,7 @@ public class BoneMapper : MonoBehaviour
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
     public List<EmoteConstraint> cameraConstraints = new List<EmoteConstraint>();
-    public List<EmoteConstraint> additionalConstraints = new List<EmoteConstraint>();
+    public List<EmoteConstraint> itemHolderConstraints = new List<EmoteConstraint>();
     public EmoteConstraint thirdPersonConstraint;
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
@@ -73,6 +73,7 @@ public class BoneMapper : MonoBehaviour
     public TempThirdPerson temporarilyThirdPerson = TempThirdPerson.none;
     internal int originalCullingMask;
     public BoneMapper currentlyLockedBoneMapper;
+    public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -493,6 +494,7 @@ public class BoneMapper : MonoBehaviour
             return;
         }
         mapperBody = transform.parent.parent.parent.GetComponent<PlayerControllerB>();
+        playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
 
@@ -573,8 +575,8 @@ public class BoneMapper : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
-        additionalConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand)));
-        additionalConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand)));
+        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder")));
+        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder")));
     }
     public GameObject parentGameObject;
     public bool positionLock, rotationLock, scaleLock;
@@ -998,6 +1000,7 @@ public class BoneMapper : MonoBehaviour
     }
     void OnDestroy()
     {
+        playersToMappers.Remove(mapperBody);
         try
         {
             currentClip.clip[0].ToString();
@@ -1057,7 +1060,7 @@ public class BoneMapper : MonoBehaviour
         {
             item.DeactivateConstraints();
         }
-        foreach (var item in additionalConstraints)
+        foreach (var item in itemHolderConstraints)
         {
             item.DeactivateConstraints();
         }
@@ -1122,7 +1125,7 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-            foreach (var item in additionalConstraints)
+            foreach (var item in itemHolderConstraints)
             {
                 item.ActivateConstraints();
             }
@@ -1144,7 +1147,7 @@ public class BoneMapper : MonoBehaviour
             mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             mapperBody.grabDistance = 5.65f;
-            mapperBody.gameplayCamera.cullingMask = 960174079;
+            mapperBody.gameplayCamera.cullingMask = mapperBody.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
             thirdPersonConstraint.ActivateConstraints();
             isInThirdPerson = true;
         }
