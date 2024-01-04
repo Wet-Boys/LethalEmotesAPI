@@ -1,27 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.Animations;
-using System.Security;
 using System.Security.Permissions;
-using UnityEngine.Networking;
-using System.Collections;
-using UnityEngine.UIElements;
-using System.Net.NetworkInformation;
 using System.Text;
 using GameNetcodeStuff;
-using System.IO;
-using MonoMod.RuntimeDetour;
-using UnityEngine.SceneManagement;
-using Unity.Netcode;
-using LethalEmotesAPI;
-using UnityEngine.Audio;
-using System.Globalization;
-using LethalEmotesApi.Ui;
 using LethalEmotesAPI.Utils;
-using TMPro;
-using BepInEx.Bootstrap;
-using System.Reflection.Emit;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements

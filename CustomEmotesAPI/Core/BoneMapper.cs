@@ -25,7 +25,6 @@ public class BoneMapper : MonoBehaviour
     public List<BonePair> pairs = new List<BonePair>();
     public float timer = 0;
     public GameObject model;
-    List<string> ignore = new List<string>();
     bool twopart = false;
     public static Dictionary<string, CustomAnimationClip> animClips = new Dictionary<string, CustomAnimationClip>();
     public CustomAnimationClip currentClip = null;
@@ -73,6 +72,7 @@ public class BoneMapper : MonoBehaviour
     public float currentAudioLevel = 0;
     public TempThirdPerson temporarilyThirdPerson = TempThirdPerson.none;
     internal int originalCullingMask;
+    public BoneMapper currentlyLockedBoneMapper;
 
     public static string GetRealAnimationName(string animationName)
     {

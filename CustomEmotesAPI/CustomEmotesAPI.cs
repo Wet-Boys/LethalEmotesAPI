@@ -730,6 +730,10 @@ namespace EmotesAPI
                 }
 
             }
+            else if (localMapper.currentlyLockedBoneMapper == mapper && Settings.StopEmoteWhenLockedToStopsEmote.Value)
+            {
+                PlayAnimation("none", localMapper);
+            }
             foreach (var item in EmoteLocation.emoteLocations)
             {
                 if (item.emoter == mapper)
@@ -765,6 +769,7 @@ namespace EmotesAPI
             }
             else
             {
+                mapper.currentlyLockedBoneMapper = null;
                 if (mapper.local && hudObject is not null)
                 {
                     CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0);
