@@ -21,6 +21,9 @@ using System.Globalization;
 using LethalEmotesApi.Ui;
 using LethalEmotesAPI.Utils;
 using TMPro;
+using BepInEx.Bootstrap;
+using ModelReplacement;
+using System.Reflection.Emit;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -455,6 +458,7 @@ public class BoneMapper : MonoBehaviour
     public Quaternion rotationBeforeRootMotion = Quaternion.identity;
     public float currentAudioLevel = 0;
     public TempThirdPerson temporarilyThirdPerson = TempThirdPerson.none;
+    internal int originalCullingMask;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -1027,6 +1031,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+                    originalCullingMask = mapperBody.gameplayCamera.cullingMask;
                     if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
                     {
                         GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
@@ -1043,7 +1048,7 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                         CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
                     }
-                    Camera c = mapperBody.GetComponentInChildren<Camera>();
+                    Camera c = mapperBody.gameplayCamera;
                     if (c is not null)
                     {
                         rotationPoint = new GameObject();
@@ -1060,7 +1065,7 @@ public class BoneMapper : MonoBehaviour
                         realCameraPos.transform.localPosition = Vector3.zero;
                         realCameraPos.transform.localEulerAngles = Vector3.zero;
                         thirdPersonConstraint = EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, realCameraPos.transform);
-
+                        thirdPersonConstraint.debug = true;
 
 
                         cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head)));
@@ -1194,7 +1199,7 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        bool yes = currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on);
+        bool yes = !CustomEmotesAPI.LCThirdPersonPresent && (currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on));
         //if (local)
         //{
         //    DebugClass.Log(yes);
@@ -1447,10 +1452,12 @@ public class BoneMapper : MonoBehaviour
         }
         if (local && mapperBody.grabDistance == 5.65f)
         {
+            mapperBody.gameplayCamera.cullingMask = originalCullingMask;
             mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
             mapperBody.grabDistance = 3f;
+            isInThirdPerson = false;
         }
         //basePlayerModelAnimator.enabled = animatorEnabled;
     }
@@ -1513,6 +1520,7 @@ public class BoneMapper : MonoBehaviour
             StartCoroutine(waitForTwoFramesThenDisableA1());
         }
     }
+    public bool isInThirdPerson = false;
     public void LockCameraStuff(bool thirdPersonLock)
     {
         if (thirdPersonLock)
@@ -1520,8 +1528,15 @@ public class BoneMapper : MonoBehaviour
             mapperBody.localVisor.localScale = Vector3.zero;
             mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            //ModelReplacementAPICompat.ChangeViewStateManagerLayer(mapperBody, 0);
+            DebugClass.Log($"setting layer from {mapperBody.thisPlayerModel.gameObject.layer} to 0");
+            mapperBody.thisPlayerModel.gameObject.layer = 0;
+            //mapperBody.GetComponent<ViewStateManager>().modelLayer = 0; //set to 3 when turning off
+            //mapperBody.GetComponent<BodyReplacementBase>().viewState.view = 0;
             mapperBody.grabDistance = 5.65f;
+            mapperBody.gameplayCamera.cullingMask = 960174079;
             thirdPersonConstraint.ActivateConstraints();
+            isInThirdPerson = true;
         }
         else
         {
@@ -1555,10 +1570,12 @@ public class BoneMapper : MonoBehaviour
         thirdPersonConstraint.DeactivateConstraints();
         if (local && mapperBody.grabDistance == 5.65f)
         {
+            mapperBody.gameplayCamera.cullingMask = originalCullingMask;
             mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
             mapperBody.grabDistance = 3f;
+            isInThirdPerson = false;
         }
     }
 }

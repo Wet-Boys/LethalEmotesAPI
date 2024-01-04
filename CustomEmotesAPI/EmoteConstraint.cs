@@ -15,6 +15,7 @@ public class EmoteConstraint : MonoBehaviour
     bool firstTime = true;
     bool hasEverActivatedConstraints = false;
     public bool onlyY = false;
+    public bool debug = false;
     void LateUpdate()
     {
         ActUponConstraints();

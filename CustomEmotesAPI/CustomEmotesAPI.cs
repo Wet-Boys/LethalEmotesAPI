@@ -24,12 +24,16 @@ using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem.Controls;
 using LethalEmotesAPI.Utils;
 using TMPro;
-using UnityEngine.SocialPlatforms;
+using System.Linq;
+using BepInEx.Bootstrap;
+using ModelReplacement.Modules;
 
 namespace EmotesAPI
 {
     [BepInPlugin(PluginGUID, PluginName, VERSION)]
     [BepInDependency(LethalCompanyInputUtilsPlugin.ModId)]
+    [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
@@ -63,6 +67,8 @@ namespace EmotesAPI
         public static List<string> allClipNames = new List<string>();
         public static List<string> randomClipList = new List<string>();
         public static List<int> blacklistedClips = new List<int>();
+        public static bool LCThirdPersonPresent;
+        public static bool ModelReplacementAPIPresent;
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -251,6 +257,18 @@ namespace EmotesAPI
         }
         private static Hook CalculateNormalLookingInputHook;
 
+
+        private void SetHoverTipAndCurrentInteractTrigger(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            //this needs to be done now, since constraints generally only fire in LateUpdate. But this is firing in Update after the original animator has tried to take back control of the camera
+            if (localMapper is not null && localMapper.thirdPersonConstraint is not null)
+            {
+                localMapper.thirdPersonConstraint.ActUponConstraints();
+            }
+            orig(self);
+        }
+        private static Hook SetHoverTipAndCurrentInteractTriggerHook;
+
         private static GameObject emoteNetworker;
 
 
@@ -291,6 +309,16 @@ namespace EmotesAPI
             MethodInfo destMethod = typeof(CustomEmotesAPI).GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             hook = new Hook(targetMethod, destMethod, this);
         }
+
+        private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
+        {
+            if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)
+            {
+                return ViewState.ThirdPerson;
+            }
+            return orig(self);
+        }
+        internal static Hook GetViewStateHook;
         public void Awake()
         {
             instance = this;
@@ -302,6 +330,11 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("enemyskeletons");
             CustomEmotesAPI.LoadResource("scavbody");
             LoadResource("customemotes-ui");
+
+
+            LCThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("LCThirdPerson");
+            ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
+
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -348,6 +381,16 @@ namespace EmotesAPI
 
             SetupHook(typeof(PlayerControllerB), "CalculateSmoothLookingInput", BindingFlags.NonPublic, nameof(CalculateSmoothLookingInput), CalculateSmoothLookingInputHook);
             SetupHook(typeof(PlayerControllerB), "CalculateNormalLookingInput", BindingFlags.NonPublic, nameof(CalculateNormalLookingInput), CalculateNormalLookingInputHook);
+            SetupHook(typeof(PlayerControllerB), "SetHoverTipAndCurrentInteractTrigger", BindingFlags.NonPublic, nameof(SetHoverTipAndCurrentInteractTrigger), SetHoverTipAndCurrentInteractTriggerHook);
+            if (ModelReplacementAPIPresent)
+            {
+                DebugClass.Log($"we need to patch view state");
+                ModelReplacementAPICompat.SetupViewStateHook();
+                SetupHook(typeof(ViewStateManager), "GetViewState", BindingFlags.Public, nameof(GetViewState), GetViewStateHook);
+            }
+            else
+            {
+            }
 
 
             AnimationReplacements.RunAll();
@@ -393,7 +436,7 @@ namespace EmotesAPI
 
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
-            if (localMapper is not null && localMapper.currentClip is not null)
+            if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
             {
                 switch (localMapper.temporarilyThirdPerson)
                 {
