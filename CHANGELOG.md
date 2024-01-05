@@ -1,3 +1,5 @@
+- Version 1.1.4: Updated ModelReplacementAPI dll reference so it don't break. Exposed each bonemapper's audiosource in code if you should ever need it. Fixed networkobject hash on the networker being bad
+
 - Version 1.1.3: Fixed an issue with the third person camera's culling mask sometimes showing purple hitboxes. Fixed items not sticking to your hands when emoting
 
 - Version 1.1.2: Fixed an error with third person settings causing camera locking when using the hotswap button.
