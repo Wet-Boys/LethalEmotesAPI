@@ -18,7 +18,6 @@ namespace LethalEmotesAPI.Patches
         {
             CustomEmotesAPI.instance.SetupHook(typeof(ViewStateManager), typeof(ModelReplacementAPICompat), "GetViewState", BindingFlags.Public, nameof(GetViewState), GetViewStateHook);
         }
-
         private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
         {
             if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)

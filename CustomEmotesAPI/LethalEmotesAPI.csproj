@@ -30,7 +30,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.1" />
+    <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.2" />
     <PackageReference Include="Rune580-LethalCompany_InputUtils" Version="0.4.4" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" />
   </ItemGroup>
