@@ -74,6 +74,7 @@ public class BoneMapper : MonoBehaviour
     internal int originalCullingMask;
     public BoneMapper currentlyLockedBoneMapper;
     public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
+    public AudioSource personalAudioSource;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -502,10 +503,10 @@ public class BoneMapper : MonoBehaviour
         obj.name = $"{name}_AudioObject";
         obj.transform.SetParent(mapperBody.transform);
         obj.transform.localPosition = Vector3.zero;
-        var source = obj.GetComponent<AudioSource>();
-        obj.AddComponent<AudioManager>().Setup(source, this);
-        source.playOnAwake = false;
-        source.volume = Settings.EmotesVolume.Value / 100f;
+        personalAudioSource = obj.GetComponent<AudioSource>();
+        obj.AddComponent<AudioManager>().Setup(personalAudioSource, this);
+        personalAudioSource.playOnAwake = false;
+        personalAudioSource.volume = Settings.EmotesVolume.Value / 100f;
         audioObject = obj;
 
         int offset = 0;

@@ -26,7 +26,6 @@ using LethalEmotesAPI.Utils;
 using TMPro;
 using System.Linq;
 using BepInEx.Bootstrap;
-using ModelReplacement.Modules;
 using LethalEmotesAPI.Patches;
 
 namespace EmotesAPI
@@ -42,7 +41,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.3";
+        public const string VERSION = "1.1.4";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -129,7 +128,7 @@ namespace EmotesAPI
         {
             orig(self);
             emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
-            emoteNetworker.AddComponent<NetworkObject>();
+            //emoteNetworker.AddComponent<NetworkObject>();
             emoteNetworker.AddComponent<EmoteNetworker>();
             GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
             foreach (var item in networkedObjects)
@@ -768,21 +767,25 @@ namespace EmotesAPI
                     }
                 }
             }
+
             if (animChanged != null)
             {
                 animChanged(newAnimation, mapper);
             }
+
             if (newAnimation != "none")
             {
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.HideAllSpots();
                 }
-                if (mapper.currentClip.lockType == AnimationClipParams.LockType.rootMotion)
+
+                if (mapper.currentClip is not null && mapper.currentClip.lockType == AnimationClipParams.LockType.rootMotion)
                 {
                     mapper.prevMapperPos = mapper.transform.position;
                     mapper.prevMapperRot = mapper.transform.eulerAngles;
                 }
+
                 mapper.positionBeforeRootMotion = mapper.mapperBody.transform.position;
                 mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
                 mapper.justSwitched = true;
@@ -790,6 +793,7 @@ namespace EmotesAPI
             else
             {
                 mapper.currentlyLockedBoneMapper = null;
+
                 if (mapper.local && hudObject is not null)
                 {
                     CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0);
@@ -798,6 +802,7 @@ namespace EmotesAPI
                 {
                     EmoteLocation.ShowAllSpots();
                 }
+
                 mapper.transform.localPosition = Vector3.zero;
                 mapper.transform.localEulerAngles = new Vector3(90, 0, 0);
             }
