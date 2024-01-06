@@ -301,7 +301,14 @@ namespace EmotesAPI
                     bool originalIsNotZero = player.moveInputVector != Vector2.zero;
                     if (localMapper.autoWalkSpeed != 0)
                     {
-                        player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
+                        if (localMapper.overrideMoveSpeed)
+                        {
+                            player.moveInputVector *= localMapper.autoWalkSpeed;
+                        }
+                        else
+                        {
+                            player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
+                        }
                     }
                     if (originalIsNotZero && localMapper.ThirdPersonCheck())
                     {
