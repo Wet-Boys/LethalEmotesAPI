@@ -764,8 +764,12 @@ public class BoneMapper : MonoBehaviour
     {
         if (h <= 0)
         {
+            if (local)
+            {
+                CustomEmotesAPI.PlayAnimation("none");
+            }
             UnlockBones(enableAnimatorOnDeath);
-            GameObject.Destroy(gameObject);
+            //GameObject.Destroy(gameObject);
             if (CustomEmotesAPI.hudObject is not null)
             {
                 CustomEmotesAPI.hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", 100f / 100f);
