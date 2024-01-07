@@ -55,7 +55,14 @@ namespace LethalEmotesAPI
                     audioTimer -= .75f;
                     if (Settings.EmotesAlertEnemies.Value)
                     {
-                        RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, mapper.mapperBody.isInHangarShipRoom && mapper.mapperBody.playersManager.hangarDoorsClosed, 5);
+                        if (mapper.playerController is not null)
+                        {
+                            RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, mapper.playerController.isInHangarShipRoom && mapper.playerController.playersManager.hangarDoorsClosed, 5);
+                        }
+                        else
+                        {
+                            RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, false, 5);
+                        }
                     }
                 }
             }
@@ -174,7 +181,7 @@ namespace LethalEmotesAPI
                     //all songs are normal
                     return false;
                 case DMCAType.Friendly:
-                    //based on import settings
+                //based on import settings
                 case DMCAType.Mute:
                     //need to just mute the song
                     return willGetClaimed;
