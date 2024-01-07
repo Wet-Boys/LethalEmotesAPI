@@ -883,6 +883,7 @@ public class BoneMapper : MonoBehaviour
             if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
             {
                 //owner of the bonemapper
+                //todo also let the server control root motion of EnemyAi dudes
                 if (local)
                 {
                     if (Settings.rootMotionType.Value != RootMotionType.None)
@@ -1043,7 +1044,8 @@ public class BoneMapper : MonoBehaviour
     public void UnlockBones(bool animatorEnabled = true)
     {
         transform.localPosition = Vector3.zero;
-        transform.localEulerAngles = new Vector3(90, 0, 0);
+        transform.eulerAngles = bodyPrefab.transform.eulerAngles;
+        //transform.localEulerAngles = new Vector3(90, 0, 0);
         foreach (var smr in basePlayerModelSMR)
         {
             for (int i = 0; i < smr.bones.Length; i++)

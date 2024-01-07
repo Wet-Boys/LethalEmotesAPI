@@ -288,6 +288,14 @@ namespace EmotesAPI
         }
         private static Hook GrabbableObjectLateUpdateHook;
 
+        private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
+        {
+            //AnimationReplacements.DebugBones(self.gameObject);
+            DebugClass.Log($"adding bone mapper to scav");
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant5.prefab", [0]);
+            orig(self);
+        }
+        private static Hook EnemyAiStartHook;
         private static GameObject emoteNetworker;
 
 
@@ -336,16 +344,6 @@ namespace EmotesAPI
             hook = new Hook(targetMethod, destMethod, this);
 
         }
-
-        //private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
-        //{
-        //    if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)
-        //    {
-        //        return ViewState.ThirdPerson;
-        //    }
-        //    return orig(self);
-        //}
-        //internal static Hook GetViewStateHook;
         public void Awake()
         {
             instance = this;
@@ -414,6 +412,7 @@ namespace EmotesAPI
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
+            SetupHook(typeof(ForestGiantAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(EnemyAiStart), EnemyAiStartHook);
 
 
             AnimationReplacements.RunAll();
@@ -460,9 +459,22 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
+
+            EmotesInputSettings.Instance.ligmaballs.started += Ligmaballs_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
 
+        private void Ligmaballs_started(InputAction.CallbackContext obj)
+        {
+            foreach (var item in GetAllBoneMappers())
+            {
+                if (item.playerController is null)
+                {
+                    int rand = UnityEngine.Random.Range(0, randomClipList.Count);
+                    PlayAnimation(randomClipList[rand], item);
+                }
+            }
+        }
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
             if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
