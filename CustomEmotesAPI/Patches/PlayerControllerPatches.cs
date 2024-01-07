@@ -88,7 +88,6 @@ public static class PlayerControllerPatches
                 new CodeMatch(code => code.opcode == OpCodes.Call),
                 new CodeMatch(code => code.opcode == OpCodes.Callvirt));
 
-            // TODO do emote constraint patching here!
             matcher
                 .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
                 .InsertAndAdvance(new CodeInstruction(OpCodes.Ldfld, localVisorFieldInfo))

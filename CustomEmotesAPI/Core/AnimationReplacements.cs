@@ -28,22 +28,26 @@ internal static class AnimationReplacements
         sb.Append($"mesh count: {meshes.Length}\n");
         sb.Append($"root bone: {meshes[0].rootBone.name}\n");
         sb.Append($"{fab.ToString()}:\n");
-        if (meshes[0].bones.Length == 0)
+        foreach (var item in meshes)
         {
-            sb.Append("No bones");
-        }
-        else
-        {
-            sb.Append("[");
-            foreach (var bone in meshes[0].bones)
+            if (item.bones.Length == 0)
             {
-                sb.Append($"'{bone.name}', ");
+                sb.Append("No bones");
             }
-            sb.Remove(sb.Length - 2, 2);
-            sb.Append("]");
+            else
+            {
+                sb.Append("[");
+                foreach (var bone in item.bones)
+                {
+                    sb.Append($"'{bone.name}', ");
+                }
+                sb.Remove(sb.Length - 2, 2);
+                sb.Append("]");
+            }
+            sb.Append("\n\n");
+            DebugClass.Log(sb.ToString());
         }
-        sb.Append("\n\n");
-        DebugClass.Log(sb.ToString());
+
     }
     internal static void ChangeAnims()
     {
@@ -185,7 +189,8 @@ internal static class AnimationReplacements
             float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             test.scale = currScale / banditScale;
-            test.h = bodyPrefab.GetComponentInChildren<PlayerControllerB>().health;
+            //todo health
+            //test.h = bodyPrefab.GetComponentInChildren<PlayerControllerB>().health;
             test.model = modelTransform.gameObject;
         }
         catch (Exception e)

@@ -41,7 +41,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.5";
+        public const string VERSION = "1.1.6";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -288,6 +288,15 @@ namespace EmotesAPI
         }
         private static Hook GrabbableObjectLateUpdateHook;
 
+        //private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
+        //{
+        //    //AnimationReplacements.DebugBones(self.gameObject);
+        //    DebugClass.Log($"adding bone mapper to scav");
+        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant2.prefab", [0]);
+        //    orig(self);
+        //}
+        //private static Hook EnemyAiStartHook;
+
         private static GameObject emoteNetworker;
 
 
@@ -414,6 +423,7 @@ namespace EmotesAPI
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
+            //SetupHook(typeof(ForestGiantAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(EnemyAiStart), EnemyAiStartHook);
 
 
             AnimationReplacements.RunAll();
@@ -460,7 +470,20 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
+            EmotesInputSettings.Instance.ligmaballs.started += Ligmaballs_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+        }
+
+        private void Ligmaballs_started(InputAction.CallbackContext obj)
+        {
+            foreach (var item in GetAllBoneMappers())
+            {
+                if (item.playerController is null)
+                {
+                    int rand = UnityEngine.Random.Range(0, randomClipList.Count);
+                    PlayAnimation("Duck This One", item);
+                }
+            }
         }
 
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
@@ -655,7 +678,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")
@@ -737,7 +760,7 @@ namespace EmotesAPI
                 if (newAnimation == "none")
                 {
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
-                    localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.mapperBody.thisPlayerBody.eulerAngles.y, 0);
+                    localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
                     if (hudObject is not null)
                     {
                         hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);

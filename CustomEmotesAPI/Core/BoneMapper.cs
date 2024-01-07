@@ -59,7 +59,8 @@ public class BoneMapper : MonoBehaviour
     public bool enableAnimatorOnDeath = true;
     public bool revertTransform = false;
     public bool oneFrameAnimatorLeeWay = false;
-    public PlayerControllerB mapperBody;
+    public GameObject mapperBody;
+    public PlayerControllerB playerController;
     public Transform mapperBodyTransform;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
@@ -307,13 +308,25 @@ public class BoneMapper : MonoBehaviour
             CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
             StartAnimations(hudAnimController, pos, CustomEmotesAPI.hudAnimator);
             CustomEmotesAPI.currentEmoteText.color = new Color(.5f, .5f, .5f, .5f);
-            if (currentClip.customName != "")
+
+            if (currentClip.displayName != "")
+            {
+                CustomEmotesAPI.currentEmoteText.text = currentClip.displayName;
+            }
+            else if (currentClip.customName != "")
             {
                 CustomEmotesAPI.currentEmoteText.text = currentClip.customName;
             }
             else
             {
-                CustomEmotesAPI.currentEmoteText.text = currentClipName;
+                if (!currentClip.visibility)
+                {
+                    CustomEmotesAPI.currentEmoteText.text = "";
+                }
+                else
+                {
+                    CustomEmotesAPI.currentEmoteText.text = currentClipName;
+                }
             }
         }
         twopart = false;
@@ -494,8 +507,24 @@ public class BoneMapper : MonoBehaviour
         {
             return;
         }
-        mapperBody = transform.parent.parent.parent.GetComponent<PlayerControllerB>();
-        playersToMappers.Add(mapperBody, this);
+        if (transform.GetComponentInParent<PlayerControllerB>())
+        {
+            mapperBody = transform.GetComponentInParent<PlayerControllerB>().gameObject;
+        }
+        else if(transform.GetComponentInParent<EnemyAI>())
+        {
+            DebugClass.Log($"found enemy ai to latch onto");
+            mapperBody = transform.GetComponentInParent<EnemyAI>().gameObject;
+        }
+        else
+        {
+            mapperBody = gameObject;
+        }
+        playerController = mapperBody.GetComponent<PlayerControllerB>();
+        if (playerController is not null)
+        {
+            playersToMappers.Add(playerController, this);
+        }
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
 
@@ -568,7 +597,10 @@ public class BoneMapper : MonoBehaviour
         }
         transform.localPosition = Vector3.zero;
         CustomEmotesAPI.MapperCreated(this);
-        StartCoroutine(SetupHandConstraint());
+        if (playerController is not null)
+        {
+            StartCoroutine(SetupHandConstraint());
+        }
     }
     public IEnumerator SetupHandConstraint()
     {
@@ -641,11 +673,11 @@ public class BoneMapper : MonoBehaviour
         {
             if (!CustomEmotesAPI.localMapper)
             {
-                if (mapperBody == StartOfRound.Instance.localPlayerController)
+                if (playerController == StartOfRound.Instance.localPlayerController)
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-                    originalCullingMask = mapperBody.gameplayCamera.cullingMask;
+                    originalCullingMask = playerController.gameplayCamera.cullingMask;
                     if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
                     {
                         GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
@@ -662,7 +694,7 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
                         CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
                     }
-                    Camera c = mapperBody.gameplayCamera;
+                    Camera c = playerController.gameplayCamera;
                     if (c is not null)
                     {
                         rotationPoint = new GameObject();
@@ -712,7 +744,6 @@ public class BoneMapper : MonoBehaviour
                 }
                 else
                 {
-                    DebugClass.Log($"two part thing");
                     ranSinceLastAnim = true;
                     if (emoteSkeletonAnimator.enabled)
                     {
@@ -762,19 +793,20 @@ public class BoneMapper : MonoBehaviour
     }
     void Health()
     {
-        if (h <= 0)
-        {
-            if (local)
-            {
-                CustomEmotesAPI.PlayAnimation("none");
-            }
-            UnlockBones(enableAnimatorOnDeath);
-            //GameObject.Destroy(gameObject);
-            if (CustomEmotesAPI.hudObject is not null)
-            {
-                CustomEmotesAPI.hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", 100f / 100f);
-            }
-        }
+        //todo health
+        //if (h <= 0)
+        //{
+        //    if (local)
+        //    {
+        //        CustomEmotesAPI.PlayAnimation("none");
+        //    }
+        //    UnlockBones(enableAnimatorOnDeath);
+        //    //GameObject.Destroy(gameObject);
+        //    if (CustomEmotesAPI.hudObject is not null)
+        //    {
+        //        CustomEmotesAPI.hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", 100f / 100f);
+        //    }
+        //}
     }
     void WorldPropAndParent()
     {
@@ -784,8 +816,7 @@ public class BoneMapper : MonoBehaviour
             {
                 mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
                 mapperBody.transform.position = parentGameObject.transform.position;
-                mapperBody.ResetFallGravity();
-
+                playerController?.ResetFallGravity();
             }
             if (rotationLock)
             {
@@ -893,7 +924,7 @@ public class BoneMapper : MonoBehaviour
 
                         //move player body
                         mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
-                        if (mapperBody.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
+                        if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
                         {
                             mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
                         }
@@ -913,7 +944,7 @@ public class BoneMapper : MonoBehaviour
                     if (deltaPos != Vector3.zero || deltaRot != Quaternion.identity)
                     {
                         //tell server where we are now
-                        EmoteNetworker.instance.SyncBoneMapperPos(mapperBody.NetworkObjectId, transform.position, transform.eulerAngles);
+                        EmoteNetworker.instance.SyncBoneMapperPos(playerController.NetworkObjectId, transform.position, transform.eulerAngles);
                     }
                 }
                 else
@@ -1005,7 +1036,10 @@ public class BoneMapper : MonoBehaviour
     }
     void OnDestroy()
     {
-        playersToMappers.Remove(mapperBody);
+        if (playerController is not null)
+        {
+            playersToMappers.Remove(playerController);
+        }
         try
         {
             currentClip.clip[0].ToString();
@@ -1073,13 +1107,13 @@ public class BoneMapper : MonoBehaviour
         {
             thirdPersonConstraint.DeactivateConstraints();
         }
-        if (local && mapperBody.grabDistance == 5.65f)
+        if (local && playerController.grabDistance == 5.65f)
         {
-            mapperBody.gameplayCamera.cullingMask = originalCullingMask;
-            mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
-            mapperBody.grabDistance = 3f;
+            playerController.gameplayCamera.cullingMask = originalCullingMask;
+            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
+            playerController.grabDistance = 3f;
             isInThirdPerson = false;
         }
         //basePlayerModelAnimator.enabled = animatorEnabled;
@@ -1148,11 +1182,11 @@ public class BoneMapper : MonoBehaviour
     {
         if (thirdPersonLock)
         {
-            mapperBody.localVisor.localScale = Vector3.zero;
-            mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            mapperBody.grabDistance = 5.65f;
-            mapperBody.gameplayCamera.cullingMask = mapperBody.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
+            playerController.localVisor.localScale = Vector3.zero;
+            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            playerController.grabDistance = 5.65f;
+            playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
             thirdPersonConstraint.ActivateConstraints();
             isInThirdPerson = true;
         }
@@ -1186,13 +1220,13 @@ public class BoneMapper : MonoBehaviour
             item.DeactivateConstraints();
         }
         thirdPersonConstraint.DeactivateConstraints();
-        if (local && mapperBody.grabDistance == 5.65f)
+        if (local && playerController.grabDistance == 5.65f)
         {
-            mapperBody.gameplayCamera.cullingMask = originalCullingMask;
-            mapperBody.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            mapperBody.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            mapperBody.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
-            mapperBody.grabDistance = 3f;
+            playerController.gameplayCamera.cullingMask = originalCullingMask;
+            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
+            playerController.grabDistance = 3f;
             isInThirdPerson = false;
         }
     }
