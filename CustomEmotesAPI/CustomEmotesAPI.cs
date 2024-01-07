@@ -41,7 +41,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.6";
+        public const string VERSION = "1.1.7";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -290,13 +290,11 @@ namespace EmotesAPI
 
         //private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
         //{
-        //    //AnimationReplacements.DebugBones(self.gameObject);
         //    DebugClass.Log($"adding bone mapper to scav");
-        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant2.prefab", [0]);
+        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant5.prefab", [0]);
         //    orig(self);
         //}
         //private static Hook EnemyAiStartHook;
-
         private static GameObject emoteNetworker;
 
 
@@ -345,16 +343,6 @@ namespace EmotesAPI
             hook = new Hook(targetMethod, destMethod, this);
 
         }
-
-        //private ViewState GetViewState(Func<ViewStateManager, ViewState> orig, ViewStateManager self)
-        //{
-        //    if (CustomEmotesAPI.localMapper is not null && CustomEmotesAPI.localMapper.isInThirdPerson)
-        //    {
-        //        return ViewState.ThirdPerson;
-        //    }
-        //    return orig(self);
-        //}
-        //internal static Hook GetViewStateHook;
         public void Awake()
         {
             instance = this;
@@ -481,11 +469,10 @@ namespace EmotesAPI
         //        if (item.playerController is null)
         //        {
         //            int rand = UnityEngine.Random.Range(0, randomClipList.Count);
-        //            PlayAnimation("Duck This One", item);
+        //            PlayAnimation(randomClipList[rand], item);
         //        }
         //    }
         //}
-
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
             if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)

@@ -100,7 +100,8 @@ internal static class AnimationReplacements
         {
             animcontroller.transform.parent = modelTransform;
             animcontroller.transform.localPosition = Vector3.zero;
-            animcontroller.transform.localEulerAngles = new Vector3(90, 0, 0);
+            animcontroller.transform.eulerAngles = bodyPrefab.transform.eulerAngles;
+            //animcontroller.transform.localEulerAngles = new Vector3(90, 0, 0);
             animcontroller.transform.localScale = Vector3.one;
         }
         catch (Exception e)

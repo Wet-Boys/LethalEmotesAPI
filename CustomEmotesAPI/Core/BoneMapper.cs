@@ -914,6 +914,7 @@ public class BoneMapper : MonoBehaviour
             if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
             {
                 //owner of the bonemapper
+                //todo also let the server control root motion of EnemyAi dudes
                 if (local)
                 {
                     if (Settings.rootMotionType.Value != RootMotionType.None)
@@ -1077,7 +1078,8 @@ public class BoneMapper : MonoBehaviour
     public void UnlockBones(bool animatorEnabled = true)
     {
         transform.localPosition = Vector3.zero;
-        transform.localEulerAngles = new Vector3(90, 0, 0);
+        transform.eulerAngles = bodyPrefab.transform.eulerAngles;
+        //transform.localEulerAngles = new Vector3(90, 0, 0);
         foreach (var smr in basePlayerModelSMR)
         {
             for (int i = 0; i < smr.bones.Length; i++)
@@ -1107,15 +1109,7 @@ public class BoneMapper : MonoBehaviour
         {
             thirdPersonConstraint.DeactivateConstraints();
         }
-        if (local && playerController.grabDistance == 5.65f)
-        {
-            playerController.gameplayCamera.cullingMask = originalCullingMask;
-            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
-            playerController.grabDistance = 3f;
-            isInThirdPerson = false;
-        }
+        DeThirdPerson();
         //basePlayerModelAnimator.enabled = animatorEnabled;
     }
     public void LockBones()
@@ -1178,6 +1172,7 @@ public class BoneMapper : MonoBehaviour
         }
     }
     public bool isInThirdPerson = false;
+    public int originalLayer = -1;
     public void LockCameraStuff(bool thirdPersonLock)
     {
         if (thirdPersonLock)
@@ -1185,6 +1180,11 @@ public class BoneMapper : MonoBehaviour
             playerController.localVisor.localScale = Vector3.zero;
             playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            if (originalLayer == -1)
+            {
+                originalLayer = playerController.thisPlayerModel.gameObject.layer;
+            }
+            playerController.thisPlayerModel.gameObject.layer = 1;
             playerController.grabDistance = 5.65f;
             playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
             thirdPersonConstraint.ActivateConstraints();
@@ -1220,12 +1220,17 @@ public class BoneMapper : MonoBehaviour
             item.DeactivateConstraints();
         }
         thirdPersonConstraint.DeactivateConstraints();
+        DeThirdPerson();
+    }
+    public void DeThirdPerson()
+    {
         if (local && playerController.grabDistance == 5.65f)
         {
             playerController.gameplayCamera.cullingMask = originalCullingMask;
             playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
+            playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;
             isInThirdPerson = false;
         }

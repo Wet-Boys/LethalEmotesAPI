@@ -127,7 +127,7 @@ namespace EmotesAPI
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(EmotesAlertEnemies, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
-
+            LethalConfigManager.SkipAutoGenFor("No Touch");
         }
 
     }
