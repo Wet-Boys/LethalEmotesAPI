@@ -1,3 +1,5 @@
+- Version 1.1.6: removed some unncesssary debug logs. Added displayName as an animation parameter, this name will overrite the name that displays in the top left of the screen when emoting.
+
 - Version 1.1.5: Probably fixed issue where you can't emote after being revived by mods that allow that. Fixed overrideMoveSpeed not working at all
 
 - Version 1.1.4: Updated ModelReplacementAPI dll reference so it don't break. Exposed each bonemapper's audiosource in code if you should ever need it. Fixed networkobject hash on the networker being bad
