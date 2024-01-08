@@ -4,6 +4,7 @@ using Editor.Utils;
 using JetBrains.Annotations;
 using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.Data;
+using LethalEmotesApi.Ui.Db;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -118,6 +119,8 @@ namespace Editor
             {
                 _data = dataToSave;
             }
+
+            public IEmoteDb EmoteDb { get; }
 
             public IReadOnlyCollection<string> EmoteKeys { get; } = new[] { "none" };
             public IReadOnlyCollection<string> RandomPoolBlacklist => _blacklist.ToArray();

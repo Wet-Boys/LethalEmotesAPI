@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LethalEmotesApi.Ui.Db;
 using UnityEngine;
 
 namespace LethalEmotesApi.Ui.Data;
@@ -19,9 +20,7 @@ public interface IEmoteUiStateController
 
     public void PlayAnimationOn(Animator animator, string emoteKey);
 
-    public IReadOnlyCollection<string> EmoteKeys { get; }
-
-    public string GetEmoteName(string emoteKey);
+    public IEmoteDb EmoteDb { get; }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
 

@@ -7,13 +7,15 @@ namespace LethalEmotesApi.Ui;
 
 public static class EmoteUiManager
 {
-    private static IEmoteUiStateController? _stateController;
+    internal static IEmoteUiStateController? _stateController;
     internal static EmoteUiPanel? EmoteUiInstance;
     
     public static void RegisterStateController(IEmoteUiStateController stateController)
     {
         _stateController = stateController;
     }
+
+    public static IEmoteUiStateController? GetStateController() => _stateController;
 
     internal static void PlayEmote(string emoteKey)
     {
@@ -52,9 +54,11 @@ public static class EmoteUiManager
         _stateController?.PlayAnimationOn(animator, emoteKey);
     }
 
-    internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteKeys;
+    internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteDb.EmoteKeys;
 
-    internal static string GetEmoteName(string emoteKey) => _stateController!.GetEmoteName(emoteKey);
+    internal static string GetEmoteName(string emoteKey) => _stateController!.EmoteDb.GetEmoteName(emoteKey);
+
+    internal static string GetEmoteModName(string emoteKey) => _stateController!.EmoteDb.GetModName(emoteKey);
     
     internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
     
