@@ -25,15 +25,12 @@ namespace LethalEmotesAPI
         [InputAction("<Keyboard>/v", Name = "CustomEmotesAPI: Join Emote")]
         public InputAction JoinEmote { get; set; }
 
-        [InputAction("<Keyboard>/b", Name = "CustomEmotesAPI: Bind Currently Playing Emote To Current Selection")]
-        public InputAction SetCurrentEmoteToWheel { get; set; }
-
         [InputAction("", Name = "Stop emoting")]
         public InputAction StopEmoting { get; set; }
 
         [InputAction("<Mouse>/middleButton", Name = "CustomEmotesAPI: Third Person Toggle")]
         public InputAction ThirdPersonToggle { get; set; }
-        //[InputAction("<Keyboard>/p", Name = "Fuck you")]
-        //public InputAction ligmaballs { get; set; }
+        [InputAction("<Keyboard>/p", Name = "Fuck you")]
+        public InputAction ligmaballs { get; set; }
     }
 }
