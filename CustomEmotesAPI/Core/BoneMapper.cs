@@ -1226,7 +1226,6 @@ public class BoneMapper : MonoBehaviour
             originalLayer = playerController.thisPlayerModel.gameObject.layer;
             originalCullingMask = playerController.gameplayCamera.cullingMask;
         }
-        DebugClass.Log($"");
         playerController.thisPlayerModel.gameObject.layer = 1;
         playerController.grabDistance = 5.65f;
         playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
@@ -1242,6 +1241,7 @@ public class BoneMapper : MonoBehaviour
             {
                 playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             }
+            needToTurnOffShadows = true;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
