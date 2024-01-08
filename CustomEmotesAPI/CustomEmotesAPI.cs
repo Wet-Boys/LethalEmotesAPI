@@ -111,7 +111,6 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            DebugClass.Log($"adding bone mapper to scav");
             AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
@@ -290,11 +289,17 @@ namespace EmotesAPI
 
         //private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
         //{
-        //    DebugClass.Log($"adding bone mapper to scav");
         //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant5.prefab", [0]);
         //    orig(self);
         //}
         //private static Hook EnemyAiStartHook;
+
+        //private void BlobAIEnemyAiStart(Action<BlobAI> orig, BlobAI self)
+        //{
+        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/blob1.prefab", [0]);
+        //    orig(self);
+        //}
+        //private static Hook BlobAIEnemyAiStartHook;
         private static GameObject emoteNetworker;
 
 
@@ -412,6 +417,7 @@ namespace EmotesAPI
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             //SetupHook(typeof(ForestGiantAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(EnemyAiStart), EnemyAiStartHook);
+            //SetupHook(typeof(BlobAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(BlobAIEnemyAiStart), BlobAIEnemyAiStartHook);
 
 
             AnimationReplacements.RunAll();

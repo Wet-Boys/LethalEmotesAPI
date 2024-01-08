@@ -73,6 +73,7 @@ public class BoneMapper : MonoBehaviour
     public float currentAudioLevel = 0;
     public TempThirdPerson temporarilyThirdPerson = TempThirdPerson.none;
     internal int originalCullingMask;
+    internal bool needToTurnOffRenderingThing = false;
     public BoneMapper currentlyLockedBoneMapper;
     public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
     public AudioSource personalAudioSource;
@@ -511,7 +512,7 @@ public class BoneMapper : MonoBehaviour
         {
             mapperBody = transform.GetComponentInParent<PlayerControllerB>().gameObject;
         }
-        else if(transform.GetComponentInParent<EnemyAI>())
+        else if (transform.GetComponentInParent<EnemyAI>())
         {
             DebugClass.Log($"found enemy ai to latch onto");
             mapperBody = transform.GetComponentInParent<EnemyAI>().gameObject;
@@ -677,7 +678,6 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-                    originalCullingMask = playerController.gameplayCamera.cullingMask;
                     if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
                     {
                         GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
@@ -1177,18 +1177,7 @@ public class BoneMapper : MonoBehaviour
     {
         if (thirdPersonLock)
         {
-            playerController.localVisor.localScale = Vector3.zero;
-            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            if (originalLayer == -1)
-            {
-                originalLayer = playerController.thisPlayerModel.gameObject.layer;
-            }
-            playerController.thisPlayerModel.gameObject.layer = 1;
-            playerController.grabDistance = 5.65f;
-            playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
-            thirdPersonConstraint.ActivateConstraints();
-            isInThirdPerson = true;
+            TurnOnThirdPerson();
         }
         else
         {
@@ -1222,12 +1211,37 @@ public class BoneMapper : MonoBehaviour
         thirdPersonConstraint.DeactivateConstraints();
         DeThirdPerson();
     }
+    internal bool needToTurnOffShadows = true;
+    public void TurnOnThirdPerson()
+    {
+        playerController.localVisor.localScale = Vector3.zero;
+        if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
+        {
+            needToTurnOffShadows = false;
+        }
+        playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        if (originalLayer == -1)
+        {
+            originalLayer = playerController.thisPlayerModel.gameObject.layer;
+            originalCullingMask = playerController.gameplayCamera.cullingMask;
+        }
+        playerController.thisPlayerModel.gameObject.layer = 1;
+        playerController.grabDistance = 5.65f;
+        playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
+        thirdPersonConstraint.ActivateConstraints();
+        isInThirdPerson = true;
+    }
     public void DeThirdPerson()
     {
         if (local && playerController.grabDistance == 5.65f)
         {
             playerController.gameplayCamera.cullingMask = originalCullingMask;
-            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            if (needToTurnOffShadows)
+            {
+                playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            }
+            needToTurnOffShadows = true;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
