@@ -61,7 +61,7 @@ namespace LethalEmotesAPI
                         }
                         else
                         {
-                            RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, false, 5);
+                            //RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, false, 5);
                         }
                     }
                 }

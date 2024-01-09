@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class EmoteConstraint : MonoBehaviour
     public bool constraintActive = false;
     public bool revertTransform;
     bool firstTime = true;
+    bool firstTime2 = true;
     bool hasEverActivatedConstraints = false;
     public bool onlyY = false;
     public bool debug = false;
@@ -39,12 +41,27 @@ public class EmoteConstraint : MonoBehaviour
     {
         if (!constraintActive)
         {
-            originalPosition = originalBone.localPosition;
-            originalRotation = originalBone.localRotation;
-            hasEverActivatedConstraints = true;
-            constraintActive = true;
-            onlyY = false;
+            if (firstTime2)
+            {
+                firstTime2 = false;
+                gameObject.GetComponent<MonoBehaviour>().StartCoroutine(FirstTimeActiveFix(this));
+            }
+            else
+            {
+                originalPosition = originalBone.localPosition;
+                originalRotation = originalBone.localRotation;
+                hasEverActivatedConstraints = true;
+                constraintActive = true;
+                onlyY = false;
+            }
         }
+    }
+    internal IEnumerator FirstTimeActiveFix(EmoteConstraint e)
+    {
+        e.enabled = false;
+        yield return new WaitForEndOfFrame();
+        e.enabled = true;
+        e.ActivateConstraints();
     }
     public void DeactivateConstraints()
     {
