@@ -443,7 +443,7 @@ public sealed class ThunderstoreChecklist : FrostingTask<BuildContext>
     private bool PluginVersionValidate(BuildContext context)
     {
         var versionRegex =
-            new Regex("\\s*public\\s+const\\s+string\\s+VERSION\\s+=\\s+\"(?<version>\\d\\.\\d\\.\\d)\";");
+            new Regex("\\s*public\\s+const\\s+string\\s+VERSION\\s+=\\s+\"(?<version>\\d+\\.\\d+\\.\\d+)\";");
         var pluginPath = context.Project.Directory / "CustomEmotesAPI.cs";
 
         using var fileStream = File.OpenRead(pluginPath);
