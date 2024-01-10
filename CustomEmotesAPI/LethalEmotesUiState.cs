@@ -3,6 +3,7 @@ using System.Linq;
 using EmotesAPI;
 using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui.Data;
+using LethalEmotesApi.Ui.Db;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
 
@@ -60,27 +61,15 @@ public class LethalEmotesUiState : IEmoteUiStateController
         BoneMapper.PreviewAnimations(animator, emoteKey);
     }
 
-    private IReadOnlyCollection<string> _emoteKeys;
+    private EmoteDb _emoteDb;
 
-    public IReadOnlyCollection<string> EmoteKeys
+    public IEmoteDb EmoteDb
     {
         get
         {
-            _emoteKeys ??= BoneMapper.animClips
-                .Where(kvp => kvp.Value is null || kvp.Value.visibility)
-                .Select(kvp => kvp.Key)
-                .ToArray();
-            return _emoteKeys;
+            _emoteDb ??= new EmoteDb();
+            return _emoteDb;
         }
-    }
-
-    public string GetEmoteName(string emoteKey)
-    {
-        if (!BoneMapper.animClips.ContainsKey(emoteKey))
-            return emoteKey;
-        
-        var clip = BoneMapper.animClips[emoteKey];
-        return clip is null || string.IsNullOrEmpty(clip.customName) ? emoteKey : clip.customName;
     }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist => BlacklistSettings.emotesExcludedFromRandom;

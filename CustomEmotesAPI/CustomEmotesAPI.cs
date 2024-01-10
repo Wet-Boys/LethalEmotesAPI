@@ -113,7 +113,6 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            DebugClass.Log($"adding bone mapper to scav");
             AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
@@ -292,11 +291,17 @@ namespace EmotesAPI
 
         //private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
         //{
-        //    DebugClass.Log($"adding bone mapper to scav");
         //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant5.prefab", [0]);
         //    orig(self);
         //}
         //private static Hook EnemyAiStartHook;
+
+        //private void BlobAIEnemyAiStart(Action<BlobAI> orig, BlobAI self)
+        //{
+        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/blob1.prefab", [0]);
+        //    orig(self);
+        //}
+        //private static Hook BlobAIEnemyAiStartHook;
         private static GameObject emoteNetworker;
 
 
@@ -414,6 +419,7 @@ namespace EmotesAPI
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             //SetupHook(typeof(ForestGiantAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(EnemyAiStart), EnemyAiStartHook);
+            //SetupHook(typeof(BlobAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(BlobAIEnemyAiStart), BlobAIEnemyAiStartHook);
 
 
             AnimationReplacements.RunAll();
@@ -440,6 +446,9 @@ namespace EmotesAPI
                 {
                 }
             }
+            
+            EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+            
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -461,7 +470,6 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
             //EmotesInputSettings.Instance.ligmaballs.started += Ligmaballs_started;
-            EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
 
         //private void Ligmaballs_started(InputAction.CallbackContext obj)
@@ -614,6 +622,8 @@ namespace EmotesAPI
 
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
+            var ownerPlugin = Assembly.GetCallingAssembly().GetBepInPlugin();
+            
             if (visible)
             {
                 allClipNames.Add(emoteName);
@@ -623,6 +633,9 @@ namespace EmotesAPI
                 }
             }
             BoneMapper.animClips.Add(emoteName, null);
+
+            if (ownerPlugin is not null)
+                EmoteUiManager.GetStateController()!.EmoteDb.AssociateEmoteKeyWithMod(emoteName, ownerPlugin.Name);
         }
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
@@ -667,7 +680,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")

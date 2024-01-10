@@ -76,6 +76,7 @@ public class BoneMapper : MonoBehaviour
     public float currentAudioLevel = 0;
     public TempThirdPerson temporarilyThirdPerson = TempThirdPerson.none;
     internal int originalCullingMask;
+    internal bool needToTurnOffRenderingThing = false;
     public BoneMapper currentlyLockedBoneMapper;
     public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
     public AudioSource personalAudioSource;
@@ -1268,7 +1269,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"couldn't clear cosmetics: {e}");
+                DebugClass.Log($"couldn't turn on cosmetics: {e}");
             }
         }
     }
@@ -1277,7 +1278,11 @@ public class BoneMapper : MonoBehaviour
         if (local && playerController.grabDistance == 5.65f)
         {
             playerController.gameplayCamera.cullingMask = originalCullingMask;
-            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            if (needToTurnOffShadows)
+            {
+                playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            }
+            needToTurnOffShadows = true;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             playerController.localVisor.gameObject.SetActive(true);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;

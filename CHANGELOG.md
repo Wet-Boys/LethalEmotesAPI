@@ -1,3 +1,7 @@
+- Version 1.1.8: Probably really fixed third person with the mirror mod for real this time.
+
+- Version 1.1.7: Fixed issue with third person breaking when using the mirror mod. Updated integration with LethalConfig
+
 - Version 1.1.6: removed some unncesssary debug logs. Added displayName as an animation parameter, this name will overrite the name that displays in the top left of the screen when emoting.
 
 - Version 1.1.5: Probably fixed issue where you can't emote after being revived by mods that allow that. Fixed overrideMoveSpeed not working at all
