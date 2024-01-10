@@ -1,6 +1,7 @@
 ﻿using EmotesAPI;
 using GameNetcodeStuff;
 using LethalEmotesAPI;
+using LethalEmotesAPI.Patches;
 using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
@@ -61,11 +62,13 @@ public class BoneMapper : MonoBehaviour
     public bool oneFrameAnimatorLeeWay = false;
     public GameObject mapperBody;
     public PlayerControllerB playerController;
+    public EnemyAI enemyController;
     public Transform mapperBodyTransform;
     public static bool firstMapperSpawn = true;
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
     public List<EmoteConstraint> cameraConstraints = new List<EmoteConstraint>();
     public List<EmoteConstraint> itemHolderConstraints = new List<EmoteConstraint>();
+    public List<EmoteConstraint> additionalConstraints = new List<EmoteConstraint>();
     public EmoteConstraint thirdPersonConstraint;
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
     public Vector3 positionBeforeRootMotion = new Vector3(69, 69, 69);
@@ -77,6 +80,8 @@ public class BoneMapper : MonoBehaviour
     public BoneMapper currentlyLockedBoneMapper;
     public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
     public AudioSource personalAudioSource;
+    public bool isServer = false;
+    public int networkId;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -511,20 +516,27 @@ public class BoneMapper : MonoBehaviour
         if (transform.GetComponentInParent<PlayerControllerB>())
         {
             mapperBody = transform.GetComponentInParent<PlayerControllerB>().gameObject;
+            networkId = (int)mapperBody.GetComponent<PlayerControllerB>().NetworkObjectId;
         }
         else if (transform.GetComponentInParent<EnemyAI>())
         {
-            DebugClass.Log($"found enemy ai to latch onto");
             mapperBody = transform.GetComponentInParent<EnemyAI>().gameObject;
+            //networkId = (int)mapperBody.GetComponent<EnemyAI>().NetworkObjectId;
+            networkId = -1; //just leaving this here, if anyone ever makes enemies have cosmetics I don't want it to break, I'll fix it after this hypothetical scenario happens
         }
         else
         {
+            networkId = -1;
             mapperBody = gameObject;
         }
         playerController = mapperBody.GetComponent<PlayerControllerB>();
         if (playerController is not null)
         {
             playersToMappers.Add(playerController, this);
+        }
+        else
+        {
+            enemyController = mapperBody.GetComponent<EnemyAI>();
         }
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
@@ -678,6 +690,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+                    isServer = playerController.IsServer && playerController.IsOwner;
                     if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
                     {
                         GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
@@ -915,9 +928,10 @@ public class BoneMapper : MonoBehaviour
             {
                 //owner of the bonemapper
                 //todo also let the server control root motion of EnemyAi dudes
-                if (local)
+                bool isEnemy = playerController is null && CustomEmotesAPI.localMapper.isServer;
+                if (local || isEnemy)
                 {
-                    if (Settings.rootMotionType.Value != RootMotionType.None)
+                    if (Settings.rootMotionType.Value != RootMotionType.None || isEnemy)
                     {
                         //grab current BoneMapper position
                         Vector3 tempPos = transform.position;
@@ -925,7 +939,7 @@ public class BoneMapper : MonoBehaviour
 
                         //move player body
                         mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
-                        if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
+                        if (isEnemy || playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
                         {
                             mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
                         }
@@ -945,7 +959,14 @@ public class BoneMapper : MonoBehaviour
                     if (deltaPos != Vector3.zero || deltaRot != Quaternion.identity)
                     {
                         //tell server where we are now
-                        EmoteNetworker.instance.SyncBoneMapperPos(playerController.NetworkObjectId, transform.position, transform.eulerAngles);
+                        if (isEnemy)
+                        {
+                            EmoteNetworker.instance.SyncBoneMapperPos(enemyController.NetworkObjectId, transform.position, transform.eulerAngles);
+                        }
+                        else
+                        {
+                            EmoteNetworker.instance.SyncBoneMapperPos(playerController.NetworkObjectId, transform.position, transform.eulerAngles);
+                        }
                     }
                 }
                 else
@@ -1105,6 +1126,10 @@ public class BoneMapper : MonoBehaviour
         {
             item.DeactivateConstraints();
         }
+        foreach (var item in additionalConstraints)
+        {
+            item.DeactivateConstraints();
+        }
         if (thirdPersonConstraint is not null)
         {
             thirdPersonConstraint.DeactivateConstraints();
@@ -1162,6 +1187,10 @@ public class BoneMapper : MonoBehaviour
             {
                 item.ActivateConstraints();
             }
+            foreach (var item in additionalConstraints)
+            {
+                item.ActivateConstraints();
+            }
             LockCameraStuff(local && ThirdPersonCheck());
         }
         else
@@ -1212,9 +1241,10 @@ public class BoneMapper : MonoBehaviour
         DeThirdPerson();
     }
     internal bool needToTurnOffShadows = true;
+    internal bool needToTurnOffCosmetics = false;
     public void TurnOnThirdPerson()
     {
-        playerController.localVisor.localScale = Vector3.zero;
+        playerController.localVisor.gameObject.SetActive(false);
         if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
         {
             needToTurnOffShadows = false;
@@ -1231,6 +1261,17 @@ public class BoneMapper : MonoBehaviour
         playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
         thirdPersonConstraint.ActivateConstraints();
         isInThirdPerson = true;
+        if (CustomEmotesAPI.MoreCompanyPresent)
+        {
+            try
+            {
+                needToTurnOffCosmetics = MoreCompanyCompat.TurnOnCosmetics(this);
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"couldn't turn on cosmetics: {e}");
+            }
+        }
     }
     public void DeThirdPerson()
     {
@@ -1243,10 +1284,22 @@ public class BoneMapper : MonoBehaviour
             }
             needToTurnOffShadows = true;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            playerController.localVisor.localScale = new Vector3(0.5136f, 0.5136f, 0.5136f);
+            playerController.localVisor.gameObject.SetActive(true);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;
             isInThirdPerson = false;
+            if (CustomEmotesAPI.MoreCompanyPresent && needToTurnOffCosmetics)
+            {
+                needToTurnOffCosmetics = false;
+                try
+                {
+                    MoreCompanyCompat.TurnOffCosmetics(this);
+                }
+                catch (Exception e)
+                {
+                    DebugClass.Log($"couldn't clear cosmetics: {e}");
+                }
+            }
         }
     }
 }
