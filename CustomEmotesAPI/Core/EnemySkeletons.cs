@@ -84,7 +84,7 @@ namespace LethalEmotesAPI.Core
         private static Hook PufferAIStartHook;
         private void NutcrackerEnemyAIStart(Action<NutcrackerEnemyAI> orig, NutcrackerEnemyAI self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/nutcracker.prefab", [0]);
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/nutcracker3.prefab", [0]);
             orig(self);
         }
         private static Hook NutcrackerEnemyAIStartHook;
@@ -116,7 +116,7 @@ namespace LethalEmotesAPI.Core
         private static Hook SpringManAIStartHook;
         private void JesterAIStart(Action<JesterAI> orig, JesterAI self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/jester.prefab", [0]);
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/jester1.prefab", [0, 1, 2]);
             orig(self);
         }
         private static Hook JesterAIStartHook;

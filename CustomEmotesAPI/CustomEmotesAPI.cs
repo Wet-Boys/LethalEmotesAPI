@@ -413,7 +413,6 @@ namespace EmotesAPI
 
 
             EnemySkeletons.SetupEnemyHooks();
-            DebugCommands.Debugcommands();
 
             AnimationReplacements.RunAll();
 
@@ -442,6 +441,7 @@ namespace EmotesAPI
             
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
             
+            DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -634,7 +634,7 @@ namespace EmotesAPI
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
             var ownerPlugin = Assembly.GetCallingAssembly().GetBepInPlugin();
-            
+
             if (visible)
             {
                 allClipNames.Add(emoteName);
