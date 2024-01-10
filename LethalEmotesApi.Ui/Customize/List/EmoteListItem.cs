@@ -11,6 +11,7 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
     public TextMeshProUGUI? label;
     public EmoteBlacklistToggle? blacklistToggle;
     public Image? selectImage;
+    public TextMeshProUGUI? modLabel;
     public EmoteDragDropController? dragDropController;
     public PreviewController? previewController;
     
@@ -65,6 +66,11 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
             return;
         
         label.SetText(EmoteUiManager.GetEmoteName(EmoteKey));
+
+        if (modLabel is null)
+            return;
+        
+        modLabel.SetText(EmoteUiManager.GetEmoteModName(EmoteKey));
 
         if (blacklistToggle is null)
             return;

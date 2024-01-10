@@ -1,3 +1,5 @@
+- Version 1.1.9: Fixed incompat with fov mod. Fixed morecompany cosmetics not showing up (fixed? added)
+
 - Version 1.1.8: Probably really fixed third person with the mirror mod for real this time.
 
 - Version 1.1.7: Fixed issue with third person breaking when using the mirror mod. Updated integration with LethalConfig

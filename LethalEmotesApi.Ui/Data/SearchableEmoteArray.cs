@@ -84,6 +84,14 @@ public class SearchableEmoteArray : IReadOnlyList<string>
         if (string.IsNullOrEmpty(filter))
             return true;
 
+        if (filter.StartsWith('@'))
+        {
+            var emoteModName = EmoteUiManager.GetEmoteModName(emoteKey);
+            var modFilter = filter[1..];
+
+            return emoteModName.Contains(modFilter, StringComparison.InvariantCultureIgnoreCase);
+        }
+
         var emoteName = EmoteUiManager.GetEmoteName(emoteKey);
 
         return emoteKey.Contains(filter, StringComparison.InvariantCultureIgnoreCase) ||

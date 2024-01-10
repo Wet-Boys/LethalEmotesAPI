@@ -36,13 +36,14 @@ namespace EmotesAPI
     [BepInDependency("ainavt.lc.lethalconfig", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("me.swipez.melonloader.morecompany", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.8";
+        public const string VERSION = "1.1.9";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -71,6 +72,7 @@ namespace EmotesAPI
         public static List<int> blacklistedClips = new List<int>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
+        public static bool MoreCompanyPresent;
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -352,7 +354,7 @@ namespace EmotesAPI
 
             LCThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("LCThirdPerson");
             ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
-
+            MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -437,6 +439,9 @@ namespace EmotesAPI
                 {
                 }
             }
+            
+            EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+            
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -628,6 +633,8 @@ namespace EmotesAPI
 
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
+            var ownerPlugin = Assembly.GetCallingAssembly().GetBepInPlugin();
+            
             if (visible)
             {
                 allClipNames.Add(emoteName);
@@ -637,6 +644,9 @@ namespace EmotesAPI
                 }
             }
             BoneMapper.animClips.Add(emoteName, null);
+
+            if (ownerPlugin is not null)
+                EmoteUiManager.GetStateController()!.EmoteDb.AssociateEmoteKeyWithMod(emoteName, ownerPlugin.Name);
         }
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
@@ -681,7 +691,7 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin);
             if (animationClipParams.visible)
             {
                 if (animationClipParams.customName != "")
