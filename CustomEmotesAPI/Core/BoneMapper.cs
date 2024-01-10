@@ -1265,7 +1265,8 @@ public class BoneMapper : MonoBehaviour
         {
             try
             {
-                needToTurnOffCosmetics = MoreCompanyCompat.TurnOnCosmetics(this);
+                needToTurnOffCosmetics = true;
+                MoreCompanyCompat.TurnOnCosmetics(this);
             }
             catch (Exception e)
             {
@@ -1275,7 +1276,7 @@ public class BoneMapper : MonoBehaviour
     }
     public void DeThirdPerson()
     {
-        if (local && playerController.grabDistance == 5.65f)
+        if (isInThirdPerson)
         {
             playerController.gameplayCamera.cullingMask = originalCullingMask;
             if (needToTurnOffShadows)
