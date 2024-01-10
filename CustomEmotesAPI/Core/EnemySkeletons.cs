@@ -48,19 +48,19 @@ namespace LethalEmotesAPI.Core
         private static Hook CentipedeAIStartHook;
         private void SandSpiderAIStart(Action<SandSpiderAI> orig, SandSpiderAI self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/sandspider4.prefab", [0]);
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/sandspider4.prefab", [0]).scale = 1.6f;
             orig(self);
         }
         private static Hook SandSpiderAIStartHook;
         private void HoarderBugAIStart(Action<HoarderBugAI> orig, HoarderBugAI self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/hoarderbug.prefab", [0]);
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/hoarderbug.prefab", [0]).scale = 1.1f;
             orig(self);
         }
         private static Hook HoarderBugAIStartHook;
         private void FlowermanAIStart(Action<FlowermanAI> orig, FlowermanAI self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/flowerman1.prefab", [0]);
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/flowerman1.prefab", [0]).scale = 1.6f;
             orig(self);
         }
         private static Hook FlowermanAIStartHook;
@@ -116,7 +116,7 @@ namespace LethalEmotesAPI.Core
         private static Hook SpringManAIStartHook;
         private void JesterAIStart(Action<JesterAI> orig, JesterAI self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/jester1.prefab", [0, 1, 2]);
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/jester2.prefab", [0, 1, 2]).scale = 1.3f;
             orig(self);
         }
         private static Hook JesterAIStartHook;
