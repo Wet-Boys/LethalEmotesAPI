@@ -35,13 +35,14 @@ namespace EmotesAPI
     [BepInDependency("ainavt.lc.lethalconfig", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("me.swipez.melonloader.morecompany", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.7";
+        public const string VERSION = "1.1.9";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -70,6 +71,7 @@ namespace EmotesAPI
         public static List<int> blacklistedClips = new List<int>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
+        public static bool MoreCompanyPresent;
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -358,7 +360,7 @@ namespace EmotesAPI
 
             LCThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("LCThirdPerson");
             ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
-
+            MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
