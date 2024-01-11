@@ -15,10 +15,6 @@ namespace LethalEmotesAPI.Patches
             Transform cosmeticRoot = mapper.basePlayerModelAnimator.transform;
             CosmeticApplication cosmeticApplication = cosmeticRoot.GetComponent<CosmeticApplication>();
             List<string> cosmetics = CosmeticRegistry.locallySelectedCosmetics;
-            if (cosmeticApplication.spawnedCosmetics.Count != 0)
-            {
-                return false;
-            }
             if (cosmeticApplication)
             {
                 cosmeticApplication.ClearCosmetics();
