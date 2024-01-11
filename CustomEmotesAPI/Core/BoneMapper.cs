@@ -5,11 +5,14 @@ using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class BoneMapper : MonoBehaviour
 {
@@ -75,8 +78,10 @@ public class BoneMapper : MonoBehaviour
     internal int originalCullingMask;
     internal bool needToTurnOffRenderingThing = false;
     public BoneMapper currentlyLockedBoneMapper;
-    public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
+    public static Dictionary<GameObject, BoneMapper> playersToMappers = new Dictionary<GameObject, BoneMapper>();
     public AudioSource personalAudioSource;
+    public InteractTrigger personalTrigger;
+    public string currentJoinButton;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -501,9 +506,17 @@ public class BoneMapper : MonoBehaviour
             }
         }
     }
+
+    public void UpdateHoverTip()
+    {
+        currentJoinButton = InputControlPath.ToHumanReadableString(
+            EmotesInputSettings.Instance.JoinEmote.bindings[0].effectivePath,
+            InputControlPath.HumanReadableStringOptions.OmitDevice);
+        personalTrigger.hoverTip = "Press " + currentJoinButton + " to join";
+    }
+    
     void Start()
     {
-
         if (worldProp)
         {
             return;
@@ -524,10 +537,27 @@ public class BoneMapper : MonoBehaviour
         playerController = mapperBody.GetComponent<PlayerControllerB>();
         if (playerController is not null)
         {
-            playersToMappers.Add(playerController, this);
+            playersToMappers.Add(playerController.gameObject, this);
         }
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
+        
+        // Tool Tip Handling
+        GameObject trigObject = mapperBody.gameObject.transform.Find("PlayerPhysicsBox").gameObject;
+        trigObject.tag = "InteractTrigger";
+        trigObject.layer = LayerMask.NameToLayer("InteractableObject");
+
+        
+        
+        personalTrigger = trigObject.AddComponent<InteractTrigger>();
+        
+        personalTrigger.interactable = false;
+        personalTrigger.hoverIcon = null;
+        personalTrigger.disabledHoverIcon = null;
+        //playerController.cursorIcon.color = Color.clear;
+        personalTrigger.disabledHoverTip = "";
+        UpdateHoverTip();
+        
 
         GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
         obj.name = $"{name}_AudioObject";
@@ -678,6 +708,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+                    Destroy(personalTrigger); // removes trigger from localplayer so you can't see it
                     if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
                     {
                         GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
@@ -1039,7 +1070,7 @@ public class BoneMapper : MonoBehaviour
     {
         if (playerController is not null)
         {
-            playersToMappers.Remove(playerController);
+            playersToMappers.Remove(playerController.gameObject);
         }
         try
         {

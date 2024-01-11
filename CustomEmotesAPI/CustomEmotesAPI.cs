@@ -274,7 +274,7 @@ namespace EmotesAPI
         {
             if (self.playerHeldBy is not null)
             {
-                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy];
+                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy.gameObject];
                 if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
                 {
                     foreach (var item in mapper.itemHolderConstraints)
@@ -754,7 +754,11 @@ namespace EmotesAPI
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
+            
             mapper.currentClipName = newAnimation;
+            mapper.UpdateHoverTip();
+            mapper.personalTrigger.interactable = false; // remove tooltip
+            
             if (mapper == localMapper)
             {
                 if (newAnimation == "none")
@@ -805,6 +809,9 @@ namespace EmotesAPI
 
             if (newAnimation != "none")
             {
+                
+                mapper.personalTrigger.interactable = true; // enable tooltip
+                
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.HideAllSpots();
@@ -826,7 +833,7 @@ namespace EmotesAPI
 
                 if (mapper.local && hudObject is not null)
                 {
-                    CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0);
+                    CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0); //remove text top left
                 }
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
@@ -856,7 +863,9 @@ namespace EmotesAPI
         public static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
         {
             if (animJoined != null)
+            {
                 animJoined(joinedAnimation, joiner, host);
+            }
         }
         public delegate void BoneMapperCreated(BoneMapper mapper);
         public static event BoneMapperCreated boneMapperCreated;
