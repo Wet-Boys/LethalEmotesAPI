@@ -27,6 +27,7 @@ using TMPro;
 using System.Linq;
 using BepInEx.Bootstrap;
 using LethalEmotesAPI.Patches;
+using LethalEmotesAPI.Core;
 
 namespace EmotesAPI
 {
@@ -289,19 +290,7 @@ namespace EmotesAPI
         }
         private static Hook GrabbableObjectLateUpdateHook;
 
-        //private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
-        //{
-        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant5.prefab", [0]);
-        //    orig(self);
-        //}
-        //private static Hook EnemyAiStartHook;
 
-        //private void BlobAIEnemyAiStart(Action<BlobAI> orig, BlobAI self)
-        //{
-        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/blob1.prefab", [0]);
-        //    orig(self);
-        //}
-        //private static Hook BlobAIEnemyAiStartHook;
         private static GameObject emoteNetworker;
 
 
@@ -418,9 +407,12 @@ namespace EmotesAPI
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
-            //SetupHook(typeof(ForestGiantAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(EnemyAiStart), EnemyAiStartHook);
-            //SetupHook(typeof(BlobAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(BlobAIEnemyAiStart), BlobAIEnemyAiStartHook);
 
+
+
+
+
+            EnemySkeletons.SetupEnemyHooks();
 
             AnimationReplacements.RunAll();
 
@@ -449,6 +441,7 @@ namespace EmotesAPI
             
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
             
+            //DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -469,20 +462,8 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
-            //EmotesInputSettings.Instance.ligmaballs.started += Ligmaballs_started;
+            EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
-
-        //private void Ligmaballs_started(InputAction.CallbackContext obj)
-        //{
-        //    foreach (var item in GetAllBoneMappers())
-        //    {
-        //        if (item.playerController is null)
-        //        {
-        //            int rand = UnityEngine.Random.Range(0, randomClipList.Count);
-        //            PlayAnimation(randomClipList[rand], item);
-        //        }
-        //    }
-        //}
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
             if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
@@ -623,7 +604,7 @@ namespace EmotesAPI
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
             var ownerPlugin = Assembly.GetCallingAssembly().GetBepInPlugin();
-            
+
             if (visible)
             {
                 allClipNames.Add(emoteName);
@@ -700,23 +681,18 @@ namespace EmotesAPI
         }
 
         public static GameObject animationControllerHolder;
-        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
+        public static BoneMapper ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
         {
-            if (!animationControllerHolder)
+            if (animationControllerHolder is null)
             {
                 animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
             }
             rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
+            return AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
         }
-        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
+        public static BoneMapper ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
         {
-            if (!animationControllerHolder)
-            {
-                animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-            }
-            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
+            return ImportArmature(bodyPrefab, rigToAnimate, false, meshPos, hideMeshes);
         }
         public static void PlayAnimation(string animationName, int pos = -2)
         {

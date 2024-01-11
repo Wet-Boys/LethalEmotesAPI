@@ -523,6 +523,7 @@ public class BoneMapper : MonoBehaviour
             mapperBody = transform.GetComponentInParent<EnemyAI>().gameObject;
             //networkId = (int)mapperBody.GetComponent<EnemyAI>().NetworkObjectId;
             networkId = -1; //just leaving this here, if anyone ever makes enemies have cosmetics I don't want it to break, I'll fix it after this hypothetical scenario happens
+            isEnemy = CustomEmotesAPI.localMapper.isServer;
         }
         else
         {
@@ -908,6 +909,7 @@ public class BoneMapper : MonoBehaviour
     public Vector3 prevMapperPos = new Vector3(69, 69, 69);
     public Vector3 prevMapperRot = new Vector3();
     public bool justSwitched = false;
+    public bool isEnemy = false;
     public void RootMotion()
     {
         try
@@ -928,7 +930,6 @@ public class BoneMapper : MonoBehaviour
             {
                 //owner of the bonemapper
                 //todo also let the server control root motion of EnemyAi dudes
-                bool isEnemy = playerController is null && CustomEmotesAPI.localMapper.isServer;
                 if (local || isEnemy)
                 {
                     if (Settings.rootMotionType.Value != RootMotionType.None || isEnemy)
