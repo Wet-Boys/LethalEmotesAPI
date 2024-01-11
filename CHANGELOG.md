@@ -1,3 +1,5 @@
+- Version 1.1.11: Added enemy skeletons, do with that as you will
+
 - Version 1.1.10: Probably fixed issue with morecompany cosmetics not being removed
 
 - Version 1.1.9: Fixed incompat with fov mod. Fixed morecompany cosmetics not showing up (fixed? added)
