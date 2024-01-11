@@ -82,6 +82,7 @@ public class BoneMapper : MonoBehaviour
     public AudioSource personalAudioSource;
     public bool isServer = false;
     public int networkId;
+    public bool canThirdPerson = true;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -863,7 +864,7 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        bool yes = !CustomEmotesAPI.LCThirdPersonPresent && (currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on));
+        bool yes = !CustomEmotesAPI.LCThirdPersonPresent && (currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on) && canThirdPerson);
         //if (local)
         //{
         //    DebugClass.Log(yes);
