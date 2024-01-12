@@ -6,6 +6,7 @@ using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
@@ -509,7 +510,6 @@ public class BoneMapper : MonoBehaviour
     }
     void Start()
     {
-
         if (worldProp)
         {
             return;
@@ -547,6 +547,8 @@ public class BoneMapper : MonoBehaviour
         obj.name = $"{name}_AudioObject";
         obj.transform.SetParent(mapperBody.transform);
         obj.transform.localPosition = Vector3.zero;
+        obj.AddComponent<SphereCollider>().radius = .01f;
+        obj.layer = 6;
         personalAudioSource = obj.GetComponent<AudioSource>();
         obj.AddComponent<AudioManager>().Setup(personalAudioSource, this);
         personalAudioSource.playOnAwake = false;
@@ -682,6 +684,19 @@ public class BoneMapper : MonoBehaviour
     public GameObject rotationPoint;
     public GameObject desiredCameraPos;
     public GameObject realCameraPos;
+    public void ResetSelf()
+    {
+        playerController.StartCoroutine(RespawnBoneMapper(playerController));
+        Destroy(this.gameObject);
+    }
+    public IEnumerator RespawnBoneMapper(PlayerControllerB self)
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
+    }
     void GetLocal()
     {
         try
