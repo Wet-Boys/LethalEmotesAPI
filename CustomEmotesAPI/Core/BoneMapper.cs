@@ -6,6 +6,7 @@ using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
@@ -82,6 +83,7 @@ public class BoneMapper : MonoBehaviour
     public AudioSource personalAudioSource;
     public bool isServer = false;
     public int networkId;
+    public bool canThirdPerson = true;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -508,7 +510,6 @@ public class BoneMapper : MonoBehaviour
     }
     void Start()
     {
-
         if (worldProp)
         {
             return;
@@ -546,6 +547,8 @@ public class BoneMapper : MonoBehaviour
         obj.name = $"{name}_AudioObject";
         obj.transform.SetParent(mapperBody.transform);
         obj.transform.localPosition = Vector3.zero;
+        obj.AddComponent<SphereCollider>().radius = .01f;
+        obj.layer = 6;
         personalAudioSource = obj.GetComponent<AudioSource>();
         obj.AddComponent<AudioManager>().Setup(personalAudioSource, this);
         personalAudioSource.playOnAwake = false;
@@ -681,6 +684,19 @@ public class BoneMapper : MonoBehaviour
     public GameObject rotationPoint;
     public GameObject desiredCameraPos;
     public GameObject realCameraPos;
+    public void ResetSelf()
+    {
+        playerController.StartCoroutine(RespawnBoneMapper(playerController));
+        Destroy(this.gameObject);
+    }
+    public IEnumerator RespawnBoneMapper(PlayerControllerB self)
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
+    }
     void GetLocal()
     {
         try
@@ -701,11 +717,8 @@ public class BoneMapper : MonoBehaviour
                         CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
                         CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
                         CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
-                        if (!CustomEmotesAPI.animationControllerHolder)
-                        {
-                            CustomEmotesAPI.animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-                        }
-                        CustomEmotesAPI.hudAnimator.runtimeAnimatorController = CustomEmotesAPI.animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
+                        GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+                        CustomEmotesAPI.hudAnimator.runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
                         CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
                     }
                     Camera c = playerController.gameplayCamera;
@@ -866,7 +879,7 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        bool yes = !CustomEmotesAPI.LCThirdPersonPresent && (currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on));
+        bool yes = !CustomEmotesAPI.LCThirdPersonPresent && (currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on) && canThirdPerson);
         //if (local)
         //{
         //    DebugClass.Log(yes);
@@ -940,7 +953,7 @@ public class BoneMapper : MonoBehaviour
 
                         //move player body
                         mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
-                        if (isEnemy || playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
+                        if (isEnemy || !isInThirdPerson)
                         {
                             mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
                         }

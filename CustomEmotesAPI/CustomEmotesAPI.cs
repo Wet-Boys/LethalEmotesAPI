@@ -43,7 +43,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.11";
+        public const string VERSION = "1.1.12";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -407,7 +407,7 @@ namespace EmotesAPI
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
-
+            CentipedePatches.PatchAll();
 
 
 
@@ -679,16 +679,13 @@ namespace EmotesAPI
             }
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
         }
-
-        public static GameObject animationControllerHolder;
         public static BoneMapper ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
         {
-            if (animationControllerHolder is null)
-            {
-                animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-            }
-            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-            return AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
+            GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
+            BoneMapper b = AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
+            g.transform.SetParent(b.transform);
+            return b;
         }
         public static BoneMapper ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
         {
