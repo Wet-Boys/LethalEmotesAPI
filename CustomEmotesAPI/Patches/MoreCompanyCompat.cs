@@ -36,11 +36,15 @@ namespace LethalEmotesAPI.Patches
         internal static void TurnOffCosmetics(BoneMapper mapper)
         {
             Transform cosmeticRoot = mapper.basePlayerModelAnimator.transform;
-            CosmeticApplication cosmeticApplication = cosmeticRoot.GetComponent<CosmeticApplication>();
-            if (cosmeticApplication)
+            CosmeticApplication[] cosmeticApplications = cosmeticRoot.GetComponents<CosmeticApplication>();
+            foreach (var item in cosmeticApplications)
             {
-                cosmeticApplication.ClearCosmetics();
+                if (item)
+                {
+                    item.ClearCosmetics();
+                }
             }
+
         }
     }
 }
