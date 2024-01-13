@@ -1,4 +1,5 @@
-﻿using EmotesAPI;
+﻿using BepInEx.Bootstrap;
+using EmotesAPI;
 using GameNetcodeStuff;
 using LethalEmotesAPI;
 using LethalEmotesAPI.Patches;
