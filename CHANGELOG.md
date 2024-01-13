@@ -1,3 +1,5 @@
+- Version 1.1.15: Made the VR mod a soft dependency purely to let it load first since the IL code injections conflict otherwise
+
 - Version 1.1.14: Fixed respawning in latecompany causing emotes to t-pose on the floor
 
 - Version 1.1.13: Fixed VRM t-posing
