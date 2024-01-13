@@ -1,3 +1,5 @@
+- Version 1.1.14: Fixed respawning in latecompany causing emotes to t-pose on the floor
+
 - Version 1.1.13: Fixed VRM t-posing
 
 - Version 1.1.12: Fixed quite a few bugs
