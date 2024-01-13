@@ -69,6 +69,7 @@ public class BoneMapper : MonoBehaviour
     public static List<List<AudioSource>> listOfCurrentEmoteAudio = new List<List<AudioSource>>();
     public List<EmoteConstraint> cameraConstraints = new List<EmoteConstraint>();
     public List<EmoteConstraint> itemHolderConstraints = new List<EmoteConstraint>();
+    public Transform itemHolderPosition;
     public List<EmoteConstraint> additionalConstraints = new List<EmoteConstraint>();
     public EmoteConstraint thirdPersonConstraint;
     public static Dictionary<string, string> customNamePairs = new Dictionary<string, string>();
@@ -625,8 +626,9 @@ public class BoneMapper : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
-        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder")));
-        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder")));
+        itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder");
+        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, itemHolderPosition));
+        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, itemHolderPosition));
     }
     public GameObject parentGameObject;
     public bool positionLock, rotationLock, scaleLock;
