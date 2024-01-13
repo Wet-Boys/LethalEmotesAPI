@@ -1,3 +1,5 @@
+- Version 1.1.13: Fixed VRM t-posing
+
 - Version 1.1.12: Fixed quite a few bugs
 
 - Version 1.1.11: Added enemy skeletons, do with that as you will

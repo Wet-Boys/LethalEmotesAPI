@@ -28,6 +28,7 @@ using System.Linq;
 using BepInEx.Bootstrap;
 using LethalEmotesAPI.Patches;
 using LethalEmotesAPI.Core;
+using LethalEmotesAPI.Patches.ModCompat;
 
 namespace EmotesAPI
 {
@@ -37,13 +38,14 @@ namespace EmotesAPI
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("me.swipez.melonloader.morecompany", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("Ooseykins.LethalVRM", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.12";
+        public const string VERSION = "1.1.13";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -73,6 +75,7 @@ namespace EmotesAPI
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
         public static bool MoreCompanyPresent;
+        public static bool VRMPresent;
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -355,6 +358,7 @@ namespace EmotesAPI
             LCThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("LCThirdPerson");
             ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
             MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
+            VRMPresent = Chainloader.PluginInfos.ContainsKey("Ooseykins.LethalVRM");
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -408,7 +412,10 @@ namespace EmotesAPI
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             CentipedePatches.PatchAll();
-
+            if (VRMPresent)
+            {
+                VRMCompat.SetupUpdateVisibilityHook();
+            }
 
 
 
@@ -438,9 +445,9 @@ namespace EmotesAPI
                 {
                 }
             }
-            
+
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
-            
+
             //DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
