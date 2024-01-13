@@ -686,8 +686,10 @@ public class BoneMapper : MonoBehaviour
     public GameObject realCameraPos;
     public void ResetSelf()
     {
-        playerController.StartCoroutine(RespawnBoneMapper(playerController));
-        Destroy(this.gameObject);
+        //GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+        //emoteSkeletonAnimator = g.GetComponent<Animator>();
+        //playerController.StartCoroutine(RespawnBoneMapper(playerController));
+        //Destroy(this.gameObject);
     }
     public IEnumerator RespawnBoneMapper(PlayerControllerB self)
     {
@@ -1255,7 +1257,7 @@ public class BoneMapper : MonoBehaviour
         DeThirdPerson();
     }
     internal bool needToTurnOffShadows = true;
-    internal bool needToTurnOffCosmetics = false;
+    internal bool needToTurnOffCosmetics = true;
     public void TurnOnThirdPerson()
     {
         playerController.localVisor.gameObject.SetActive(false);
@@ -1305,7 +1307,6 @@ public class BoneMapper : MonoBehaviour
             isInThirdPerson = false;
             if (CustomEmotesAPI.MoreCompanyPresent && needToTurnOffCosmetics)
             {
-                needToTurnOffCosmetics = false;
                 try
                 {
                     MoreCompanyCompat.TurnOffCosmetics(this);

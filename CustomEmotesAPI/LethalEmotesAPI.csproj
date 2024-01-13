@@ -29,6 +29,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.2" />
     <PackageReference Include="notnotnotswipez-MoreCompany" Version="1.7.4" />
@@ -48,6 +52,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\LethalEmotesApi.Ui\LethalEmotesApi.Ui.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Patches\ModCompat\" />
   </ItemGroup>
 
 </Project>

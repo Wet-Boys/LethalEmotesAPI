@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 
 
+[DefaultExecutionOrder(-2)]
 public class EmoteConstraint : MonoBehaviour
 {
     public Transform originalBone;
