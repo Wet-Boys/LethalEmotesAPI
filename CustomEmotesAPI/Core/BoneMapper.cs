@@ -684,21 +684,6 @@ public class BoneMapper : MonoBehaviour
     public GameObject rotationPoint;
     public GameObject desiredCameraPos;
     public GameObject realCameraPos;
-    public void ResetSelf()
-    {
-        //GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-        //emoteSkeletonAnimator = g.GetComponent<Animator>();
-        //playerController.StartCoroutine(RespawnBoneMapper(playerController));
-        //Destroy(this.gameObject);
-    }
-    public IEnumerator RespawnBoneMapper(PlayerControllerB self)
-    {
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-        AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
-    }
     void GetLocal()
     {
         try
@@ -1174,8 +1159,7 @@ public class BoneMapper : MonoBehaviour
         }
         if (!jank)
         {
-            //a1.enabled = false;
-            //StartCoroutine(waitForTwoFramesThenDisableA1());
+            emoteSkeletonSMR.enabled = true;
             foreach (var smr in basePlayerModelSMR)
             {
                 for (int i = 0; i < smr.bones.Length; i++)
