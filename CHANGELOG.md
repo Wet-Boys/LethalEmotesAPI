@@ -1,3 +1,5 @@
+- Version 1.2.0: Exposed the healthbar animator you can create and remove requests with HealthbarAnimator.StartHealthbarAnimateRequest() and HealthbarAnimator.FinishHealthbarAnimateRequest()
+
 - Version 1.1.16: Fixed cosmetic issues with MoreCompany/AdvancedCompany
 
 - Version 1.1.15: Made the VR mod a soft dependency purely to let it load first since the IL code injections conflict otherwise
