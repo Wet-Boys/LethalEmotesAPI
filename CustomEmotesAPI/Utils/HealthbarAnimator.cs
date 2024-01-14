@@ -41,13 +41,9 @@ namespace LethalEmotesAPI.Utils
                 {
                     for (int x = startingXPoint; x < smr.bones.Length; x++)
                     {
-                        //DebugClass.Log($"comparing:    {smr1.bones[i].name}     {smr.bones[x].name}");
-                        //DebugClass.Log($"--------------  {smrbone.gameObject.name}   {smr1bone.gameObject.name}      {smrbone.GetComponent<ParentConstraint>()}");
                         if (mapper.basePlayerModelSMR[0].bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
                         {
                             startingXPoint = x;
-                            //DebugClass.Log($"they are equal!");
-                            //DebugClass.Log($"{smr.name}--- i is equal to {x}  ------ {smr.bones[x].name}");
                             EmoteConstraint e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
                             e.AddSource(ref smr.bones[x], ref mapper.basePlayerModelSMR[0].bones[i]);
                             e.revertTransform = mapper.revertTransform;
