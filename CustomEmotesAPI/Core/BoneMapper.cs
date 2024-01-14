@@ -87,6 +87,7 @@ public class BoneMapper : MonoBehaviour
     public bool isServer = false;
     public int networkId;
     public bool canThirdPerson = true;
+    internal bool canEmote = false;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -500,6 +501,11 @@ public class BoneMapper : MonoBehaviour
             }
         }
     }
+    internal IEnumerator preventEmotesInSpawnAnimation() //this is a hacky fix, but for some reason if you emote while spawning the log will just fucking die, need to come back to this but it's not really a big deal
+    {
+        yield return new WaitForSeconds(3);
+        canEmote = true;
+    }
     void Start()
     {
         if (worldProp)
@@ -610,6 +616,7 @@ public class BoneMapper : MonoBehaviour
         {
             StartCoroutine(SetupHandConstraint());
         }
+        StartCoroutine(preventEmotesInSpawnAnimation());
     }
     public IEnumerator SetupHandConstraint()
     {

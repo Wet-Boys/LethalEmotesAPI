@@ -46,7 +46,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.2.1";
+        public const string VERSION = "1.2.2";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -118,7 +118,20 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0/*, 1, 2, 3*/ });
+            int SMR1 = 0, SMR2 = 0;
+            //this may seem hacky, but I would argue mods inserting SMRs into the bone structure is more hacky so I'm just being safe
+            for (int i = 0; i < self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>().Length; i++)
+            {
+                if (self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == self.thisPlayerModelLOD1)
+                {
+                    SMR1 = i;
+                }
+                else if (self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == self.thisPlayerModelArms)
+                {
+                    SMR2 = i;
+                }
+            }
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
             {
@@ -178,7 +191,13 @@ namespace EmotesAPI
             orig(self, health, hurtPlayer);
             if (hudObject is not null)
             {
-                hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                try
+                {
+                    hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
         private static Hook hudManagerUpdateHealthUIHook;
@@ -302,7 +321,7 @@ namespace EmotesAPI
         //Vector3 prevCamPosition = Vector3.zero;
         internal static void AutoWalking(PlayerControllerB player)
         {
-            if (player == StartOfRound.Instance.localPlayerController)
+            if (player == StartOfRound.Instance.localPlayerController && player is not null)
             {
                 if (localMapper)
                 {
@@ -704,6 +723,10 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, int pos = -2)
         {
+            if (localMapper is null || !localMapper.canEmote)
+            {
+                return;
+            }
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
@@ -712,6 +735,10 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
+            if (mapper is null || !mapper.canEmote)
+            {
+                return;
+            }
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
@@ -740,11 +767,17 @@ namespace EmotesAPI
         static int requestCounter = 0;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            if (mapper is null)
+            {
+                DebugClass.Log("AnimChanged called on null BoneMapper!");
+                return;
+            }
+            
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
-                if (requestCounter != 0)
+                if (requestCounter != 0 && CustomEmotesAPI.hudObject is not null)
                 {
                     requestCounter--;
                     HealthbarAnimator.FinishHealthbarAnimateRequest();
@@ -754,7 +787,7 @@ namespace EmotesAPI
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
                 }
-                else
+                else if (CustomEmotesAPI.hudObject is not null)
                 {
                     requestCounter++;
                     HealthbarAnimator.StartHealthbarAnimateRequest();
