@@ -46,7 +46,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.2.0";
+        public const string VERSION = "1.2.2";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -178,7 +178,13 @@ namespace EmotesAPI
             orig(self, health, hurtPlayer);
             if (hudObject is not null)
             {
-                hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                try
+                {
+                    hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
         private static Hook hudManagerUpdateHealthUIHook;
@@ -744,7 +750,7 @@ namespace EmotesAPI
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
-                if (requestCounter != 0)
+                if (requestCounter != 0 && CustomEmotesAPI.hudObject is not null)
                 {
                     requestCounter--;
                     HealthbarAnimator.FinishHealthbarAnimateRequest();
@@ -754,7 +760,7 @@ namespace EmotesAPI
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
                 }
-                else
+                else if (CustomEmotesAPI.hudObject is not null)
                 {
                     requestCounter++;
                     HealthbarAnimator.StartHealthbarAnimateRequest();
