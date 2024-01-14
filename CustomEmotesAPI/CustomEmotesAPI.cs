@@ -118,7 +118,7 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0/*, 1, 2, 3*/ });
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
             {
