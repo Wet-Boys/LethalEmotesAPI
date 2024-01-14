@@ -46,7 +46,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.16";
+        public const string VERSION = "1.2.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -155,6 +155,7 @@ namespace EmotesAPI
         public static GameObject baseHUDObject;
         public static GameObject selfRedHUDObject;
         public static TextMeshPro currentEmoteText;
+        public static Camera hudCamera;
         private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
         {
             orig(self);
@@ -460,6 +461,7 @@ namespace EmotesAPI
             var ScrollD = new InputAction("ScrollDOWN", binding: "<Mouse>/Scroll/Down");
             ScrollU.Enable();
             ScrollD.Enable();
+            Settings.SetHealthbarRequest();
 
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
@@ -735,31 +737,27 @@ namespace EmotesAPI
         }
         public delegate void AnimationChanged(string newAnimation, BoneMapper mapper);
         public static event AnimationChanged animChanged;
+        static int requestCounter = 0;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
+                if (requestCounter != 0)
+                {
+                    requestCounter--;
+                    HealthbarAnimator.FinishHealthbarAnimateRequest();
+                }
                 if (newAnimation == "none")
                 {
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
-                    if (hudObject is not null)
-                    {
-                        hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
-                        baseHUDObject.SetActive(true);
-                        selfRedHUDObject.SetActive(true);
-                    }
                 }
                 else
                 {
-                    if (hudObject is not null)
-                    {
-                        hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
-                        baseHUDObject.SetActive(false);
-                        selfRedHUDObject.SetActive(false);
-                    }
+                    requestCounter++;
+                    HealthbarAnimator.StartHealthbarAnimateRequest();
                 }
 
             }

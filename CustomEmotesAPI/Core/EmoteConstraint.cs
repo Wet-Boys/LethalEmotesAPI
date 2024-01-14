@@ -19,6 +19,7 @@ public class EmoteConstraint : MonoBehaviour
     bool hasEverActivatedConstraints = false;
     public bool onlyY = false;
     public bool debug = false;
+    public bool localTransforms = false;
     void LateUpdate()
     {
         ActUponConstraints();
@@ -27,14 +28,29 @@ public class EmoteConstraint : MonoBehaviour
     {
         if (constraintActive)
         {
-            if (onlyY)
+            if (localTransforms)
             {
-                originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+                if (onlyY)
+                {
+                    originalBone.localPosition = new Vector3(originalBone.localPosition.x, emoteBone.localPosition.y, originalBone.localPosition.z);
+                }
+                else
+                {
+                    originalBone.localPosition = emoteBone.localPosition;
+                    originalBone.localRotation = emoteBone.localRotation;
+                }
             }
             else
             {
-                originalBone.position = emoteBone.position;
-                originalBone.rotation = emoteBone.rotation;
+                if (onlyY)
+                {
+                    originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+                }
+                else
+                {
+                    originalBone.position = emoteBone.position;
+                    originalBone.rotation = emoteBone.rotation;
+                }
             }
         }
     }
