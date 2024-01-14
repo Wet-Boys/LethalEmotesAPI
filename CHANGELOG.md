@@ -1,3 +1,5 @@
+- Version 1.2.3: Fixed being able to emoting during AC's terminal, fixed emote text not always showing up top
+
 - Verison 1.2.2: Fixed a critical incompatibility issue I caused. Fixed first person arms not working when animating
 
 - Version 1.2.1: Fixed the HealthbarAnimator from not spawning in the correct spot
