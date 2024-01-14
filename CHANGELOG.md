@@ -1,3 +1,5 @@
+- Verison 1.2.2: Fixed a critical incompatibility issue I caused. Fixed first person arms not working when animating
+
 - Version 1.2.1: Fixed the HealthbarAnimator from not spawning in the correct spot
 
 - Version 1.2.0: Exposed the healthbar animator you can create and remove requests with HealthbarAnimator.StartHealthbarAnimateRequest() and HealthbarAnimator.FinishHealthbarAnimateRequest()
