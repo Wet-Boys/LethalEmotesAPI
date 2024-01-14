@@ -307,8 +307,7 @@ public class BoneMapper : MonoBehaviour
         StartAnimations(animController, pos, emoteSkeletonAnimator);
         if (local && CustomEmotesAPI.hudObject is not null)
         {
-            CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
-            CustomEmotesAPI.currentEmoteText.color = new Color(.5f, .5f, .5f, .5f);
+
 
             if (currentClip.displayName != "")
             {

@@ -1,3 +1,5 @@
+- Version 1.2.1: Fixed the HealthbarAnimator from not spawning in the correct spot
+
 - Version 1.2.0: Exposed the healthbar animator you can create and remove requests with HealthbarAnimator.StartHealthbarAnimateRequest() and HealthbarAnimator.FinishHealthbarAnimateRequest()
 
 - Version 1.1.16: Fixed cosmetic issues with MoreCompany/AdvancedCompany
