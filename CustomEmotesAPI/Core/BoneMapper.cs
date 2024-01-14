@@ -252,10 +252,6 @@ public class BoneMapper : MonoBehaviour
         if (s == "none")
         {
             emoteSkeletonAnimator.Play("none", -1, 0f);
-            if (local && CustomEmotesAPI.hudObject is not null)
-            {
-                CustomEmotesAPI.hudAnimator.Play("none", -1, 0f);
-            }
             twopart = false;
             prevClip = currentClip;
             currentClip = null;
@@ -266,11 +262,6 @@ public class BoneMapper : MonoBehaviour
         }
 
         AnimatorOverrideController animController = new AnimatorOverrideController(emoteSkeletonAnimator.runtimeAnimatorController);
-        AnimatorOverrideController hudAnimController = new AnimatorOverrideController();
-        if (local && CustomEmotesAPI.hudObject is not null)
-        {
-            hudAnimController = new AnimatorOverrideController(CustomEmotesAPI.hudAnimator.runtimeAnimatorController);
-        }
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
@@ -317,7 +308,6 @@ public class BoneMapper : MonoBehaviour
         if (local && CustomEmotesAPI.hudObject is not null)
         {
             CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
-            StartAnimations(hudAnimController, pos, CustomEmotesAPI.hudAnimator);
             CustomEmotesAPI.currentEmoteText.color = new Color(.5f, .5f, .5f, .5f);
 
             if (currentClip.displayName != "")
@@ -699,19 +689,9 @@ public class BoneMapper : MonoBehaviour
                     CustomEmotesAPI.localMapper = this;
                     local = true;
                     isServer = playerController.IsServer && playerController.IsOwner;
-                    if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
-                    {
-                        GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
-                        info.transform.SetParent(mapperBody.transform.parent);
-                        CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
-                        CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(90, 0, 0);
-                        CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
-                        CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
-                        CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
-                        GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-                        CustomEmotesAPI.hudAnimator.runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
-                        CustomEmotesAPI.currentEmoteText = info.GetComponentInChildren<TextMeshPro>();
-                    }
+                    HealthbarAnimator.Setup(this);
+
+
                     Camera c = playerController.gameplayCamera;
                     if (c is not null)
                     {

@@ -47,6 +47,7 @@ namespace EmotesAPI
 
         public static ConfigEntry<string> EmoteWheelSetDataEntryString;
         public static ConfigEntry<string> RandomEmoteBlacklist;
+        public static ConfigEntry<bool> PermanentEmotingHealthbar;
 
 
         public static void RunAll()
@@ -68,9 +69,27 @@ namespace EmotesAPI
             RandomEmoteBlacklist = CustomEmotesAPI.instance.Config.Bind<string>("No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key, probably don't want to touch this here");
             thirdPersonType = CustomEmotesAPI.instance.Config.Bind<ThirdPersonType>("Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");
             StopEmoteWhenLockedToStopsEmote = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Stop Emote When Locked Player Stops Emote", true, "If you are locked to a player for an emote (determined by emote mods themselves), you will stop emoting and unlock yourself if the other person stops emoting");
-
+            PermanentEmotingHealthbar = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Permanent Healthbar Animation", false, "Keeps the fun lil guy in the top left animating at all times");
             HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
+            PermanentEmotingHealthbar.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
         }
+
+        private static void PermanentEmotingHealthbar_SettingChanged(object sender, EventArgs e)
+        {
+            SetHealthbarRequest();
+        }
+        internal static void SetHealthbarRequest()
+        {
+            if (PermanentEmotingHealthbar.Value)
+            {
+                HealthbarAnimator.StartHealthbarAnimateRequest();
+            }
+            else
+            {
+                HealthbarAnimator.FinishHealthbarAnimateRequest();
+            }
+        }
+
         private static void HideJoinSpots_SettingChanged(object sender, EventArgs e)
         {
             if (!HideJoinSpots.Value)
@@ -127,6 +146,7 @@ namespace EmotesAPI
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(EmotesAlertEnemies, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(PermanentEmotingHealthbar, false));
             LethalConfigManager.SkipAutoGenFor("No Touch");
         }
 
