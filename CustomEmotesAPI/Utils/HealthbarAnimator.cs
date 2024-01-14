@@ -1,5 +1,6 @@
 ﻿using EmotesAPI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -85,7 +86,7 @@ namespace LethalEmotesAPI.Utils
         }
         internal static void SetHealthbarPosition()
         {
-            if (activeRequests != 0)
+            if (activeRequests != 0 || permaOn)
             {
                 if (CustomEmotesAPI.hudObject is not null)
                 {
@@ -105,14 +106,21 @@ namespace LethalEmotesAPI.Utils
             }
 
         }
+        void Start()
+        {
+            StartCoroutine(FixPosition());
+        }
+        IEnumerator FixPosition()
+        {
+            yield return new WaitForEndOfFrame();
+            CustomEmotesAPI.hudObject.transform.localPosition = CustomEmotesAPI.baseHUDObject.transform.localPosition;
+            CustomEmotesAPI.currentEmoteText.color = new Color(.5f, .5f, .5f, .5f);
+            CustomEmotesAPI.currentEmoteText.text = "";
+        }
         void LateUpdate()
         {
             if (setupComplete && (activeRequests != 0 || permaOn))
             {
-                if (CustomEmotesAPI.hudAnimator.transform.localPosition != new Vector3(-822.5184f, -235.6528f, 1074.747f))
-                {
-                    CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
-                }
                 foreach (var item in healthbarConstraints)
                 {
                     try

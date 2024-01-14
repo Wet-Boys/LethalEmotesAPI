@@ -80,14 +80,7 @@ namespace EmotesAPI
         }
         internal static void SetHealthbarRequest()
         {
-            if (PermanentEmotingHealthbar.Value)
-            {
-                HealthbarAnimator.StartHealthbarAnimateRequest();
-            }
-            else
-            {
-                HealthbarAnimator.FinishHealthbarAnimateRequest();
-            }
+            HealthbarAnimator.permaOn = PermanentEmotingHealthbar.Value;
         }
 
         private static void HideJoinSpots_SettingChanged(object sender, EventArgs e)
