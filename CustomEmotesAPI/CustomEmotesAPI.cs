@@ -118,7 +118,20 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0/*, 1, 2, 3*/ });
+            int SMR1 = 0, SMR2 = 0;
+            //this may seem hacky, but I would argue mods inserting SMRs into the bone structure is more hacky so I'm just being safe
+            for (int i = 0; i < self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>().Length; i++)
+            {
+                if (self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == self.thisPlayerModelLOD1)
+                {
+                    SMR1 = i;
+                }
+                else if (self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == self.thisPlayerModelArms)
+                {
+                    SMR2 = i;
+                }
+            }
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
             {
@@ -710,6 +723,10 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, int pos = -2)
         {
+            if (localMapper is null || !localMapper.canEmote)
+            {
+                return;
+            }
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
@@ -718,6 +735,10 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
+            if (mapper is null || !mapper.canEmote)
+            {
+                return;
+            }
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
