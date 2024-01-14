@@ -14,7 +14,7 @@ namespace LethalEmotesAPI.Patches
         private void ClingToPlayer(Action<CentipedeAI, PlayerControllerB> orig, CentipedeAI self, PlayerControllerB player)
         {
             orig(self, player);
-            BoneMapper b = BoneMapper.playersToMappers[self.clingingToPlayer];
+            BoneMapper b = BoneMapper.playersToMappers[self.clingingToPlayer.gameObject];
             b.canThirdPerson = false;
             if (b.isInThirdPerson)
             {
@@ -28,7 +28,7 @@ namespace LethalEmotesAPI.Patches
         {
             try
             {
-                BoneMapper b = BoneMapper.playersToMappers[self.clingingToPlayer];
+                BoneMapper b = BoneMapper.playersToMappers[self.clingingToPlayer.gameObject];
                 b.canThirdPerson = true;
                 if ((b.temporarilyThirdPerson == TempThirdPerson.on) || (b.local && b.ThirdPersonCheck()))
                 {

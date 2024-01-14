@@ -82,7 +82,7 @@ public class BoneMapper : MonoBehaviour
     internal int originalCullingMask;
     internal bool needToTurnOffRenderingThing = false;
     public BoneMapper currentlyLockedBoneMapper;
-    public static Dictionary<PlayerControllerB, BoneMapper> playersToMappers = new Dictionary<PlayerControllerB, BoneMapper>();
+    public static Dictionary<GameObject, BoneMapper> playersToMappers = new Dictionary<GameObject, BoneMapper>();
     public AudioSource personalAudioSource;
     public bool isServer = false;
     public int networkId;
@@ -530,14 +530,11 @@ public class BoneMapper : MonoBehaviour
             mapperBody = gameObject;
         }
         playerController = mapperBody.GetComponent<PlayerControllerB>();
-        if (playerController is not null)
-        {
-            playersToMappers.Add(playerController, this);
-        }
-        else
+        if (playerController is null)
         {
             enemyController = mapperBody.GetComponent<EnemyAI>();
         }
+        playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
 
@@ -1049,10 +1046,7 @@ public class BoneMapper : MonoBehaviour
     }
     void OnDestroy()
     {
-        if (playerController is not null)
-        {
-            playersToMappers.Remove(playerController);
-        }
+        playersToMappers.Remove(mapperBody);
         try
         {
             currentClip.clip[0].ToString();
