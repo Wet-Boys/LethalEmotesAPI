@@ -40,6 +40,7 @@ namespace EmotesAPI
     [BepInDependency("me.swipez.melonloader.morecompany", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("Ooseykins.LethalVRM", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("io.daxcess.lcvr", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.potatoepet.AdvancedCompany", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
@@ -77,6 +78,7 @@ namespace EmotesAPI
         public static bool ModelReplacementAPIPresent;
         public static bool MoreCompanyPresent;
         public static bool VRMPresent;
+        public static bool AdvancedCompanyPresent;
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -301,7 +303,7 @@ namespace EmotesAPI
         {
             if (self.playerHeldBy is not null)
             {
-                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy];
+                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy.gameObject];
                 if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
                 {
                     foreach (var item in mapper.itemHolderConstraints)
@@ -380,6 +382,7 @@ namespace EmotesAPI
             ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
             MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
             VRMPresent = Chainloader.PluginInfos.ContainsKey("Ooseykins.LethalVRM");
+            AdvancedCompanyPresent = Chainloader.PluginInfos.ContainsKey("com.potatoepet.AdvancedCompany");
 
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
@@ -438,7 +441,10 @@ namespace EmotesAPI
             {
                 VRMCompat.SetupUpdateVisibilityHook();
             }
-
+            if (AdvancedCompanyPresent)
+            {
+                AdvancedCompanyCompat.SetupUpdateVisibilityHook();
+            }
 
 
             EnemySkeletons.SetupEnemyHooks();
@@ -841,7 +847,7 @@ namespace EmotesAPI
 
                 if (mapper.local && hudObject is not null)
                 {
-                    CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0);
+                    CustomEmotesAPI.currentEmoteText.text = "";
                 }
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
