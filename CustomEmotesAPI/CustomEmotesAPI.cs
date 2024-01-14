@@ -308,7 +308,7 @@ namespace EmotesAPI
         //Vector3 prevCamPosition = Vector3.zero;
         internal static void AutoWalking(PlayerControllerB player)
         {
-            if (player == StartOfRound.Instance.localPlayerController)
+            if (player == StartOfRound.Instance.localPlayerController && player is not null)
             {
                 if (localMapper)
                 {
@@ -746,6 +746,12 @@ namespace EmotesAPI
         static int requestCounter = 0;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            if (mapper is null)
+            {
+                DebugClass.Log("AnimChanged called on null BoneMapper!");
+                return;
+            }
+            
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
