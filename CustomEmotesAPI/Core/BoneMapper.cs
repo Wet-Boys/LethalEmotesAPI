@@ -3,6 +3,7 @@ using EmotesAPI;
 using GameNetcodeStuff;
 using LethalEmotesAPI;
 using LethalEmotesAPI.Patches;
+using LethalEmotesAPI.Patches.ModCompat;
 using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
@@ -1262,6 +1263,7 @@ public class BoneMapper : MonoBehaviour
         playerController.thisPlayerModel.gameObject.layer = 1;
         playerController.grabDistance = 5.65f;
         playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
+        playerController.gameplayCamera.cullingMask |= 1 << 23;
         thirdPersonConstraint.ActivateConstraints();
         isInThirdPerson = true;
         if (CustomEmotesAPI.MoreCompanyPresent)
@@ -1292,6 +1294,7 @@ public class BoneMapper : MonoBehaviour
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;
             isInThirdPerson = false;
+
             if (CustomEmotesAPI.MoreCompanyPresent && needToTurnOffCosmetics)
             {
                 try
