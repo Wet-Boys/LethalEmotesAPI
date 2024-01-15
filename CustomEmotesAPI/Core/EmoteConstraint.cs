@@ -73,12 +73,20 @@ public class EmoteConstraint : MonoBehaviour
             }
         }
     }
-    internal IEnumerator FirstTimeActiveFix(EmoteConstraint e)
+    internal IEnumerator FirstTimeActiveFix(EmoteConstraint e)//this is used for some enemies that just don't like to have their emote constraints work unless I do this? Not really sure why but it's not a huge deal tbh
     {
         e.enabled = false;
         yield return new WaitForEndOfFrame();
         e.enabled = true;
-        e.ActivateConstraints();
+        if (e.onlyY)
+        {
+            e.ActivateConstraints();
+            e.onlyY = true;
+        }
+        else
+        {
+            e.ActivateConstraints();
+        }
     }
     public void DeactivateConstraints()
     {
