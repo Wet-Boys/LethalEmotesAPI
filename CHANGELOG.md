@@ -1,3 +1,5 @@
+- Version 1.2.4: Fixed the first time any first person emote played, it would be camera locked.
+
 - Version 1.2.3: Fixed being able to emoting during AC's terminal, fixed emote text not always showing up top
 
 - Verison 1.2.2: Fixed a critical incompatibility issue I caused. Fixed first person arms not working when animating
