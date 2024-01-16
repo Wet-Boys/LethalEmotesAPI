@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Use this when reporting issues.
+about: Use this when reporting issues/Incompatibilities.
 title: ''
 labels: possible bug
 assignees: ''
