@@ -33,7 +33,7 @@ namespace LethalEmotesAPI
                     needToContinueOnFinish = false;
                     return;
                 }
-                audioSource.timeSamples = 0;
+                audioSource.time = 0;
                 if (CheckDMCA(currentClipDMCA))
                 {
                     audioSource.clip = BoneMapper.secondaryDMCAFreeAudioClips[syncPos][currEvent];
@@ -74,7 +74,7 @@ namespace LethalEmotesAPI
             {
                 return;
             }
-            audioSource.timeSamples = 0;
+            audioSource.time = 0;
             this.syncPos = syncPos;
             this.currEvent = currEvent;
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0 && sync)
@@ -152,6 +152,7 @@ namespace LethalEmotesAPI
             if (a)
             {
                 audioSource.clip = a;
+                audioSource.volume = 0;
                 audioSource.Play();
             }
             else
@@ -163,14 +164,15 @@ namespace LethalEmotesAPI
         {
             if (BoneMapper.listOfCurrentEmoteAudio[syncPos].Count != 0)
             {
-                audioSource.timeSamples = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].timeSamples;
+                audioSource.time = BoneMapper.listOfCurrentEmoteAudio[syncPos][0].time;
                 var theBusStopProblem = gameObject.AddComponent<BusStop>();
                 theBusStopProblem.desiredSampler = BoneMapper.listOfCurrentEmoteAudio[syncPos][0];
                 theBusStopProblem.receiverSampler = audioSource;
             }
             else
             {
-                audioSource.timeSamples = 0;
+                audioSource.volume = Settings.EmotesVolume.Value / 100f;
+                audioSource.time = 0;
             }
         }
         public bool CheckDMCA(bool willGetClaimed)
@@ -203,12 +205,13 @@ namespace LethalEmotesAPI
         {
             if (!desiredSampler)
             {
+                receiverSampler.volume = Settings.EmotesVolume.Value / 100f;
                 DestroyImmediate(this);
             }
-            if (desiredSampler.timeSamples != receiverSampler.timeSamples)
+            if (desiredSampler.time != receiverSampler.time)
             {
                 receiverSampler.volume = 0;
-                receiverSampler.timeSamples = desiredSampler.timeSamples;
+                receiverSampler.time = desiredSampler.time;
                 success = 0;
             }
             else

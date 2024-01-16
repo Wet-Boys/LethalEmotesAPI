@@ -1137,7 +1137,6 @@ public class BoneMapper : MonoBehaviour
                 dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
             foreach (var bone in emoteSkeletonAnimator.GetBoneTransform(item).GetComponentsInChildren<Transform>())
             {
-
                 dontAnimateUs.Add(bone.name);
             }
         }
@@ -1153,7 +1152,9 @@ public class BoneMapper : MonoBehaviour
                         if (smr.bones[i].gameObject.GetComponent<EmoteConstraint>() && !dontAnimateUs.Contains(smr.bones[i].name))
                         {
                             //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
-                            smr.bones[i].gameObject.GetComponent<EmoteConstraint>().ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
+                            EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
+                            ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
+                            ec.localTransforms = currentClip.localTransforms;
                         }
                         else if (dontAnimateUs.Contains(smr.bones[i].name))
                         {

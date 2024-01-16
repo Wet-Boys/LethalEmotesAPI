@@ -37,6 +37,7 @@ namespace EmotesAPI
         public float audioLevel = .5f; // determines the volume of the emote in terms of alerting enemies, 0 is nothing, 1 is max
         public bool thirdPerson = false; // If true, will default animation to third person, although there are user settings to override this in either direction
         public string displayName = ""; //If specified, will replace the name of the emote in the top left corner when emoting. Use this primarily for hidden emotes that you still want to show up there.
+        public bool useLocalTransforms = false;
 
         /// <summary>
         /// <see cref="BepInPlugin"/> of the mod that created this <see cref="AnimationClipParams"/>.
