@@ -1,3 +1,5 @@
+- Version 1.2.6: Fixed audio sync issues, hopefully people will no longer be suffering randomly. Added useLocalTransforms to AnimationClipParams, this is primarily for if you are trying to do something like an upper body only animation where you  ignore the legs/pelvis
+
 - Version 1.2.5: Fixed head not having proper mapping for emotes.
 
 - Version 1.2.4: Fixed the first time any first person emote played, it would be camera locked.
