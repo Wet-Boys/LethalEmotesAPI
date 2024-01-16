@@ -328,6 +328,7 @@ namespace EmotesAPI
                 if (localMapper)
                 {
                     bool originalIsNotZero = player.moveInputVector != Vector2.zero;
+                    BoneMapper.moving = originalIsNotZero;
                     if (localMapper.autoWalkSpeed != 0)
                     {
                         if (localMapper.overrideMoveSpeed)
