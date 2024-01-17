@@ -118,4 +118,10 @@ public class EmoteConstraint : MonoBehaviour
         constraint.revertTransform = mapper.revertTransform;
         return constraint;
     }
+
+    void Start()
+    {
+        ActivateConstraints();
+        DeactivateConstraints();
+    }
 }

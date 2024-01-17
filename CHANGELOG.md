@@ -1,3 +1,5 @@
+- Version 1.2.7: Quick fix preventing spaghettification if your first emote has bones ignored from it's animation (literally no use case right now but just future proofing it)
+
 - Version 1.2.6: Fixed audio sync issues, hopefully people will no longer be suffering randomly. Added useLocalTransforms to AnimationClipParams, this is primarily for if you are trying to do something like an upper body only animation where you  ignore the legs/pelvis
 
 - Version 1.2.5: Fixed head not having proper mapping for emotes.
