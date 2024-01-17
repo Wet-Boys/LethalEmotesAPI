@@ -1,3 +1,5 @@
+- Version 1.2.9: Fixed issue where I was locking the camera when I wasn't supposed to
+
 - Verison 1.2.8: Fixed coil heads eating their own ass
 
 - Version 1.2.7: Quick fix preventing spaghettification if your first emote has bones ignored from it's animation (literally no use case right now but just future proofing it)
