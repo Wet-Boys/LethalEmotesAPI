@@ -110,7 +110,7 @@ namespace LethalEmotesAPI.Core
             g.transform.SetParent(t);
             g.transform.localPosition = Vector3.zero;
             g.transform.localEulerAngles = new Vector3(-90, 0, 0);
-            b.additionalConstraints.Add(EmoteConstraint.AddConstraint(head.gameObject, b, g.transform));
+            b.additionalConstraints.Add(EmoteConstraint.AddConstraint(head.gameObject, b, g.transform, true));
 
         }
         private static Hook SpringManAIStartHook;

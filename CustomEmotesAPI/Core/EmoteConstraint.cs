@@ -20,6 +20,7 @@ public class EmoteConstraint : MonoBehaviour
     public bool onlyY = false;
     public bool debug = false;
     public bool localTransforms = false;
+    internal bool needToFix = true;
     void LateUpdate()
     {
         ActUponConstraints();
@@ -111,11 +112,12 @@ public class EmoteConstraint : MonoBehaviour
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
     }
-    internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target)
+    internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target, bool needToFix)
     {
         EmoteConstraint constraint = gameObject.AddComponent<EmoteConstraint>();
         constraint.AddSource(gameObject.transform, target);
         constraint.revertTransform = mapper.revertTransform;
+        constraint.needToFix = needToFix;
         return constraint;
     }
 
@@ -126,8 +128,11 @@ public class EmoteConstraint : MonoBehaviour
     IEnumerator FixConstraints()
     {
         yield return new WaitForEndOfFrame();
-        ActivateConstraints();
-        yield return new WaitForEndOfFrame();
-        DeactivateConstraints();
+        if (needToFix)
+        {
+            ActivateConstraints();
+            yield return new WaitForEndOfFrame();
+            DeactivateConstraints();
+        }
     }
 }
