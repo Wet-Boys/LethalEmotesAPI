@@ -121,7 +121,13 @@ public class EmoteConstraint : MonoBehaviour
 
     void Start()
     {
+        StartCoroutine(FixConstraints());
+    }
+    IEnumerator FixConstraints()
+    {
+        yield return new WaitForEndOfFrame();
         ActivateConstraints();
+        yield return new WaitForEndOfFrame();
         DeactivateConstraints();
     }
 }

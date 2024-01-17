@@ -128,6 +128,7 @@ namespace LethalEmotesAPI.Utils
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_worm");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_baboon hawk thing");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_manticoil");
+            CustomEmotesAPI.AddNonAnimatingEmote("enemies default dance");
             CustomEmotesAPI.animChanged += CustomEmotesAPI_animChanged;
         }
         private static QuickMenuManager quickMenuManagerInstance;
@@ -185,6 +186,15 @@ namespace LethalEmotesAPI.Utils
                     break;
                 case "spawn_manticoil":
                     RoundManager.Instance.SpawnEnemyGameObject(mapper.transform.position, 0, 1, manticoil);
+                    break;
+                case "enemies default dance":
+                    foreach (var item in BoneMapper.allMappers)
+                    {
+                        if (item.isEnemy)
+                        {
+                            CustomEmotesAPI.PlayAnimation("DanceMoves", item);
+                        }
+                    }
                     break;
                 default:
                     break;
