@@ -1,3 +1,5 @@
+- Version 1.2.10: Hardened code on spawning to prevent conflicts with weird mod configurations
+
 - Version 1.2.9: Fixed issue where I was locking the camera when I wasn't supposed to
 
 - Verison 1.2.8: Fixed coil heads eating their own ass
