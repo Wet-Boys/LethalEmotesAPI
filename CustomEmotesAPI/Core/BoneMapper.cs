@@ -607,6 +607,10 @@ public class BoneMapper : MonoBehaviour
             }
             //a1.enabled = false;
         }
+        foreach (var item in emoteSkeletonSMR.bones)
+        {
+            item.name += "_EmoteBone";
+        }
         transform.localPosition = Vector3.zero;
         CustomEmotesAPI.MapperCreated(this);
         if (playerController is not null)
@@ -621,9 +625,9 @@ public class BoneMapper : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
-        itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder");
-        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/spine/spine.001/spine.002/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/ServerItemHolder").gameObject, this, itemHolderPosition, true));
-        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(mapperBody.transform.Find("ScavengerModel/metarig/ScavengerModelArmsOnly/metarig/spine.003/shoulder.R/arm.R_upper/arm.R_lower/hand.R/LocalItemHolder").gameObject, this, itemHolderPosition, true));
+        itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder_EmoteBone");
+        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.serverItemHolder.gameObject, this, itemHolderPosition, true));
+        itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.localItemHolder.gameObject, this, itemHolderPosition, true));
     }
     public GameObject parentGameObject;
     public bool positionLock, rotationLock, scaleLock;
@@ -794,6 +798,19 @@ public class BoneMapper : MonoBehaviour
     }
     void Health()
     {
+        if (playerController is not null)
+        {
+            if (playerController.health <= 0 && local)
+            {
+                CustomEmotesAPI.PlayAnimation("none");
+                foreach (var item in props)
+                {
+                    if (item)
+                        GameObject.Destroy(item);
+                }
+                props.Clear();
+            }
+        }
         //todo health
         //if (h <= 0)
         //{
