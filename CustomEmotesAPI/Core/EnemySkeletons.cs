@@ -105,7 +105,7 @@ namespace LethalEmotesAPI.Core
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
-            Transform t = b.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).Find("springBone.002").Find("springBone.002_end");
+            Transform t = b.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).Find("springBone.002_EmoteBone").Find("springBone.002_end_EmoteBone");
             GameObject g = new GameObject();
             g.transform.SetParent(t);
             g.transform.localPosition = Vector3.zero;

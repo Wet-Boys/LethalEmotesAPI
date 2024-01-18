@@ -120,26 +120,31 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            int SMR1 = 0, SMR2 = 0;
-            //this may seem hacky, but I would argue mods inserting SMRs into the bone structure is more hacky so I'm just being safe
-            for (int i = 0; i < self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>().Length; i++)
-            {
-                if (self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == self.thisPlayerModelLOD1)
-                {
-                    SMR1 = i;
-                }
-                else if (self.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == self.thisPlayerModelArms)
-                {
-                    SMR2 = i;
-                }
-            }
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
+            self.StartCoroutine(ImportPlayerSkeleton(self));
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
             {
                 GameObject networker = Instantiate<GameObject>(emoteNetworker);
                 networker.GetComponent<NetworkObject>().Spawn(true);
             }
+        }
+        IEnumerator ImportPlayerSkeleton(PlayerControllerB player)
+        {
+            yield return new WaitForEndOfFrame();
+            int SMR1 = 0, SMR2 = 0;
+            //this may seem hacky, but I would argue mods inserting SMRs into the bone structure is more hacky so I'm just being safe
+            for (int i = 0; i < player.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>().Length; i++)
+            {
+                if (player.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == player.thisPlayerModelLOD1)
+                {
+                    SMR1 = i;
+                }
+                else if (player.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == player.thisPlayerModelArms)
+                {
+                    SMR2 = i;
+                }
+            }
+            AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
         }
         private static Hook playerControllerStartHook;
 
