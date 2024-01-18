@@ -607,10 +607,10 @@ public class BoneMapper : MonoBehaviour
             }
             //a1.enabled = false;
         }
-        foreach (var item in emoteSkeletonSMR.bones)
-        {
-            item.name += "_EmoteBone";
-        }
+        //foreach (var item in emoteSkeletonSMR.bones)
+        //{
+        //    item.name += "_EmoteBone";
+        //}
         transform.localPosition = Vector3.zero;
         CustomEmotesAPI.MapperCreated(this);
         if (playerController is not null)
@@ -625,7 +625,7 @@ public class BoneMapper : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
-        itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder_EmoteBone");
+        itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder");
         itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.serverItemHolder.gameObject, this, itemHolderPosition, true));
         itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.localItemHolder.gameObject, this, itemHolderPosition, true));
     }

@@ -18,13 +18,14 @@ internal static class AnimationReplacements
     internal static BoneMapper Import(GameObject prefab, string skeleton, int[] pos, bool hidemesh = true)
     {
         GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-        Assets.Load<GameObject>(skeleton).GetComponent<Animator>().runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
-        BoneMapper b = AnimationReplacements.ApplyAnimationStuff(prefab, GameObject.Instantiate(Assets.Load<GameObject>(skeleton)), pos, hidemesh, revertBonePositions: true);
+        GameObject emoteSkeleton = GameObject.Instantiate(Assets.Load<GameObject>(skeleton));
+        emoteSkeleton.GetComponent<Animator>().runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
+        BoneMapper b = AnimationReplacements.ApplyAnimationStuff(prefab, emoteSkeleton, pos, hidemesh, revertBonePositions: true);
         g.transform.SetParent(b.transform);
-        foreach (var item in g.GetComponentsInChildren<Transform>())
-        {
-            item.name += "_runttimeAnimatorControllerHolder";
-        }
+        //foreach (var item in g.GetComponentsInChildren<Transform>())
+        //{
+        //    item.name += "_runttimeAnimatorControllerHolder";
+        //}
         return b;
     }
     public static void DebugBones(GameObject fab)
