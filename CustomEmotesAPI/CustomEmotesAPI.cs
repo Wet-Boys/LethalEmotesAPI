@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.2.10";
+        public const string VERSION = "1.2.11";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -120,7 +120,8 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            self.StartCoroutine(ImportPlayerSkeleton(self));
+            GameObject g = new GameObject();
+            g.AddComponent<AudioContainer>().StartCoroutine(ImportPlayerSkeleton(self));
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
             {
@@ -145,6 +146,7 @@ namespace EmotesAPI
                 }
             }
             AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
+            Destroy(gameObject);
         }
         private static Hook playerControllerStartHook;
 
