@@ -800,7 +800,7 @@ public class BoneMapper : MonoBehaviour
     {
         if (playerController is not null)
         {
-            if (playerController.health <= 0 && local)
+            if (playerController.isPlayerDead && local)
             {
                 CustomEmotesAPI.PlayAnimation("none");
                 foreach (var item in props)
