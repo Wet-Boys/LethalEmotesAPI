@@ -1,3 +1,7 @@
+- Version 1.2.12: I suck
+
+- Version 1.2.11: emergency fix oooooooooooooooooooooooooooooooooops
+
 - Version 1.2.10: Hardened code on spawning to prevent conflicts with weird mod configurations
 
 - Version 1.2.9: Fixed issue where I was locking the camera when I wasn't supposed to
