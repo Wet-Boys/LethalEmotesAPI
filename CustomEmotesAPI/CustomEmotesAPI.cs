@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.2.12";
+        public const string VERSION = "1.2.13";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -146,7 +146,15 @@ namespace EmotesAPI
                 }
             }
             AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
-            Destroy(gameObject);
+
+            //TODO this cleanup is not working?????
+            try
+            {
+                Destroy(gameObject);
+            }
+            catch (Exception)
+            {
+            }
         }
         private static Hook playerControllerStartHook;
 
@@ -323,6 +331,25 @@ namespace EmotesAPI
         }
         private static Hook GrabbableObjectLateUpdateHook;
 
+        private void StartPerformingEmoteClientRpc(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            orig(self);
+            try
+            {
+                DebugClass.Log($"we are playing on {self.gameObject}");
+                BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
+                if (mapper.emoteSkeletonAnimator.enabled)
+                {
+                    PlayAnimation("none", mapper);
+                }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"couldn't find bonemapper? {e}");
+            }
+        }
+        private static Hook StartPerformingEmoteClientRpcHook;
+
 
         private static GameObject emoteNetworker;
 
@@ -444,6 +471,8 @@ namespace EmotesAPI
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
+
             CentipedePatches.PatchAll();
             if (VRMPresent)
             {
@@ -506,8 +535,24 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
+            //EmotesInputSettings.Instance.LigmaBalls.started += LigmaBalls_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
+
+        bool yote = true;
+        private void LigmaBalls_started(InputAction.CallbackContext obj)
+        {
+            yote = !yote;
+            if (yote)
+            {
+                localMapper.UnlockBones();
+            }
+            else
+            {
+                localMapper.LockBones();
+            }
+        }
+
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
             if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
@@ -786,7 +831,7 @@ namespace EmotesAPI
                 DebugClass.Log("AnimChanged called on null BoneMapper!");
                 return;
             }
-            
+
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
             mapper.currentClipName = newAnimation;
             if (mapper == localMapper)

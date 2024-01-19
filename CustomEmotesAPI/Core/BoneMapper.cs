@@ -97,13 +97,19 @@ public class BoneMapper : MonoBehaviour
         }
         return animationName;
     }
+    IEnumerator actuallyPlayAnimation(string s, int pos)
+    {
+        yield return new WaitForEndOfFrame();
+        PlayAnim(s, pos);
+    }
     public void PlayAnim(string s, int pos, int eventNum)
     {
         desiredEvent = eventNum;
         s = GetRealAnimationName(s);
-        PlayAnim(s, pos);
+        //PlayAnim(s, pos);
+        StartCoroutine(actuallyPlayAnimation(s, pos));
     }
-    public void PlayAnim(string s, int pos)
+    internal void PlayAnim(string s, int pos)
     {
         ranSinceLastAnim = false;
         s = GetRealAnimationName(s);
@@ -1260,8 +1266,7 @@ public class BoneMapper : MonoBehaviour
         }
         playerController.thisPlayerModel.gameObject.layer = 1;
         playerController.grabDistance = 5.65f;
-        playerController.gameplayCamera.cullingMask = playerController.playersManager.spectateCamera.cullingMask;//some people use 960174079, but I think it just makes more sense to use spectate camera's culling mask since that is effectively what third person is
-        playerController.gameplayCamera.cullingMask |= 1 << 23;
+        playerController.gameplayCamera.cullingMask = StartOfRound.Instance.spectateCamera.cullingMask;//if you break the spectator culling mask, don't, stop, get some help
         thirdPersonConstraint.ActivateConstraints();
         isInThirdPerson = true;
         if (CustomEmotesAPI.MoreCompanyPresent)
