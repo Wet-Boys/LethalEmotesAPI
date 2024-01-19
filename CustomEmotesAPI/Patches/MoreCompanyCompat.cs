@@ -41,7 +41,14 @@ namespace LethalEmotesAPI.Patches
             {
                 if (item)
                 {
-                    item.ClearCosmetics();
+                    foreach (var cosmetic in item.spawnedCosmetics)
+                    {
+                        cosmetic.gameObject.layer = 23;//I hate layer 23 so much but everyone does it cause mirror mod does it so I guess I fall in line :/
+                        foreach (var t in cosmetic.gameObject.GetComponentsInChildren<Transform>())
+                        {
+                            t.gameObject.layer = 23;
+                        }
+                    }
                 }
             }
 
