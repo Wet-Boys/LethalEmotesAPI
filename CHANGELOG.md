@@ -1,3 +1,5 @@
+- Version 1.2.13: Changed the third person camera to truly use the spectator camera's culling mask. This means it will only be able to see what you can see while spectating players (but it does mean if the spectator camera get's messed up, well... but this is better than the previous solution). Fixed issue when combing emotes from emotes api and toomanyemotes at the same time. The only conflict was when both played at the same time, so now emotes properly end when the other gets played to prevent this.
+
 - Version 1.2.12: I suck
 
 - Version 1.2.11: emergency fix oooooooooooooooooooooooooooooooooops
