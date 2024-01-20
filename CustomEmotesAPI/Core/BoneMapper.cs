@@ -1177,7 +1177,10 @@ public class BoneMapper : MonoBehaviour
                             //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
                             EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
                             ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
-                            ec.localTransforms = currentClip.localTransforms;
+                            if (smr == basePlayerModelSMR.First())
+                            {
+                                ec.localTransforms = currentClip.localTransforms;
+                            }
                         }
                         else if (dontAnimateUs.Contains(smr.bones[i].name))
                         {
