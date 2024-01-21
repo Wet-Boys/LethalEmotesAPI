@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.2.14";
+        public const string VERSION = "1.2.15";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -162,15 +162,25 @@ namespace EmotesAPI
         public static List<GameObject> networkedObjects = new List<GameObject>();
         private void NetworkManagerStart(Action<GameNetworkManager> orig, GameNetworkManager self)
         {
-            orig(self);
-            emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
-            //emoteNetworker.AddComponent<NetworkObject>();
-            emoteNetworker.AddComponent<EmoteNetworker>();
-            GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
-            foreach (var item in networkedObjects)
+            try
             {
-                GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(item);
+                emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
+
+                emoteNetworker.AddComponent<EmoteNetworker>();
+
+                GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
+
+                foreach (var item in networkedObjects)
+                {
+                    GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(item);
+                }
             }
+            catch (Exception)
+            {
+                DebugClass.Log($"Couldn't setup LethalEmotesAPI's networker");
+            }
+            orig(self);
+
         }
         private static Hook networkManagerStartHook;
         private void StartOfRoundUpdate(Action<StartOfRound> orig, StartOfRound self)
