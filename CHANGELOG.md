@@ -1,3 +1,5 @@
+- Version 1.2.15: Upped LethalEmotesAPI priority in GameNetworkManager's Start but added a try catch block to attempt to sidestep some conflicts 
+
 - Version 1.2.14: Fixed issue where I was destroying cosmetics when other mods still need them
 
 - Version 1.2.13: Changed the third person camera to truly use the spectator camera's culling mask. This means it will only be able to see what you can see while spectating players (but it does mean if the spectator camera get's messed up, well... but this is better than the previous solution). Fixed issue when combing emotes from emotes api and toomanyemotes at the same time. The only conflict was when both played at the same time, so now emotes properly end when the other gets played to prevent this.
