@@ -128,7 +128,8 @@ namespace LethalEmotesAPI.Utils
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_worm");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_baboon hawk thing");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_manticoil");
-            CustomEmotesAPI.AddNonAnimatingEmote("enemies default dance");
+            CustomEmotesAPI.AddNonAnimatingEmote("enemies test dance");
+            CustomEmotesAPI.AddNonAnimatingEmote("enemies random dance");
             CustomEmotesAPI.animChanged += CustomEmotesAPI_animChanged;
         }
         private static QuickMenuManager quickMenuManagerInstance;
@@ -187,12 +188,22 @@ namespace LethalEmotesAPI.Utils
                 case "spawn_manticoil":
                     RoundManager.Instance.SpawnEnemyGameObject(mapper.transform.position, 0, 1, manticoil);
                     break;
-                case "enemies default dance":
+                case "enemies test dance":
                     foreach (var item in BoneMapper.allMappers)
                     {
                         if (item.isEnemy)
                         {
-                            CustomEmotesAPI.PlayAnimation("DanceMoves", item);
+                            CustomEmotesAPI.PlayAnimation("JJK Lost in Paradise", item);
+                        }
+                    }
+                    break;
+                case "enemies random dance":
+                    foreach (var item in BoneMapper.allMappers)
+                    {
+                        if (item.isEnemy)
+                        {
+                            int rand = UnityEngine.Random.Range(0, CustomEmotesAPI.randomClipList.Count);
+                            CustomEmotesAPI.PlayAnimation(CustomEmotesAPI.randomClipList[rand], item);
                         }
                     }
                     break;

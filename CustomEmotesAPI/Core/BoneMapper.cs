@@ -102,7 +102,7 @@ public class BoneMapper : MonoBehaviour
         yield return new WaitForEndOfFrame();
         PlayAnim(s, pos);
     }
-    public void PlayAnim(string s, int pos, int eventNum)
+    public void PlayAnim(string s, int pos, int eventNum = -1)
     {
         desiredEvent = eventNum;
         s = GetRealAnimationName(s);
@@ -339,7 +339,14 @@ public class BoneMapper : MonoBehaviour
         twopart = false;
         NewAnimation(currentClip.joinSpots);
 
-        CustomEmotesAPI.Changed(s, this);
+        if (currentClip.usesNewImportSystem)
+        {
+            CustomEmotesAPI.Changed(currentClip.customName, this);
+        }
+        else
+        {
+            CustomEmotesAPI.Changed(s, this);
+        }
     }
     public void StartAnimations(AnimatorOverrideController animController, int pos, Animator animator)
     {

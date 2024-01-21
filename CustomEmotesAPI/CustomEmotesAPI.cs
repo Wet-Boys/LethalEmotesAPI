@@ -71,28 +71,20 @@ namespace EmotesAPI
         {
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
-        public static List<string> allClipNames = new List<string>();
         public static List<string> randomClipList = new List<string>();
-        public static List<int> blacklistedClips = new List<int>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
         public static bool MoreCompanyPresent;
         public static bool VRMPresent;
         public static bool AdvancedCompanyPresent;
-        public static void BlackListEmote(string name)
-        {
-            for (int i = 0; i < allClipNames.Count; i++)
-            {
-                if (allClipNames[i] == name)
-                {
-                    blacklistedClips.Add(i);
-                    return;
-                }
-            }
-        }
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
+        }
+        [Obsolete("Does nothing, but not removing to not brick stuff")]
+        public static void BlackListEmote(string name)
+        {
+            //lmao this does nothing
         }
         internal static bool GetKey(ConfigEntry<KeyboardShortcut> entry)
         {
@@ -164,7 +156,6 @@ namespace EmotesAPI
         {
             orig(self);
             emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
-            //emoteNetworker.AddComponent<NetworkObject>();
             emoteNetworker.AddComponent<EmoteNetworker>();
             GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
             foreach (var item in networkedObjects)
@@ -513,7 +504,7 @@ namespace EmotesAPI
 
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
 
-            //DebugCommands.Debugcommands();
+            DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -690,13 +681,13 @@ namespace EmotesAPI
             return GameObject.Instantiate(BoneMapper.allWorldProps[propPos].prop);
         }
 
+
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
             var ownerPlugin = Assembly.GetCallingAssembly().GetBepInPlugin();
 
             if (visible)
             {
-                allClipNames.Add(emoteName);
                 if (!BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
                 {
                     randomClipList.Add(emoteName);
@@ -707,6 +698,7 @@ namespace EmotesAPI
             if (ownerPlugin is not null)
                 EmoteUiManager.GetStateController()!.EmoteDb.AssociateEmoteKeyWithMod(emoteName, ownerPlugin.Name);
         }
+        [Obsolete("please use EmoteImporter.ImportEmote instead.")]
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
             if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name))
@@ -750,17 +742,9 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms, false);
             if (animationClipParams.visible)
             {
-                if (animationClipParams.customName != "")
-                {
-                    allClipNames.Add(animationClipParams.customName);
-                }
-                else
-                {
-                    allClipNames.Add(animationClipParams.animationClip[0].name);
-                }
                 if (!BlacklistSettings.emotesExcludedFromRandom.Contains(animationClipParams.animationClip[0].name))
                 {
                     randomClipList.Add(animationClipParams.animationClip[0].name);
@@ -826,6 +810,7 @@ namespace EmotesAPI
         static int requestCounter = 0;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            DebugClass.Log($"changed: {newAnimation}");
             if (mapper is null)
             {
                 DebugClass.Log("AnimChanged called on null BoneMapper!");
