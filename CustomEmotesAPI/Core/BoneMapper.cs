@@ -213,6 +213,7 @@ public class BoneMapper : MonoBehaviour
         {
             prevClip = currentClip;
             currentClip = animClips[s];
+            DebugClass.Log($"animClips[{s}] custom name is {currentClip.customInternalName}");
             try
             {
                 currentClip.clip[0].ToString();
@@ -320,9 +321,9 @@ public class BoneMapper : MonoBehaviour
             {
                 CustomEmotesAPI.currentEmoteText.text = currentClip.displayName;
             }
-            else if (currentClip.customName != "")
+            else if (currentClip.customInternalName != "")
             {
-                CustomEmotesAPI.currentEmoteText.text = currentClip.customName;
+                CustomEmotesAPI.currentEmoteText.text = currentClip.customInternalName;
             }
             else
             {
@@ -341,7 +342,7 @@ public class BoneMapper : MonoBehaviour
 
         if (currentClip.usesNewImportSystem)
         {
-            CustomEmotesAPI.Changed(currentClip.customName, this);
+            CustomEmotesAPI.Changed(currentClip.customInternalName, this);
         }
         else
         {

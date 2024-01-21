@@ -67,7 +67,6 @@ public class SegmentLabel : UIBehaviour
     {
         if (targetText is null || _emoteKey is null)
             return;
-        
         targetText.SetText(EmoteUiManager.GetEmoteName(_emoteKey));
     }
 

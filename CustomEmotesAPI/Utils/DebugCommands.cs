@@ -13,9 +13,7 @@ namespace LethalEmotesAPI.Utils
         private void QuickMenuManagerStart(Action<QuickMenuManager> orig, QuickMenuManager self)
         {
             quickMenuManagerInstance = self;
-            DebugClass.Log($"setting self to {self}");
             orig(self);
-            DebugClass.Log($"enemy count: {self.testAllEnemiesLevel.Enemies.Count}     {self.testAllEnemiesLevel.OutsideEnemies.Count}   {self.testAllEnemiesLevel.DaytimeEnemies.Count}");
             foreach (var item in self.testAllEnemiesLevel.Enemies)
             {
                 RegisterEnemyType(item.enemyType);

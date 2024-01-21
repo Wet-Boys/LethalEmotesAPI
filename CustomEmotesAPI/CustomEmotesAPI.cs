@@ -156,6 +156,8 @@ namespace EmotesAPI
         {
             try
             {
+                LethalEmotesUiState.FixLegacyEmotes();
+
                 emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
 
                 emoteNetworker.AddComponent<EmoteNetworker>();

@@ -6,6 +6,7 @@ using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
+using LethalEmotesApi.Ui;
 
 namespace LethalEmotesAPI;
 
@@ -84,11 +85,33 @@ public class LethalEmotesUiState : IEmoteUiStateController
         BlacklistSettings.RemoveFromExcludeList(emoteKey);
     }
 
+    internal static void FixLegacyEmotes()
+    {
+        EmoteWheelSetData e = EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
+        foreach (var wheel in e.EmoteWheels)
+        {
+            for (int i = 0; i < wheel.Emotes.Length; i++)
+            {
+                if (!BoneMapper.animClips.ContainsKey(wheel.Emotes[i]))
+                {
+                    foreach (var key in BoneMapper.animClips.Keys)
+                    {
+                        if (key.Contains(wheel.Emotes[i]) || (BoneMapper.animClips[key] is not null && BoneMapper.animClips[key].clip[0].name == wheel.Emotes[i]))
+                        {
+                            wheel.Emotes[i] = key;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        Settings.EmoteWheelSetDataEntryString.Value = e.ToJson();
+    }
     public EmoteWheelSetData LoadEmoteWheelSetData()
     {
+
         return EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
     }
-
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
         Settings.EmoteWheelSetDataEntryString.Value = dataToSave.ToJson();

@@ -66,6 +66,7 @@ namespace LethalEmotesAPI.ImportV2
                 }
             }
             BoneMapper.animClips.Add(animationClipParams.customName, clip);
+
         }
     }
 }

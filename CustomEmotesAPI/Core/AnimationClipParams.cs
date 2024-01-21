@@ -29,6 +29,9 @@ namespace EmotesAPI
         public int joinPref = -1; // Spot in animationClip array where a BoneMapper will play when there is at least one other instance of said emote playing, -1 is random, -2 is sequential, anything else is what you make it to be
         public JoinSpot[] joinSpots = null; // Array of join spots which will appear when the animation is playing
         public bool useSafePositionReset = false; // Unused in Lethal Company
+        /// <summary>
+        /// If using EmoteImporter.ImportEmote, use displayName instead
+        /// </summary>
         public string customName = ""; // Custom name for emote, if not specified, the first emote from animationClip will be used as the name
         public Action<BoneMapper> customPostEventCodeSync = null; // if declared, will fire when an emote plays audio with sync enabled
         public Action<BoneMapper> customPostEventCodeNoSync = null;// if declared, will fire when an emote plays audio with sync disabled

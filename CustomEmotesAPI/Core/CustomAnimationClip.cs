@@ -20,7 +20,7 @@ public class CustomAnimationClip : MonoBehaviour
     public int startPref, joinPref;
     public JoinSpot[] joinSpots;
     public bool useSafePositionReset;
-    public string customName;
+    public string customInternalName;
     public Action<BoneMapper> customPostEventCodeSync;
     public Action<BoneMapper> customPostEventCodeNoSync;
 
@@ -124,15 +124,14 @@ public class CustomAnimationClip : MonoBehaviour
             _joinSpots = new JoinSpot[0];
         joinSpots = _joinSpots;
         this.useSafePositionReset = safePositionReset;
-        this.customName = customName;
+        this.customInternalName = customName;
         this.usesNewImportSystem = usesNewImportSystem;
-        if (customName != "" && !usesNewImportSystem)
+        if (!usesNewImportSystem)
         {
-            BoneMapper.customNamePairs.Add(customName, _clip[0].name);
-        }
-        else
-        {
-            this.customName = clip[0].name;
+            if (customName != "")
+            {
+                BoneMapper.customNamePairs.Add(customName, _clip[0].name);
+            }
         }
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
         this.lockType = lockType;
@@ -140,6 +139,11 @@ public class CustomAnimationClip : MonoBehaviour
         this.audioLevel = audioLevel;
         this.thirdPerson = thirdPerson;
         this.displayName = displayName;
+        if (displayName == "")
+        {
+            DebugClass.Log($"display name wasn't set, using {this.customInternalName}");
+            this.displayName = this.customInternalName;
+        }
         this.ownerPlugin = ownerPlugin;
         this.localTransforms = localTransforms;
     }
