@@ -1,3 +1,5 @@
+- Version 1.3.2: Fixed syncing on emotes imported with the new system not working. Fixed oversight on MoreCompany cosmetic patches. Fixed when emotes get changed being a frame late
+
 - Version 1.3.1: Removed debug commands, oops
 
 - Version 1.3.0: Added new way to import emotes which allows more than one mod to have the same emote. This should address the issue where there are like 20 different emotes that are duplicated across multiple mods.
