@@ -148,13 +148,13 @@ namespace EmotesAPI
             AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
 
             //TODO this cleanup is not working?????
-            try
-            {
-                Destroy(gameObject);
-            }
-            catch (Exception)
-            {
-            }
+            //try
+            //{
+            //    Destroy(gameObject);
+            //}
+            //catch (Exception)
+            //{
+            //}
         }
         private static Hook playerControllerStartHook;
 
