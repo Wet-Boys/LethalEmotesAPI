@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.3.0";
+        public const string VERSION = "1.3.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -517,7 +517,7 @@ namespace EmotesAPI
 
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
 
-            DebugCommands.Debugcommands();
+            //DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
