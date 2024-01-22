@@ -811,8 +811,9 @@ namespace EmotesAPI
 
             if (newAnimation != "none")
             {
-                
-                mapper.personalTrigger.interactable = true; // enable tooltip
+ 
+                    mapper.personalTrigger.interactable = true; // enable tooltip
+
                 
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {

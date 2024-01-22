@@ -87,6 +87,7 @@ public class BoneMapper : MonoBehaviour
     public string currentJoinButton;
     public bool isServer = false;
     public int networkId;
+    public bool joined = false;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -517,7 +518,7 @@ public class BoneMapper : MonoBehaviour
         currentJoinButton = InputControlPath.ToHumanReadableString(
             EmotesInputSettings.Instance.JoinEmote.bindings[0].effectivePath,
             InputControlPath.HumanReadableStringOptions.OmitDevice);
-        personalTrigger.hoverTip = "Press " + currentJoinButton + " to join";
+        personalTrigger.hoverTip = "Press [" + currentJoinButton + "] to join";
     }
     
     void Start()
@@ -543,14 +544,13 @@ public class BoneMapper : MonoBehaviour
             mapperBody = gameObject;
         }
         playerController = mapperBody.GetComponent<PlayerControllerB>();
-        if (playerController is not null)
-        {
-            playersToMappers.Add(playerController.gameObject, this);
-        }
-        else
+        if (playerController is null)
         {
             enemyController = mapperBody.GetComponent<EnemyAI>();
+            
         }
+        playersToMappers.Add(mapperBody.gameObject, this);
+            
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
         
