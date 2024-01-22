@@ -97,19 +97,18 @@ public class BoneMapper : MonoBehaviour
         }
         return animationName;
     }
-    IEnumerator actuallyPlayAnimation(string s, int pos)
+    IEnumerator lockBonesAfterAFrame()
     {
         yield return new WaitForEndOfFrame();
-        PlayAnim(s, pos);
+        LockBones();
     }
-    public void PlayAnim(string s, int pos, int eventNum = -1)
+    public void PlayAnim(string s, int pos, int eventNum)
     {
         desiredEvent = eventNum;
         s = GetRealAnimationName(s);
-        //PlayAnim(s, pos);
-        StartCoroutine(actuallyPlayAnimation(s, pos));
+        PlayAnim(s, pos);
     }
-    internal void PlayAnim(string s, int pos)
+    public void PlayAnim(string s, int pos)
     {
         ranSinceLastAnim = false;
         s = GetRealAnimationName(s);
@@ -253,7 +252,7 @@ public class BoneMapper : MonoBehaviour
             {
                 pos = UnityEngine.Random.Range(0, currentClip.clip.Length);
             }
-            LockBones();
+            StartCoroutine(lockBonesAfterAFrame());
         }
 
         if (s == "none")

@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.3.1";
+        public const string VERSION = "1.3.2";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -643,8 +643,17 @@ namespace EmotesAPI
                         }
                         if (nearestMapper)
                         {
-                            PlayAnimation(nearestMapper.currentClip.clip[0].name);
-                            Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
+                            string animationName;
+                            if (nearestMapper.currentClip.usesNewImportSystem)
+                            {
+                                animationName = nearestMapper.currentClip.customInternalName;
+                            }
+                            else
+                            {
+                                animationName = nearestMapper.currentClip.clip[0].name;
+                            }
+                            PlayAnimation(animationName);
+                            Joined(animationName, localMapper, nearestMapper); //this is not networked and only sent locally FYI
                         }
                         nearestMapper = null;
                     }
