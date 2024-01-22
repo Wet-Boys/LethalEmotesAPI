@@ -1,3 +1,5 @@
+- Version 1.2.16: Fixed issue where we were breaking the bodycam mod
+
 - Version 1.2.15: Upped LethalEmotesAPI priority in GameNetworkManager's Start but added a try catch block to attempt to sidestep some conflicts 
 
 - Version 1.2.14: Fixed issue where I was destroying cosmetics when other mods still need them
