@@ -13,9 +13,7 @@ namespace LethalEmotesAPI.Utils
         private void QuickMenuManagerStart(Action<QuickMenuManager> orig, QuickMenuManager self)
         {
             quickMenuManagerInstance = self;
-            DebugClass.Log($"setting self to {self}");
             orig(self);
-            DebugClass.Log($"enemy count: {self.testAllEnemiesLevel.Enemies.Count}     {self.testAllEnemiesLevel.OutsideEnemies.Count}   {self.testAllEnemiesLevel.DaytimeEnemies.Count}");
             foreach (var item in self.testAllEnemiesLevel.Enemies)
             {
                 RegisterEnemyType(item.enemyType);
@@ -128,7 +126,8 @@ namespace LethalEmotesAPI.Utils
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_worm");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_baboon hawk thing");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_manticoil");
-            CustomEmotesAPI.AddNonAnimatingEmote("enemies default dance");
+            CustomEmotesAPI.AddNonAnimatingEmote("enemies test dance");
+            CustomEmotesAPI.AddNonAnimatingEmote("enemies random dance");
             CustomEmotesAPI.animChanged += CustomEmotesAPI_animChanged;
         }
         private static QuickMenuManager quickMenuManagerInstance;
@@ -187,12 +186,22 @@ namespace LethalEmotesAPI.Utils
                 case "spawn_manticoil":
                     RoundManager.Instance.SpawnEnemyGameObject(mapper.transform.position, 0, 1, manticoil);
                     break;
-                case "enemies default dance":
+                case "enemies test dance":
                     foreach (var item in BoneMapper.allMappers)
                     {
                         if (item.isEnemy)
                         {
-                            CustomEmotesAPI.PlayAnimation("DanceMoves", item);
+                            CustomEmotesAPI.PlayAnimation("JJK Lost in Paradise", item);
+                        }
+                    }
+                    break;
+                case "enemies random dance":
+                    foreach (var item in BoneMapper.allMappers)
+                    {
+                        if (item.isEnemy)
+                        {
+                            int rand = UnityEngine.Random.Range(0, CustomEmotesAPI.randomClipList.Count);
+                            CustomEmotesAPI.PlayAnimation(CustomEmotesAPI.randomClipList[rand], item);
                         }
                     }
                     break;
