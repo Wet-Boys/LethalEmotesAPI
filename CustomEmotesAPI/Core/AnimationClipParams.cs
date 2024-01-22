@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using BepInEx;
+using LethalEmotesAPI.ImportV2;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
 

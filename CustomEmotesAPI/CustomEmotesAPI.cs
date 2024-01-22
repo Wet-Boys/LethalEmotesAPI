@@ -711,7 +711,7 @@ namespace EmotesAPI
             if (ownerPlugin is not null)
                 EmoteUiManager.GetStateController()!.EmoteDb.AssociateEmoteKeyWithMod(emoteName, ownerPlugin.Name);
         }
-        [Obsolete("please use EmoteImporter.ImportEmote instead.")]
+        [Obsolete("Use EmoteImporter.ImportEmote instead")]
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
             if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name))
@@ -823,7 +823,6 @@ namespace EmotesAPI
         static int requestCounter = 0;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
-            DebugClass.Log($"changed: {newAnimation}");
             if (mapper is null)
             {
                 DebugClass.Log("AnimChanged called on null BoneMapper!");

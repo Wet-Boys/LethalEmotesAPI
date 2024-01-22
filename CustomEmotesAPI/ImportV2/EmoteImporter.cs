@@ -9,21 +9,21 @@ namespace LethalEmotesAPI.ImportV2
 {
     public class EmoteImporter
     {
-        public static void ImportEmote(AnimationClipParams animationClipParams)
+        public static void ImportEmote(CustomEmoteParams animationClipParams)
         {
-            if (animationClipParams.customName == "")
+            if (animationClipParams.internalName == "")
             {
-                animationClipParams.customName = animationClipParams.animationClip[0].name;
+                animationClipParams.internalName = animationClipParams.primaryAnimationClips[0].name;
             }
-            animationClipParams.customName = $"{animationClipParams.OwnerPlugin.GUID}__{animationClipParams.customName}";
-            if (BoneMapper.animClips.ContainsKey(animationClipParams.customName))
+            animationClipParams.internalName = $"{animationClipParams.OwnerPlugin.GUID}__{animationClipParams.internalName}";
+            if (BoneMapper.animClips.ContainsKey(animationClipParams.internalName))
             {
-                Debug.Log($"EmotesError: [{animationClipParams.customName}] is already defined as a custom emote but is trying to be added. Skipping");
+                Debug.Log($"EmotesError: [{animationClipParams.internalName}] is already defined as a custom emote but is trying to be added. Skipping");
                 return;
             }
-            if (!animationClipParams.animationClip[0].isHumanMotion)
+            if (!animationClipParams.primaryAnimationClips[0].isHumanMotion)
             {
-                Debug.Log($"EmotesError: [{animationClipParams.customName}] is not a humanoid animation!");
+                Debug.Log($"EmotesError: [{animationClipParams.internalName}] is not a humanoid animation!");
                 return;
             }
             if (animationClipParams.rootBonesToIgnore == null)
@@ -32,40 +32,40 @@ namespace LethalEmotesAPI.ImportV2
                 animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
 
 
-            if (animationClipParams._primaryAudioClips == null)
-                animationClipParams._primaryAudioClips = new AudioClip[] { null };
-            if (animationClipParams._secondaryAudioClips == null)
-                animationClipParams._secondaryAudioClips = new AudioClip[] { null };
-            if (animationClipParams._primaryDMCAFreeAudioClips == null)
-                animationClipParams._primaryDMCAFreeAudioClips = new AudioClip[] { null };
-            if (animationClipParams._secondaryDMCAFreeAudioClips == null)
-                animationClipParams._secondaryDMCAFreeAudioClips = new AudioClip[] { null };
+            if (animationClipParams.primaryAudioClips == null)
+                animationClipParams.primaryAudioClips = [null];
+            if (animationClipParams.secondaryAudioClips == null)
+                animationClipParams.secondaryAudioClips = [null];
+            if (animationClipParams.primaryDMCAFreeAudioClips == null)
+                animationClipParams.primaryDMCAFreeAudioClips = [null];
+            if (animationClipParams.secondaryDMCAFreeAudioClips == null)
+                animationClipParams.secondaryDMCAFreeAudioClips = [null];
 
-            List<AudioClip> testClipList = new List<AudioClip>(animationClipParams._primaryDMCAFreeAudioClips);
-            while (testClipList.Count != animationClipParams._primaryAudioClips.Length)
+            List<AudioClip> testClipList = new List<AudioClip>(animationClipParams.primaryDMCAFreeAudioClips);
+            while (testClipList.Count != animationClipParams.primaryAudioClips.Length)
             {
                 testClipList.Add(null);
             }
-            animationClipParams._primaryDMCAFreeAudioClips = testClipList.ToArray();
+            animationClipParams.primaryDMCAFreeAudioClips = testClipList.ToArray();
 
-            testClipList = new List<AudioClip>(animationClipParams._secondaryDMCAFreeAudioClips);
-            while (testClipList.Count != animationClipParams._secondaryAudioClips.Length)
+            testClipList = new List<AudioClip>(animationClipParams.secondaryDMCAFreeAudioClips);
+            while (testClipList.Count != animationClipParams.secondaryAudioClips.Length)
             {
                 testClipList.Add(null);
             }
-            animationClipParams._secondaryDMCAFreeAudioClips = testClipList.ToArray();
+            animationClipParams.secondaryDMCAFreeAudioClips = testClipList.ToArray();
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms, true);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.primaryAnimationClips, animationClipParams.audioLoops, animationClipParams.primaryAudioClips, animationClipParams.secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimationClips, false, animationClipParams.stopWhenMove, false, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, false, animationClipParams.internalName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams.primaryDMCAFreeAudioClips, animationClipParams.secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms, true);
             if (animationClipParams.visible)
             {
-                if (!BlacklistSettings.emotesExcludedFromRandom.Contains(animationClipParams.customName))
+                if (!BlacklistSettings.emotesExcludedFromRandom.Contains(animationClipParams.internalName))
                 {
-                    CustomEmotesAPI.randomClipList.Add(animationClipParams.customName);
+                    CustomEmotesAPI.randomClipList.Add(animationClipParams.internalName);
                 }
             }
-            BoneMapper.animClips.Add(animationClipParams.customName, clip);
+            BoneMapper.animClips.Add(animationClipParams.internalName, clip);
 
         }
     }

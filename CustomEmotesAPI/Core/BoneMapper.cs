@@ -213,7 +213,6 @@ public class BoneMapper : MonoBehaviour
         {
             prevClip = currentClip;
             currentClip = animClips[s];
-            DebugClass.Log($"animClips[{s}] custom name is {currentClip.customInternalName}");
             try
             {
                 currentClip.clip[0].ToString();
