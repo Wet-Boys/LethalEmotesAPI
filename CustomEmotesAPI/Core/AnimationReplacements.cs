@@ -21,11 +21,7 @@ internal static class AnimationReplacements
         GameObject emoteSkeleton = GameObject.Instantiate(Assets.Load<GameObject>(skeleton));
         emoteSkeleton.GetComponent<Animator>().runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
         BoneMapper b = AnimationReplacements.ApplyAnimationStuff(prefab, emoteSkeleton, pos, hidemesh, revertBonePositions: true);
-        g.transform.SetParent(b.transform);
-        //foreach (var item in g.GetComponentsInChildren<Transform>())
-        //{
-        //    item.name += "_runttimeAnimatorControllerHolder";
-        //}
+        g.transform.SetParent(emoteSkeleton.transform);
         return b;
     }
     public static void DebugBones(GameObject fab)
