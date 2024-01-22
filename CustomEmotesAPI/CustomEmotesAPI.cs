@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.2.15";
+        public const string VERSION = "1.2.16";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -140,13 +140,13 @@ namespace EmotesAPI
             AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
 
             //TODO this cleanup is not working?????
-            try
-            {
-                Destroy(gameObject);
-            }
-            catch (Exception)
-            {
-            }
+            //try
+            //{
+            //    Destroy(gameObject);
+            //}
+            //catch (Exception)
+            //{
+            //}
         }
         private static Hook playerControllerStartHook;
 
