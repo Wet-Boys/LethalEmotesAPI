@@ -191,7 +191,7 @@ namespace LethalEmotesAPI.Utils
                     {
                         if (item.isEnemy)
                         {
-                            CustomEmotesAPI.PlayAnimation("JJK Lost in Paradise", item);
+                            CustomEmotesAPI.PlayAnimation("com.weliveinasociety.badasscompany__Deep Dab", item);
                         }
                     }
                     break;

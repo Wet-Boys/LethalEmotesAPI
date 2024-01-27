@@ -47,7 +47,7 @@ namespace LethalEmotesAPI.Utils
                             EmoteConstraint e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
                             e.AddSource(ref smr.bones[x], ref mapper.basePlayerModelSMR[0].bones[i]);
                             e.revertTransform = mapper.revertTransform;
-                            e.localTransforms = true;
+                            e.SetLocalTransforms(true);
                             healthbarConstraints.Add(e);
                             break;
                         }

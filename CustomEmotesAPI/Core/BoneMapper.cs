@@ -682,16 +682,18 @@ public class BoneMapper : MonoBehaviour
     Vector3 scaleDiff = Vector3.one;
     void LocalFunctions()
     {
-        //AudioFunctions();
-        try
+        if (currentClip is not null)
         {
-            if ((moving && currentClip.stopOnMove))
+            try
             {
-                CustomEmotesAPI.PlayAnimation("none");
+                if (moving && currentClip.stopOnMove)
+                {
+                    CustomEmotesAPI.PlayAnimation("none");
+                }
             }
-        }
-        catch (Exception)
-        {
+            catch (Exception)
+            {
+            }
         }
     }
     public GameObject rotationPoint;
@@ -709,7 +711,7 @@ public class BoneMapper : MonoBehaviour
                     local = true;
                     isServer = playerController.IsServer && playerController.IsOwner;
                     HealthbarAnimator.Setup(this);
-
+                    FixLocalArms();
 
                     Camera c = playerController.gameplayCamera;
                     if (c is not null)
@@ -730,8 +732,14 @@ public class BoneMapper : MonoBehaviour
                         thirdPersonConstraint = EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, realCameraPos.transform, false);
                         thirdPersonConstraint.debug = true;
 
-
-                        cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head), false));
+                        if (basePlayerModelSMR[0].bones[32].name == "spine.004")//probably scavenger
+                        {
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, basePlayerModelSMR[0].bones[32], false));
+                        }
+                        else//not scavenger or someone broke the bone order :(
+                        {
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head), false));
+                        }
 
                         GameObject cameraRotationObjectLmao = new GameObject();
                         cameraRotationObjectLmao.transform.SetParent(c.transform);
@@ -746,6 +754,35 @@ public class BoneMapper : MonoBehaviour
         catch (Exception e)
         {
             DebugClass.Log(e);
+        }
+    }
+    internal void FixLocalArms()
+    {
+        int x = 0;
+        for (int i = 0; i < basePlayerModelSMR[1].bones.Length; i++)
+        {
+            EmoteConstraint e = basePlayerModelSMR[1].bones[i].GetComponent<EmoteConstraint>();
+            if (e is not null)
+            {
+                int startX = x;
+                for (; x < basePlayerModelSMR[0].bones.Length; x++)
+                {
+                    if (basePlayerModelSMR[1].bones[i].name == basePlayerModelSMR[0].bones[x].name)
+                    {
+                        e.AddSource(basePlayerModelSMR[1].bones[i], basePlayerModelSMR[0].bones[x]);
+                        e.forceGlobalTransforms = true;
+                        break;
+                    }
+                    if (x == startX - 1)
+                    {
+                        break;
+                    }
+                    if (startX > 0 && x == basePlayerModelSMR[0].bones.Length - 1)
+                    {
+                        x = -1;
+                    }
+                }
+            }
         }
     }
     bool ranSinceLastAnim = false; //this is probably really jank but it's been 2 years since I touched this part and I'm afraid to break something, I should come back to this later though...
@@ -931,7 +968,7 @@ public class BoneMapper : MonoBehaviour
         try
         {
             //just skip it all if we aren't playing anything
-            if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
+            if (!emoteSkeletonAnimator.enabled)
             {
                 return;
             }
@@ -1185,7 +1222,7 @@ public class BoneMapper : MonoBehaviour
                             ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                             if (smr == basePlayerModelSMR.First())
                             {
-                                ec.localTransforms = currentClip.localTransforms;
+                                ec.SetLocalTransforms(currentClip.localTransforms);
                             }
                         }
                         else if (dontAnimateUs.Contains(smr.bones[i].name))
