@@ -1,3 +1,5 @@
+- Version 1.3.4: Fixed a weird 3-way bug with AdvancedCompany and More_Emotes when pulling out the portable terminal
+
 - Version 1.3.3: Fixed local arms not being local enough when localTransforms is enabled on emotes.
 
 - Version 1.3.2: Fixed syncing on emotes imported with the new system not working. Fixed oversight on MoreCompany cosmetic patches. Fixed when emotes get changed being a frame late
