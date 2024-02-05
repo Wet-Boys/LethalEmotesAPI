@@ -1,3 +1,5 @@
+- Verison 1.4.1: Added emote skeleton for Peepers, added an option for the new import method to allow non-animating emotes
+
 - Version 1.4.0: Added an emote skeleton for a few custom monsters
 
 - Version 1.3.4: Fixed a weird 3-way bug with AdvancedCompany and More_Emotes when pulling out the portable terminal
