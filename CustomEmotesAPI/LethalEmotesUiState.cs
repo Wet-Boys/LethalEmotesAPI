@@ -96,7 +96,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
                 {
                     foreach (var key in BoneMapper.animClips.Keys)
                     {
-                        if (key.Contains(wheel.Emotes[i]) || (BoneMapper.animClips[key] is not null && BoneMapper.animClips[key].clip[0].name == wheel.Emotes[i]))
+                        if (key.Contains(wheel.Emotes[i]) || ((BoneMapper.animClips[key] is not null && BoneMapper.animClips[key].animates) && BoneMapper.animClips[key].clip[0].name == wheel.Emotes[i]))
                         {
                             wheel.Emotes[i] = key;
                             break;

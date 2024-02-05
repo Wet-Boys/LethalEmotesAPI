@@ -120,7 +120,7 @@ public class BoneMapper : MonoBehaviour
                 DebugClass.Log($"No emote bound to the name [{s}]");
                 return;
             }
-            if (animClips[s] is null)
+            if (animClips[s] is null || !animClips[s].animates)
             {
                 CustomEmotesAPI.Changed(s, this);
                 return;
@@ -392,7 +392,7 @@ public class BoneMapper : MonoBehaviour
     {
         AnimatorOverrideController animController = new AnimatorOverrideController(animator.runtimeAnimatorController);
         CustomAnimationClip customClip = animClips[GetRealAnimationName(animation)];
-        if (customClip is null)
+        if (customClip is null || !customClip.animates)
         {
             return;
         }
@@ -1080,14 +1080,7 @@ public class BoneMapper : MonoBehaviour
             }
         }
 
-        if (currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
-        {
-            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, true, spot);
-        }
-        else
-        {
-            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, false, spot);
-        }
+        EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp, spot);
     }
     public void RemoveProp(int propPos)
     {
@@ -1112,6 +1105,10 @@ public class BoneMapper : MonoBehaviour
     }
     void OnDestroy()
     {
+        if (worldProp)
+        {
+            return;
+        }
         playersToMappers.Remove(mapperBody);
         try
         {

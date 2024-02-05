@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.4.0";
+        public const string VERSION = "1.4.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -156,7 +156,6 @@ namespace EmotesAPI
         {
             try
             {
-                LethalEmotesUiState.FixLegacyEmotes();
 
                 emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
 
@@ -172,6 +171,14 @@ namespace EmotesAPI
             catch (Exception)
             {
                 DebugClass.Log($"Couldn't setup LethalEmotesAPI's networker");
+            }
+            try
+            {
+                LethalEmotesUiState.FixLegacyEmotes();
+            }
+            catch (Exception)
+            {
+                DebugClass.Log($"Couldn't fix legacy emotes");
             }
             orig(self);
 

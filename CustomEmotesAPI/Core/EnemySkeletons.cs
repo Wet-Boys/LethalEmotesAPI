@@ -102,6 +102,9 @@ namespace LethalEmotesAPI.Core
                     case "Demogorgon":
                         AnimationReplacements.Import(self.gameObject, "assets/fineilldoitmyself/DemoGorgon13.prefab", [0, 1, 2, 3]);
                         break;
+                    case "Peeper":
+                        AnimationReplacements.Import(self.gameObject, "assets/fineilldoitmyself/Peeper2.prefab", [0]);
+                        break;
                     default:
                         DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;

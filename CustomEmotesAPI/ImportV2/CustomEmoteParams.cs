@@ -141,7 +141,10 @@ namespace LethalEmotesAPI.ImportV2
         /// </summary>
         public BepInPlugin OwnerPlugin { get; } = Assembly.GetCallingAssembly().GetBepInPlugin();
 
-
+        /// <summary>
+        /// Declare if your emote will not directly call animation. AnimationClips passed into earlier parameters will still be used for preview purposes, leave those null if not needed.
+        /// </summary>
+        public bool nonAnimatingEmote = false;
 
 
 

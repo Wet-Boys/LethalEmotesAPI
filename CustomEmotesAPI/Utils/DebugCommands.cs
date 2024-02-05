@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 
 namespace LethalEmotesAPI.Utils
 {
@@ -128,9 +129,12 @@ namespace LethalEmotesAPI.Utils
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_manticoil");
             CustomEmotesAPI.AddNonAnimatingEmote("enemies test dance");
             CustomEmotesAPI.AddNonAnimatingEmote("enemies random dance");
+            CustomEmotesAPI.AddNonAnimatingEmote("enemies join dance");
             CustomEmotesAPI.animChanged += CustomEmotesAPI_animChanged;
         }
         private static QuickMenuManager quickMenuManagerInstance;
+        static BoneMapper nearestMapper = null;
+
         private static void CustomEmotesAPI_animChanged(string newAnimation, BoneMapper mapper)
         {
             switch (newAnimation)
@@ -202,6 +206,73 @@ namespace LethalEmotesAPI.Utils
                         {
                             int rand = UnityEngine.Random.Range(0, CustomEmotesAPI.randomClipList.Count);
                             CustomEmotesAPI.PlayAnimation(CustomEmotesAPI.randomClipList[rand], item);
+                        }
+                    }
+                    break;
+                case "enemies join dance":
+                    foreach (var item in BoneMapper.allMappers)
+                    {
+                        if (item.isEnemy)
+                        {
+                            try
+                            {
+                                if (item.currentEmoteSpot || item.reservedEmoteSpot)
+                                {
+                                    item.JoinEmoteSpot();
+                                }
+                                else
+                                {
+                                    foreach (var mapper2 in BoneMapper.allMappers)
+                                    {
+                                        try
+                                        {
+                                            if (mapper2 != item)
+                                            {
+                                                if (!nearestMapper && (mapper2.currentClip.syncronizeAnimation || mapper2.currentClip.syncronizeAudio))
+                                                {
+                                                    nearestMapper = mapper2;
+                                                }
+                                                else if (nearestMapper)
+                                                {
+                                                    if ((mapper2.currentClip.syncronizeAnimation || mapper2.currentClip.syncronizeAudio) && Vector3.Distance(item.transform.position, mapper2.transform.position) < Vector3.Distance(item.transform.position, nearestMapper.transform.position))
+                                                    {
+                                                        nearestMapper = mapper2;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        catch (System.Exception)
+                                        {
+                                        }
+                                    }
+                                    if (nearestMapper)
+                                    {
+                                        string animationName;
+                                        if (nearestMapper.currentClip.usesNewImportSystem)
+                                        {
+                                            animationName = nearestMapper.currentClip.customInternalName;
+                                        }
+                                        else
+                                        {
+                                            animationName = nearestMapper.currentClip.clip[0].name;
+                                        }
+                                        CustomEmotesAPI.PlayAnimation(animationName, item);
+                                    }
+                                    nearestMapper = null;
+                                }
+                            }
+                            catch (System.Exception e)
+                            {
+                                DebugClass.Log($"had issue while attempting to join an emote as a client: {e}\nNotable info: [nearestMapper: {nearestMapper}] [localMapper: {item}]");
+                                try
+                                {
+                                    nearestMapper.currentClip.ToString();
+                                    DebugClass.Log($"[nearestMapper.currentClip: {nearestMapper.currentClip.ToString()}] [nearestMapper.currentClip.clip[0]: {nearestMapper.currentClip.clip[0]}]");
+                                }
+                                catch (System.Exception)
+                                {
+                                }
+                            }
                         }
                     }
                     break;

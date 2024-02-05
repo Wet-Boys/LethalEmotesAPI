@@ -100,9 +100,9 @@ public class EmoteNetworker : NetworkBehaviour
     [ClientRpc]
     public void SyncJoinSpotToClientRpc(ulong playerId, ulong joinSpotId, bool worldProp, int posInArray)
     {
-
         GameObject bodyObject = GetNetworkObject(playerId).gameObject;
         GameObject spotObject = GetNetworkObject(joinSpotId).gameObject;
+
         if (!bodyObject)
         {
             DebugClass.Log($"Body is null!!!");
