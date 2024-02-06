@@ -1,3 +1,5 @@
+- Version 1.4.2: Fixed a bug in realtion to advanced company not enjoying my emote bones existing. Made the deprecated importer sidestep duplicate emotes instead of straight up breaking when a duplicate is found
+
 - Verison 1.4.1: Added emote skeleton for Peepers, added an option for the new import method to allow non-animating emotes
 
 - Version 1.4.0: Added an emote skeleton for a few custom monsters
