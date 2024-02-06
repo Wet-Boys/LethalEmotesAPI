@@ -730,14 +730,21 @@ namespace EmotesAPI
         [Obsolete("Use EmoteImporter.ImportEmote instead")]
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
-            if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name))
+            if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name) || BoneMapper.animClips.ContainsKey(BoneMapper.GetRealAnimationName(animationClipParams.customName)))
             {
-                Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                if (animationClipParams.customName != "")
+                {
+                    Debug.LogError($"EmotesError: [{animationClipParams.customName}] is already defined as a custom emote but is trying to be added. Skipping");
+                }
+                else
+                {
+                    Debug.LogError($"EmotesError: [{animationClipParams.animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                }
                 return;
             }
             if (!animationClipParams.animationClip[0].isHumanMotion)
             {
-                Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
+                Debug.LogError($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
                 return;
             }
             if (animationClipParams.rootBonesToIgnore == null)
