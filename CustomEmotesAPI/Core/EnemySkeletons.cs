@@ -25,9 +25,15 @@ namespace LethalEmotesAPI.Core
             b.additionalConstraints.Add(EmoteConstraint.AddConstraint(head.gameObject, b, g.transform, true));
 
         }
+        internal IEnumerator SetupMaskedEmoteSkeletonAfterAFewFrames(MaskedPlayerEnemy self)
+        {
+            //Advanced company does something with the bones and it doesn't appreciate my bones already existing so we wait
+            yield return new WaitForEndOfFrame();
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]);
+        }
         private void MaskedPlayerEnemyStart(Action<MaskedPlayerEnemy> orig, MaskedPlayerEnemy self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]);
+            CustomEmotesAPI.localMapper.StartCoroutine(SetupMaskedEmoteSkeletonAfterAFewFrames(self));
             orig(self);
         }
         private static Hook MaskedPlayerEnemyStartHook;
