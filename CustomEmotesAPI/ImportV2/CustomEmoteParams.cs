@@ -47,9 +47,14 @@ namespace LethalEmotesAPI.ImportV2
         public AudioClip[] secondaryDMCAFreeAudioClips = null;
 
         /// <summary>
-        /// If true, will turn off the emote when the player starts moving
+        /// If true, will turn off the emote when the player starts moving, to prevent movement entirely use preventMovement
         /// </summary>
         public bool stopWhenMove = false;
+
+        /// <summary>
+        /// If true, will prevent movement actions while emote is playing, to stop the emote when the player moves use stopWhenMove
+        /// </summary>
+        public bool preventMovement = false;
 
         /// <summary>
         /// If false, will hide the emote from all normal areas, however it can still be invoked through PlayAnimation, use this for emotes that are only needed in code
