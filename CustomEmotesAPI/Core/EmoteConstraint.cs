@@ -63,7 +63,7 @@ public class EmoteConstraint : MonoBehaviour
     }
     public void ActivateConstraints()
     {
-        if (!constraintActive)
+        if (!constraintActive && emoteBone is not null)
         {
             if (firstTime2)
             {

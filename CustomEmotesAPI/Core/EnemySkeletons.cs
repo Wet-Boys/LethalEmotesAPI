@@ -37,11 +37,9 @@ namespace LethalEmotesAPI.Core
             orig(self);
         }
         private static Hook MaskedPlayerEnemyStartHook;
-
-
-
-        private void EnemyAIStart(Action<EnemyAI> orig, EnemyAI self)
+        internal IEnumerator SetupSkeleton(EnemyAI self)
         {
+            yield return new WaitForEndOfFrame();
             try
             {
                 switch (self.enemyType.enemyName)
@@ -120,7 +118,16 @@ namespace LethalEmotesAPI.Core
             {
                 DebugClass.Log($"couldn't setup an enemy?");
             }
-            
+        }
+
+
+        private void EnemyAIStart(Action<EnemyAI> orig, EnemyAI self)
+        {
+
+            if (CustomEmotesAPI.localMapper is not null)
+            {
+                CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeleton(self));
+            }
             orig(self);
         }
         private static Hook EnemyAIStartHook;

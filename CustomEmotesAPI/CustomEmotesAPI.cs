@@ -262,7 +262,7 @@ namespace EmotesAPI
         {
             float prevY = self.thisPlayerBody.eulerAngles.y;
             orig(self);
-            if (localMapper is not null && localMapper.isInThirdPerson)
+            if (localMapper is not null && (localMapper.isInThirdPerson || (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)))
             {
                 localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
                 self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
@@ -361,6 +361,18 @@ namespace EmotesAPI
         }
         private static Hook StartPerformingEmoteClientRpcHook;
 
+        private void Jump_performed(Action<PlayerControllerB,InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
+        {
+            if (localMapper is not null && localMapper.playerController == self)
+            {
+                if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                {
+                    return;
+                }
+            }
+            orig(self, context);
+        }
+        private static Hook Jump_performedHook;
 
         private static GameObject emoteNetworker;
 
@@ -370,8 +382,13 @@ namespace EmotesAPI
         {
             if (player == StartOfRound.Instance.localPlayerController && player is not null)
             {
-                if (localMapper)
+                if (localMapper is not null)
                 {
+                    if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                    {
+                        player.moveInputVector = Vector2.zeroVector;
+                        return;
+                    }
                     bool originalIsNotZero = player.moveInputVector != Vector2.zero;
                     BoneMapper.moving = originalIsNotZero;
                     if (localMapper.autoWalkSpeed != 0)
@@ -483,6 +500,7 @@ namespace EmotesAPI
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "Jump_performed", BindingFlags.NonPublic, nameof(Jump_performed), Jump_performedHook);
 
             CentipedePatches.PatchAll();
             if (VRMPresent)

@@ -427,6 +427,16 @@ public class BoneMapper : MonoBehaviour
         {
             try
             {
+                if (local)
+                {
+                    itemHolderPosition.gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+            try
+            {
                 emoteLocations.Clear();
                 autoWalkSpeed = 0;
                 autoWalk = false;
@@ -640,6 +650,7 @@ public class BoneMapper : MonoBehaviour
         itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder");
         itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.serverItemHolder.gameObject, this, itemHolderPosition, true));
         itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.localItemHolder.gameObject, this, itemHolderPosition, true));
+        itemHolderPosition.gameObject.AddComponent<EmoteConstraint>();
     }
     public GameObject parentGameObject;
     public bool positionLock, rotationLock, scaleLock;
@@ -1353,5 +1364,10 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
+    }
+    public void AttachItemHolderToTransform(Transform target)
+    {
+        itemHolderPosition.gameObject.GetComponent<EmoteConstraint>().AddSource(itemHolderPosition, target);
+        itemHolderPosition.gameObject.GetComponent<EmoteConstraint>().ActivateConstraints();
     }
 }
