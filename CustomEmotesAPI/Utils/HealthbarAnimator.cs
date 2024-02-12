@@ -26,7 +26,7 @@ namespace LethalEmotesAPI.Utils
                 info.transform.SetParent(mapper.mapperBody.transform.parent);
                 CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();
                 CustomEmotesAPI.hudCamera = info.GetComponentInChildren<Camera>();
-                CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(0, 0, 0);
+                CustomEmotesAPI.hudAnimator.transform.localEulerAngles = new Vector3(0, 180, 180);
                 CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1100);
                 CustomEmotesAPI.hudObject.transform.localScale = new Vector3(1.175f, 1.175f, 1.175f);
                 CustomEmotesAPI.hudObject.transform.localPosition = new Vector3(-425.0528f, 245.3589f, -0.0136f);
