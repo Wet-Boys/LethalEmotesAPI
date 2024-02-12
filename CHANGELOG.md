@@ -1,3 +1,5 @@
+- Version 1.5.0: Updated to use more accurate avatar for animations, consider using [](the new ChadRig) if you are animating your own emotes and you want more precision.
+
 - Version 1.4.3: Enemy emote skeletons now get added a frame later to allow other mods to go first. Added BoneMapper.AttachItemHolderToTransform to allow easy locking of the held item position. Added a new import setting to prevent all movement during an emote.
 
 - Version 1.4.2: Fixed a bug in realtion to advanced company not enjoying my emote bones existing. Made the deprecated importer sidestep duplicate emotes instead of straight up breaking when a duplicate is found
