@@ -203,7 +203,7 @@ namespace EmotesAPI
             Transform selfTransform = self.PlayerInfo.canvasGroup.transform.Find("Self");
             if (selfTransform is not null)
             {
-                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarimage2.prefab"));
+                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/lethalemotesapi-ui/hud-healthbarimage.prefab"));
                 hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
                 baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
                 selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;

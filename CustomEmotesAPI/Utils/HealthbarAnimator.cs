@@ -21,7 +21,7 @@ namespace LethalEmotesAPI.Utils
         {
             if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
             {
-                GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarcamera.prefab"));
+                GameObject info = GameObject.Instantiate(Assets.Load<GameObject>("assets/lethalemotesapi-ui/hud-healthbarcamera.prefab"));
                 info.AddComponent<HealthbarAnimator>();
                 info.transform.SetParent(mapper.mapperBody.transform.parent);
                 CustomEmotesAPI.hudAnimator = info.GetComponentInChildren<Animator>();

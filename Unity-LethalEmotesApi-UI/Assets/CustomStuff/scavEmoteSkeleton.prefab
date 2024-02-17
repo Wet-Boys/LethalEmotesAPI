@@ -48,13 +48,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -6446412839051105205, guid: badf1d7cd3752b646ae7dd1eb2d6c013, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: badf1d7cd3752b646ae7dd1eb2d6c013, type: 3}
       propertyPath: m_Name
-      value: scavEmoteSkeleton6
+      value: scavEmoteSkeleton
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: badf1d7cd3752b646ae7dd1eb2d6c013, type: 3}
       propertyPath: m_UpdateMode
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: badf1d7cd3752b646ae7dd1eb2d6c013, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: badf1d7cd3752b646ae7dd1eb2d6c013, type: 3}
       propertyPath: m_ApplyRootMotion
