@@ -195,7 +195,7 @@ namespace EmotesAPI
         public static GameObject hudObject;
         public static GameObject baseHUDObject;
         public static GameObject selfRedHUDObject;
-        public static TextMeshPro currentEmoteText;
+        public static TextMeshProUGUI currentEmoteText;
         public static Camera hudCamera;
         private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
         {
@@ -203,10 +203,11 @@ namespace EmotesAPI
             Transform selfTransform = self.PlayerInfo.canvasGroup.transform.Find("Self");
             if (selfTransform is not null)
             {
-                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarimage2.prefab"));
+                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/lethalemotesapi-ui/hud-healthbarimage.prefab"));
                 hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
                 baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
                 selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+                CustomEmotesAPI.currentEmoteText = hudObject.GetComponentInChildren<TextMeshProUGUI>();
                 CustomEmotesAPI.hudObject.transform.localPosition = baseHUDObject.transform.localPosition;
             }
             var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote ui.prefab"),
