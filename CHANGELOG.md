@@ -1,3 +1,5 @@
+- Version 1.5.1: Updated some internal methods to be much more optimized. Should give a bit of a performance boost
+
 - Version 1.5.0: Updated to use more accurate avatar for animations, consider using [the new ChadRig](https://github.com/Wet-Boys/LethalEmotesAPI/tree/main/ChadRigFolder) if you are animating your own emotes and you want more precision.
 
 - Version 1.4.3: Enemy emote skeletons now get added a frame later to allow other mods to go first. Added BoneMapper.AttachItemHolderToTransform to allow easy locking of the held item position. Added a new import setting to prevent all movement during an emote.
