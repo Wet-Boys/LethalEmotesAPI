@@ -768,7 +768,7 @@ public class BoneMapper : MonoBehaviour
         {
             DebugClass.Log(e);
         }
-        if (CustomEmotesAPI.localMapper is null)
+        if (!CustomEmotesAPI.localMapper)
         {
             StartCoroutine(GetLocal());
         }
