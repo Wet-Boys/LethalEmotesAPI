@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.5.0";
+        public const string VERSION = "1.5.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -241,6 +241,10 @@ namespace EmotesAPI
 
         private void BeginUsingTerminal(Action<Terminal> orig, Terminal self)
         {
+            if (localMapper is not null)
+            {
+                localMapper.UnlockBones();
+            }
             orig(self);
             InTerminal();
         }
@@ -362,7 +366,7 @@ namespace EmotesAPI
         }
         private static Hook StartPerformingEmoteClientRpcHook;
 
-        private void Jump_performed(Action<PlayerControllerB,InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
+        private void Jump_performed(Action<PlayerControllerB, InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
         {
             if (localMapper is not null && localMapper.playerController == self)
             {
