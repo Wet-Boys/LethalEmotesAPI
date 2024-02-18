@@ -805,9 +805,9 @@ public class BoneMapper : MonoBehaviour
     bool ranSinceLastAnim = false; //this is probably really jank but it's been 2 years since I touched this part and I'm afraid to break something, I should come back to this later though...
     void TwoPartThing()
     {
-        if (currentClipName == "none")
+        if (!ranSinceLastAnim)
         {
-            if (!ranSinceLastAnim)
+            if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
             {
                 if (!twopart)
                 {
@@ -855,11 +855,11 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-        }
-        else
-        {
-            //a1.enabled = false;
-            twopart = false;
+            else
+            {
+                //a1.enabled = false;
+                twopart = false;
+            }
         }
     }
     void Health()
