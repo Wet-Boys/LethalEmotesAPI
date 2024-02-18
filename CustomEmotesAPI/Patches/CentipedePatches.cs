@@ -18,7 +18,7 @@ namespace LethalEmotesAPI.Patches
             b.canThirdPerson = false;
             if (b.isInThirdPerson)
             {
-                b.UnlockCameraStuff();
+                b.UnlockCameraStuff(false);
                 b.LockCameraStuff(false);
             }
         }
@@ -32,7 +32,7 @@ namespace LethalEmotesAPI.Patches
                 b.canThirdPerson = true;
                 if ((b.temporarilyThirdPerson == TempThirdPerson.on) || (b.local && b.ThirdPersonCheck()))
                 {
-                    b.UnlockCameraStuff();
+                    b.UnlockCameraStuff(false);
                     b.LockCameraStuff(true);
                 }
             }

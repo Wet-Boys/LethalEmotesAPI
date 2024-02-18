@@ -403,7 +403,7 @@ namespace EmotesAPI
                             player.moveInputVector = new Vector2(0, localMapper.autoWalkSpeed);
                         }
                     }
-                    if (originalIsNotZero && localMapper.ThirdPersonCheck())
+                    if (originalIsNotZero && localMapper.isInThirdPerson)
                     {
                         player.thisPlayerBody.eulerAngles = new Vector3(player.thisPlayerBody.eulerAngles.x, localMapper.rotationPoint.transform.eulerAngles.y, player.thisPlayerBody.eulerAngles.z);
                         localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, player.thisPlayerBody.eulerAngles.y, 0);
@@ -585,26 +585,26 @@ namespace EmotesAPI
 
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
-            if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
+            if (localMapper is not null && (localMapper.currentClip is not null || Settings.AllowCameraPostionChangeAtAllTimes.Value) && !LCThirdPersonPresent)
             {
                 switch (localMapper.temporarilyThirdPerson)
                 {
                     case TempThirdPerson.none:
                         localMapper.temporarilyThirdPerson = localMapper.isInThirdPerson ? TempThirdPerson.off : TempThirdPerson.on;
 
-                        localMapper.UnlockCameraStuff();
+                        localMapper.UnlockCameraStuff(false);
                         localMapper.LockCameraStuff(localMapper.temporarilyThirdPerson == TempThirdPerson.on);
                         break;
                     case TempThirdPerson.on:
                         localMapper.temporarilyThirdPerson = TempThirdPerson.off;
 
-                        localMapper.UnlockCameraStuff();
+                        localMapper.UnlockCameraStuff(false);
                         localMapper.LockCameraStuff(false);
                         break;
                     case TempThirdPerson.off:
                         localMapper.temporarilyThirdPerson = TempThirdPerson.on;
 
-                        localMapper.UnlockCameraStuff();
+                        localMapper.UnlockCameraStuff(false);
                         localMapper.LockCameraStuff(true);
 
                         break;
@@ -1031,6 +1031,7 @@ namespace EmotesAPI
         public static void InTerminal() // Ends emote when opening terminal
         {
             var localPlayer = GameNetworkManager.Instance.localPlayerController;
+            localMapper.DeThirdPerson(false);
             PlayAnimation("none");
         }
     }

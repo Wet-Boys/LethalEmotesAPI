@@ -868,6 +868,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (playerController.isPlayerDead && local && currentClip is not null)
             {
+                DeThirdPerson(false);
                 CustomEmotesAPI.PlayAnimation("none");
                 foreach (var item in props)
                 {
@@ -1179,9 +1180,12 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        foreach (var item in cameraConstraints)
+        if (!(isInThirdPerson && !Settings.ReturnToFirstPersonAfterEmote.Value))
         {
-            item.DeactivateConstraints();
+            foreach (var item in cameraConstraints)
+            {
+                item.DeactivateConstraints();
+            }
         }
         foreach (var item in itemHolderConstraints)
         {
@@ -1191,11 +1195,7 @@ public class BoneMapper : MonoBehaviour
         {
             item.DeactivateConstraints();
         }
-        if (thirdPersonConstraint is not null)
-        {
-            thirdPersonConstraint.DeactivateConstraints();
-        }
-        DeThirdPerson();
+        DeThirdPerson(true);
         //basePlayerModelAnimator.enabled = animatorEnabled;
     }
     public void LockBones()
@@ -1275,7 +1275,7 @@ public class BoneMapper : MonoBehaviour
         else
         {
             if (Settings.rootMotionType.Value != RootMotionType.None &&
-(currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
+(currentClip is null || currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
                 foreach (var item in cameraConstraints)
                 {
@@ -1295,53 +1295,64 @@ public class BoneMapper : MonoBehaviour
             }
         }
     }
-    public void UnlockCameraStuff()
+    public void UnlockCameraStuff(bool sourceIsEmoteEnding)
     {
-        foreach (var item in cameraConstraints)
+        if ((!sourceIsEmoteEnding || Settings.ReturnToFirstPersonAfterEmote.Value))
         {
-            item.DeactivateConstraints();
+            foreach (var item in cameraConstraints)
+            {
+                item.DeactivateConstraints();
+            }
+            thirdPersonConstraint.DeactivateConstraints();
         }
-        thirdPersonConstraint.DeactivateConstraints();
-        DeThirdPerson();
+        DeThirdPerson(sourceIsEmoteEnding);
     }
     internal bool needToTurnOffShadows = true;
     internal bool needToTurnOffCosmetics = true;
     public void TurnOnThirdPerson()
     {
-        playerController.localVisor.gameObject.SetActive(false);
-        if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
+        if (!isInThirdPerson)
         {
-            needToTurnOffShadows = false;
-        }
-        playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-        playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-        if (originalLayer == -1)
-        {
-            originalLayer = playerController.thisPlayerModel.gameObject.layer;
-            originalCullingMask = playerController.gameplayCamera.cullingMask;
-        }
-        playerController.thisPlayerModel.gameObject.layer = 1;
-        playerController.grabDistance = 5.65f;
-        playerController.gameplayCamera.cullingMask = StartOfRound.Instance.spectateCamera.cullingMask;//if you break the spectator culling mask, don't, stop, get some help
-        thirdPersonConstraint.ActivateConstraints();
-        isInThirdPerson = true;
-        if (CustomEmotesAPI.MoreCompanyPresent)
-        {
-            try
+            playerController.localVisor.gameObject.SetActive(false);
+            if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
             {
-                needToTurnOffCosmetics = true;
-                MoreCompanyCompat.TurnOnCosmetics(this);
+                needToTurnOffShadows = false;
             }
-            catch (Exception e)
+            playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            if (originalLayer == -1)
             {
-                DebugClass.Log($"couldn't turn on cosmetics: {e}");
+                originalLayer = playerController.thisPlayerModel.gameObject.layer;
+                originalCullingMask = playerController.gameplayCamera.cullingMask;
+            }
+            playerController.thisPlayerModel.gameObject.layer = 1;
+            playerController.grabDistance = 5.65f;
+            playerController.gameplayCamera.cullingMask = StartOfRound.Instance.spectateCamera.cullingMask;//if you break the spectator culling mask, don't, stop, get some help
+            thirdPersonConstraint.ActivateConstraints();
+            isInThirdPerson = true;
+            if (CustomEmotesAPI.MoreCompanyPresent)
+            {
+                try
+                {
+                    needToTurnOffCosmetics = true;
+                    MoreCompanyCompat.TurnOnCosmetics(this);
+                }
+                catch (Exception e)
+                {
+                    DebugClass.Log($"couldn't turn on cosmetics: {e}");
+                }
             }
         }
     }
-    public void DeThirdPerson()
+    public void DeThirdPerson(bool sourceIsEmoteEnding)
     {
-        if (isInThirdPerson)
+        DebugClass.Log($"{isInThirdPerson} && ({!sourceIsEmoteEnding} || {Settings.ReturnToFirstPersonAfterEmote.Value}) == {isInThirdPerson && (!sourceIsEmoteEnding || Settings.ReturnToFirstPersonAfterEmote.Value)}");
+        if (isInThirdPerson && (!sourceIsEmoteEnding || Settings.ReturnToFirstPersonAfterEmote.Value))
         {
+            if (thirdPersonConstraint is not null)
+            {
+                thirdPersonConstraint.DeactivateConstraints();
+            }
             playerController.gameplayCamera.cullingMask = originalCullingMask;
             if (needToTurnOffShadows)
             {

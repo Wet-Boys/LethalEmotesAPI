@@ -49,6 +49,10 @@ namespace EmotesAPI
         public static ConfigEntry<string> RandomEmoteBlacklist;
         public static ConfigEntry<bool> PermanentEmotingHealthbar;
 
+        public static ConfigEntry<bool> ReturnToFirstPersonAfterEmote;
+        public static ConfigEntry<bool> AllowCameraPostionChangeAtAllTimes;
+
+
 
         public static void RunAll()
         {
@@ -70,6 +74,9 @@ namespace EmotesAPI
             thirdPersonType = CustomEmotesAPI.instance.Config.Bind<ThirdPersonType>("Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");
             StopEmoteWhenLockedToStopsEmote = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Stop Emote When Locked Player Stops Emote", true, "If you are locked to a player for an emote (determined by emote mods themselves), you will stop emoting and unlock yourself if the other person stops emoting");
             PermanentEmotingHealthbar = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Permanent Healthbar Animation", false, "Keeps the fun lil guy in the top left animating at all times");
+            ReturnToFirstPersonAfterEmote = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "Return To First Person After Emote", true, "If turned on, you will return to first person after emotes end.");
+            AllowCameraPostionChangeAtAllTimes = CustomEmotesAPI.instance.Config.Bind<bool>("Controls", "Allow Camera Postion Change At All Times", false, "If turned on, you can change between first and third person at any time, not just during emotes.");
+
             HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
             PermanentEmotingHealthbar.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
         }

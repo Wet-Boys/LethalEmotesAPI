@@ -18,6 +18,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
             if (self.Player.Controller)
             {
                 BoneMapper.playersToMappers[self.Player.Controller.gameObject].UnlockBones();
+                BoneMapper.playersToMappers[self.Player.Controller.gameObject].DeThirdPerson(false);
                 CustomEmotesAPI.PlayAnimation("none", BoneMapper.playersToMappers[self.Player.Controller.gameObject]);
             }
             orig(self);
