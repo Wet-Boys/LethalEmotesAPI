@@ -716,7 +716,7 @@ public class BoneMapper : MonoBehaviour
         yield return new WaitForEndOfFrame();
         try
         {
-            if (CustomEmotesAPI.localMapper is null)
+            if (!CustomEmotesAPI.localMapper)
             {
                 if (playerController == StartOfRound.Instance.localPlayerController)
                 {
