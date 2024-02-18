@@ -640,6 +640,7 @@ public class BoneMapper : MonoBehaviour
             StartCoroutine(SetupHandConstraint());
         }
         StartCoroutine(preventEmotesInSpawnAnimation());
+        StartCoroutine(GetLocal());
     }
     public IEnumerator SetupHandConstraint()
     {
@@ -693,7 +694,7 @@ public class BoneMapper : MonoBehaviour
     Vector3 scaleDiff = Vector3.one;
     void LocalFunctions()
     {
-        if (currentClip is not null)
+        if (emoteSkeletonAnimator.enabled)
         {
             try
             {
@@ -710,8 +711,9 @@ public class BoneMapper : MonoBehaviour
     public GameObject rotationPoint;
     public GameObject desiredCameraPos;
     public GameObject realCameraPos;
-    void GetLocal()
+    IEnumerator GetLocal()
     {
+        yield return new WaitForEndOfFrame();
         try
         {
             if (!CustomEmotesAPI.localMapper)
@@ -766,6 +768,10 @@ public class BoneMapper : MonoBehaviour
         {
             DebugClass.Log(e);
         }
+        if (!CustomEmotesAPI.localMapper)
+        {
+            StartCoroutine(GetLocal());
+        }
     }
     internal void FixLocalArms()
     {
@@ -799,7 +805,7 @@ public class BoneMapper : MonoBehaviour
     bool ranSinceLastAnim = false; //this is probably really jank but it's been 2 years since I touched this part and I'm afraid to break something, I should come back to this later though...
     void TwoPartThing()
     {
-        if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
+        if (currentClipName == "none")
         {
             if (!ranSinceLastAnim)
             {
@@ -917,10 +923,6 @@ public class BoneMapper : MonoBehaviour
         if (local)
         {
             LocalFunctions();
-        }
-        else
-        {
-            GetLocal();
         }
         TwoPartThing();
         Health();
