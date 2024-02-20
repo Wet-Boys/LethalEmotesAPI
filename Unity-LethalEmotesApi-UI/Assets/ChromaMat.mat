@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ChromaMat
-  m_Shader: {fileID: -6465566751694194690, guid: e70d5cf5e31bb7e4da83e929d6c19b9a, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 7abd215f657472e41b9cd27fbc774c03, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -131,6 +131,7 @@ Material:
     - _Cutoff: 0.5
     - _DamageAlpha: 0
     - _DepthOffsetEnable: 0
+    - _Depth_Threshold: 1.61
     - _DetailNormalMapScale: 1
     - _DistortionBlend: 0.5
     - _DistortionEnabled: 0
@@ -184,7 +185,7 @@ Material:
     - _StencilWriteMaskMV: 41
     - _SupportDecals: 1
     - _SurfaceType: 1
-    - _Thickness: 0.005
+    - _Thickness: 2
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
