@@ -4,6 +4,10 @@
 
 - You need to assign emotes in game, the default keybind is C, then look in the top right corner to customize your emote wheel.
 
+- Default keybind to join emotes is V
+
+- ALL KEYBINDS CAN BE CHANGED IN THE REGULAR KEYBINDS MENU
+
 ## WIKI
 
 - [Wiki Link](https://github.com/Wet-Boys/LethalEmotesAPI/wiki)
