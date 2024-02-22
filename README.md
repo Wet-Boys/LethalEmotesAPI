@@ -6,6 +6,8 @@
 
 - Default keybind to join emotes is V
 
+- Default random emote key is F
+
 - ALL KEYBINDS CAN BE CHANGED IN THE REGULAR KEYBINDS MENU
 
 ## WIKI
