@@ -88,6 +88,7 @@ public class BoneMapper : MonoBehaviour
     public int networkId;
     public bool canThirdPerson = true;
     internal bool canEmote = false;
+    public bool isValidPlayer = false;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -556,6 +557,7 @@ public class BoneMapper : MonoBehaviour
         {
             enemyController = mapperBody.GetComponent<EnemyAI>();
         }
+        isValidPlayer = playerController is not null;
         playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
@@ -864,7 +866,7 @@ public class BoneMapper : MonoBehaviour
     }
     void Health()
     {
-        if (playerController is not null)
+        if (isValidPlayer)
         {
             if (playerController.isPlayerDead && local && currentClip is not null)
             {
