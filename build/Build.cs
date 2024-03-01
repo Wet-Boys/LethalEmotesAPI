@@ -206,9 +206,6 @@ public sealed class SetupNetcodePatcher : FrostingTask<BuildContext>
 
         if (Directory.GetFiles(context.PatcherDir / "deps").Length == 0)
             return true;
-
-        if (!File.Exists(context.PatcherDir / "NetcodePatcher.runtimeconfig.json"))
-            return true;
         
         return false;
     }
@@ -220,17 +217,7 @@ public sealed class SetupNetcodePatcher : FrostingTask<BuildContext>
 
         Directory.CreateDirectory(context.PatcherDir);
         
-        var url = $"https://github.com/EvaisaDev/UnityNetcodeWeaver/releases/download/{context.NetcodePatcherRelease}/NetcodePatcher-{context.NetcodePatcherRelease}.zip";
-        var patcherZip = context.PatcherDir / "patcher.zip";
-        context.DownloadFile(url, patcherZip);
-        
-        ZipFile.ExtractToDirectory(patcherZip, context.PatcherDir);
-        File.Delete(patcherZip);
-        
-        File.WriteAllText(context.PatcherDir / "NetcodePatcher.runtimeconfig.json", "{\"runtimeOptions\":{\"tfm\":\"net8.0\",\"framework\":{\"name\":\"Microsoft.NETCore.App\",\"version\":\"8.0.0\"}}}");
-        
         ZipFile.ExtractToDirectory(context.StubbedFilesPath, context.PatcherDir / "deps");
-        
         File.WriteAllText(context.PatcherDir / "version", context.NetcodePatcherRelease);
     }
 }
@@ -287,7 +274,7 @@ public sealed class PatchNetcode : FrostingTask<BuildContext>
     {
         AbsolutePath patcherPluginsDir = context.PatcherDir / "plugins";
 
-        if (patcherPluginsDir.GlobFiles("*").Count != 0)
+        if (Directory.Exists(patcherPluginsDir))
             Directory.Delete(patcherPluginsDir, true);
         Directory.CreateDirectory(patcherPluginsDir);
         
@@ -296,7 +283,7 @@ public sealed class PatchNetcode : FrostingTask<BuildContext>
         
         using var patcher = new Process();
         patcher.StartInfo.FileName = "dotnet";
-        patcher.StartInfo.Arguments = $"exec NetcodePatcher.dll ./plugins ./deps";
+        patcher.StartInfo.Arguments = $"tool run netcode-patch ./plugins ./deps";
         patcher.StartInfo.WorkingDirectory = context.PatcherDir;
         patcher.StartInfo.CreateNoWindow = false;
         patcher.StartInfo.UseShellExecute = true;
