@@ -12,6 +12,7 @@ using Cake.Common.IO;
 using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
+using Cake.Common.Tools.DotNet.Restore;
 using Cake.Core;
 using Cake.Core.Diagnostics;
 using Cake.Frosting;
@@ -228,6 +229,16 @@ public sealed class RestoreTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         context.DotNetRestore(context.SolutionPath);
+        
+        using var dotnetToolRestore = new Process();
+        dotnetToolRestore.StartInfo.FileName = "dotnet";
+        dotnetToolRestore.StartInfo.Arguments = $"tool restore";
+        dotnetToolRestore.StartInfo.CreateNoWindow = false;
+        dotnetToolRestore.StartInfo.UseShellExecute = true;
+        dotnetToolRestore.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        
+        dotnetToolRestore.Start();
+        dotnetToolRestore.WaitForExit();
     }
 }
 
