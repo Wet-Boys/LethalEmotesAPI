@@ -1,3 +1,5 @@
+- Version 1.5.2: Updated netcode patcher to 3.3.4, might help with ping related issues, idk ymmv
+
 - Version 1.5.1: Updated some internal methods to be much more optimized. Should give a bit of a performance boost
 
 - Version 1.5.0: Updated to use more accurate avatar for animations, consider using [the new ChadRig](https://github.com/Wet-Boys/LethalEmotesAPI/tree/main/ChadRigFolder) if you are animating your own emotes and you want more precision.
