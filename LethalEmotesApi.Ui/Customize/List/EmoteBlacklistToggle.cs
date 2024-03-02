@@ -10,6 +10,7 @@ public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerE
 {
     public EmoteListItem? emoteListItem;
     public Image? toggleImage;
+    public EmoteVisibilityToggle? visibilityToggle;
 
     private string? _emoteKey;
     private bool InBlacklist => EmoteUiManager.RandomPoolBlacklist.Contains(_emoteKey);
@@ -47,6 +48,11 @@ public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerE
         }
         
         UpdateState();
+
+        if (visibilityToggle is null)
+            return;
+        
+        visibilityToggle.UpdateState();
     }
     
     public void UpdateState()

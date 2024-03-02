@@ -682,6 +682,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   emoteListItem: {fileID: 5559504937275200181}
   toggleImage: {fileID: 4159377674058410878}
+  visibilityToggle: {fileID: 565719386430926793}
 --- !u!114 &3595406878814683715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1059,6 +1060,7 @@ MonoBehaviour:
   visibilityImage: {fileID: 7423535601753996666}
   enabledSprite: {fileID: 21300000, guid: 58a17f49342d548478ba3141ae1522f2, type: 3}
   disabledSprite: {fileID: 21300000, guid: 8989e0c75a2acb6469ca792aae73bedf, type: 3}
+  blacklistToggle: {fileID: 5326279805958892969}
 --- !u!114 &458323417402357225
 MonoBehaviour:
   m_ObjectHideFlags: 0

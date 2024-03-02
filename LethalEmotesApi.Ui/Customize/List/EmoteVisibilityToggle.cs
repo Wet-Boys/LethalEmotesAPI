@@ -12,7 +12,8 @@ public class EmoteVisibilityToggle : UIBehaviour, IPointerEnterHandler, IPointer
     public Image? visibilityImage;
     public Sprite? enabledSprite;
     public Sprite? disabledSprite;
-
+    public EmoteBlacklistToggle? blacklistToggle; 
+        
     private string? _emoteKey;
     private bool IsVisible => !EmoteUiManager.EmotePoolBlacklist.Contains(_emoteKey);
 
@@ -49,6 +50,11 @@ public class EmoteVisibilityToggle : UIBehaviour, IPointerEnterHandler, IPointer
         }
         
         UpdateState();
+
+        if (blacklistToggle is null)
+            return;
+        
+        blacklistToggle.UpdateState();
     }
 
     public void UpdateState()
