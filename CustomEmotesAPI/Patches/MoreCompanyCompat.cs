@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static PlayerSettings;
 
 namespace LethalEmotesAPI.Patches
 {
@@ -11,15 +12,24 @@ namespace LethalEmotesAPI.Patches
     {
         internal static bool TurnOnCosmetics(BoneMapper mapper)
         {
-            //copied this from https://github.com/notnotnotswipez/MoreCompany/blob/master/MoreCompany/MimicPatches.cs#L32
+            //copied this partially from https://github.com/notnotnotswipez/MoreCompany/blob/master/MoreCompany/MimicPatches.cs#L32
             Transform cosmeticRoot = mapper.basePlayerModelAnimator.transform;
             CosmeticApplication cosmeticApplication = cosmeticRoot.GetComponent<CosmeticApplication>();
-            List<string> cosmetics = CosmeticRegistry.locallySelectedCosmetics;
-            if (cosmeticApplication)
+            if (cosmeticApplication && cosmeticApplication.spawnedCosmetics.Count != 0)
             {
-                cosmeticApplication.ClearCosmetics();
-                GameObject.Destroy(cosmeticApplication);
+                foreach (var item in cosmeticApplication.spawnedCosmetics)
+                {
+                    foreach (var t in item.gameObject.GetComponentsInChildren<Transform>())
+                    {
+                        t.gameObject.SetActive(true);
+                        t.gameObject.layer = 0;
+                    }
+
+                }
+                return true;
             }
+
+            List<string> cosmetics = CosmeticRegistry.locallySelectedCosmetics;
 
             cosmeticApplication = cosmeticRoot.gameObject.AddComponent<CosmeticApplication>();
             foreach (var cosmetic in cosmetics)

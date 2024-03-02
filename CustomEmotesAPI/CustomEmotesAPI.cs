@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.3.0";
+        public const string VERSION = "1.5.2";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -156,7 +156,6 @@ namespace EmotesAPI
         {
             try
             {
-                LethalEmotesUiState.FixLegacyEmotes();
 
                 emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
 
@@ -173,6 +172,14 @@ namespace EmotesAPI
             {
                 DebugClass.Log($"Couldn't setup LethalEmotesAPI's networker");
             }
+            try
+            {
+                LethalEmotesUiState.FixLegacyEmotes();
+            }
+            catch (Exception)
+            {
+                DebugClass.Log($"Couldn't fix legacy emotes");
+            }
             orig(self);
 
         }
@@ -188,7 +195,7 @@ namespace EmotesAPI
         public static GameObject hudObject;
         public static GameObject baseHUDObject;
         public static GameObject selfRedHUDObject;
-        public static TextMeshPro currentEmoteText;
+        public static TextMeshProUGUI currentEmoteText;
         public static Camera hudCamera;
         private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
         {
@@ -196,10 +203,11 @@ namespace EmotesAPI
             Transform selfTransform = self.PlayerInfo.canvasGroup.transform.Find("Self");
             if (selfTransform is not null)
             {
-                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/healthbarimage2.prefab"));
+                hudObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/lethalemotesapi-ui/hud-healthbarimage.prefab"));
                 hudObject.transform.SetParent(self.PlayerInfo.canvasGroup.transform);
                 baseHUDObject = self.PlayerInfo.canvasGroup.transform.Find("Self").gameObject;
                 selfRedHUDObject = self.PlayerInfo.canvasGroup.transform.Find("SelfRed").gameObject;
+                CustomEmotesAPI.currentEmoteText = hudObject.GetComponentInChildren<TextMeshProUGUI>();
                 CustomEmotesAPI.hudObject.transform.localPosition = baseHUDObject.transform.localPosition;
             }
             var emoteWheelController = Instantiate(Assets.Load<GameObject>("assets/emote ui.prefab"),
@@ -233,6 +241,10 @@ namespace EmotesAPI
 
         private void BeginUsingTerminal(Action<Terminal> orig, Terminal self)
         {
+            if (localMapper is not null)
+            {
+                localMapper.UnlockBones();
+            }
             orig(self);
             InTerminal();
         }
@@ -255,7 +267,7 @@ namespace EmotesAPI
         {
             float prevY = self.thisPlayerBody.eulerAngles.y;
             orig(self);
-            if (localMapper is not null && localMapper.isInThirdPerson)
+            if (localMapper is not null && (localMapper.isInThirdPerson || (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)))
             {
                 localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
                 self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
@@ -354,6 +366,18 @@ namespace EmotesAPI
         }
         private static Hook StartPerformingEmoteClientRpcHook;
 
+        private void Jump_performed(Action<PlayerControllerB, InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
+        {
+            if (localMapper is not null && localMapper.playerController == self)
+            {
+                if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                {
+                    return;
+                }
+            }
+            orig(self, context);
+        }
+        private static Hook Jump_performedHook;
 
         private static GameObject emoteNetworker;
 
@@ -363,8 +387,13 @@ namespace EmotesAPI
         {
             if (player == StartOfRound.Instance.localPlayerController && player is not null)
             {
-                if (localMapper)
+                if (localMapper is not null)
                 {
+                    if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                    {
+                        player.moveInputVector = Vector2.zeroVector;
+                        return;
+                    }
                     bool originalIsNotZero = player.moveInputVector != Vector2.zero;
                     BoneMapper.moving = originalIsNotZero;
                     if (localMapper.autoWalkSpeed != 0)
@@ -476,6 +505,7 @@ namespace EmotesAPI
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "Jump_performed", BindingFlags.NonPublic, nameof(Jump_performed), Jump_performedHook);
 
             CentipedePatches.PatchAll();
             if (VRMPresent)
@@ -517,7 +547,7 @@ namespace EmotesAPI
 
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
 
-            DebugCommands.Debugcommands();
+            //DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -643,8 +673,17 @@ namespace EmotesAPI
                         }
                         if (nearestMapper)
                         {
-                            PlayAnimation(nearestMapper.currentClip.clip[0].name);
-                            Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
+                            string animationName;
+                            if (nearestMapper.currentClip.usesNewImportSystem)
+                            {
+                                animationName = nearestMapper.currentClip.customInternalName;
+                            }
+                            else
+                            {
+                                animationName = nearestMapper.currentClip.clip[0].name;
+                            }
+                            PlayAnimation(animationName);
+                            Joined(animationName, localMapper, nearestMapper); //this is not networked and only sent locally FYI
                         }
                         nearestMapper = null;
                     }
@@ -714,14 +753,21 @@ namespace EmotesAPI
         [Obsolete("Use EmoteImporter.ImportEmote instead")]
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
-            if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name))
+            if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name) || BoneMapper.animClips.ContainsKey(BoneMapper.GetRealAnimationName(animationClipParams.customName)))
             {
-                Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                if (animationClipParams.customName != "")
+                {
+                    Debug.LogError($"EmotesError: [{animationClipParams.customName}] is already defined as a custom emote but is trying to be added. Skipping");
+                }
+                else
+                {
+                    Debug.LogError($"EmotesError: [{animationClipParams.animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                }
                 return;
             }
             if (!animationClipParams.animationClip[0].isHumanMotion)
             {
-                Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
+                Debug.LogError($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
                 return;
             }
             if (animationClipParams.rootBonesToIgnore == null)

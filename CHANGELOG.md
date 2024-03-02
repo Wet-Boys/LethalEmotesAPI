@@ -1,3 +1,25 @@
+- Version 1.5.2: Updated netcode patcher to 3.3.4, might help with ping related issues, idk ymmv
+
+- Version 1.5.1: Updated some internal methods to be much more optimized. Should give a bit of a performance boost
+
+- Version 1.5.0: Updated to use more accurate avatar for animations, consider using [the new ChadRig](https://github.com/Wet-Boys/LethalEmotesAPI/tree/main/ChadRigFolder) if you are animating your own emotes and you want more precision.
+
+- Version 1.4.3: Enemy emote skeletons now get added a frame later to allow other mods to go first. Added BoneMapper.AttachItemHolderToTransform to allow easy locking of the held item position. Added a new import setting to prevent all movement during an emote.
+
+- Version 1.4.2: Fixed a bug in realtion to advanced company not enjoying my emote bones existing. Made the deprecated importer sidestep duplicate emotes instead of straight up breaking when a duplicate is found
+
+- Verison 1.4.1: Added emote skeleton for Peepers, added an option for the new import method to allow non-animating emotes
+
+- Version 1.4.0: Added an emote skeleton for a few custom monsters
+
+- Version 1.3.4: Fixed a weird 3-way bug with AdvancedCompany and More_Emotes when pulling out the portable terminal
+
+- Version 1.3.3: Fixed local arms not being local enough when localTransforms is enabled on emotes.
+
+- Version 1.3.2: Fixed syncing on emotes imported with the new system not working. Fixed oversight on MoreCompany cosmetic patches. Fixed when emotes get changed being a frame late
+
+- Version 1.3.1: Removed debug commands, oops
+
 - Version 1.3.0: Added new way to import emotes which allows more than one mod to have the same emote. This should address the issue where there are like 20 different emotes that are duplicated across multiple mods.
 
 - Version 1.2.16: Fixed issue where we were breaking the bodycam mod

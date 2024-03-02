@@ -103,19 +103,18 @@ public class BoneMapper : MonoBehaviour
         }
         return animationName;
     }
-    IEnumerator actuallyPlayAnimation(string s, int pos)
+    IEnumerator lockBonesAfterAFrame()
     {
         yield return new WaitForEndOfFrame();
-        PlayAnim(s, pos);
+        LockBones();
     }
-    public void PlayAnim(string s, int pos, int eventNum = -1)
+    public void PlayAnim(string s, int pos, int eventNum)
     {
         desiredEvent = eventNum;
         s = GetRealAnimationName(s);
-        //PlayAnim(s, pos);
-        StartCoroutine(actuallyPlayAnimation(s, pos));
+        PlayAnim(s, pos);
     }
-    internal void PlayAnim(string s, int pos)
+    public void PlayAnim(string s, int pos)
     {
         ranSinceLastAnim = false;
         s = GetRealAnimationName(s);
@@ -127,7 +126,7 @@ public class BoneMapper : MonoBehaviour
                 DebugClass.Log($"No emote bound to the name [{s}]");
                 return;
             }
-            if (animClips[s] is null)
+            if (animClips[s] is null || !animClips[s].animates)
             {
                 CustomEmotesAPI.Changed(s, this);
                 return;
@@ -259,7 +258,7 @@ public class BoneMapper : MonoBehaviour
             {
                 pos = UnityEngine.Random.Range(0, currentClip.clip.Length);
             }
-            LockBones();
+            StartCoroutine(lockBonesAfterAFrame());
         }
 
         if (s == "none")
@@ -399,7 +398,7 @@ public class BoneMapper : MonoBehaviour
     {
         AnimatorOverrideController animController = new AnimatorOverrideController(animator.runtimeAnimatorController);
         CustomAnimationClip customClip = animClips[GetRealAnimationName(animation)];
-        if (customClip is null)
+        if (customClip is null || !customClip.animates)
         {
             return;
         }
@@ -432,6 +431,16 @@ public class BoneMapper : MonoBehaviour
     {
         try
         {
+            try
+            {
+                if (local)
+                {
+                    itemHolderPosition.gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
+                }
+            }
+            catch (Exception e)
+            {
+            }
             try
             {
                 emoteLocations.Clear();
@@ -666,6 +675,7 @@ public class BoneMapper : MonoBehaviour
             StartCoroutine(SetupHandConstraint());
         }
         StartCoroutine(preventEmotesInSpawnAnimation());
+        StartCoroutine(GetLocal());
     }
     public IEnumerator SetupHandConstraint()
     {
@@ -676,6 +686,7 @@ public class BoneMapper : MonoBehaviour
         itemHolderPosition = this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand).Find("ServerItemHolder");
         itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.serverItemHolder.gameObject, this, itemHolderPosition, true));
         itemHolderConstraints.Add(EmoteConstraint.AddConstraint(playerController.localItemHolder.gameObject, this, itemHolderPosition, true));
+        itemHolderPosition.gameObject.AddComponent<EmoteConstraint>();
     }
     public GameObject parentGameObject;
     public bool positionLock, rotationLock, scaleLock;
@@ -718,23 +729,26 @@ public class BoneMapper : MonoBehaviour
     Vector3 scaleDiff = Vector3.one;
     void LocalFunctions()
     {
-        //AudioFunctions();
-        try
+        if (emoteSkeletonAnimator.enabled)
         {
-            if ((moving && currentClip.stopOnMove))
+            try
             {
-                CustomEmotesAPI.PlayAnimation("none");
+                if (moving && currentClip.stopOnMove)
+                {
+                    CustomEmotesAPI.PlayAnimation("none");
+                }
             }
-        }
-        catch (Exception)
-        {
+            catch (Exception)
+            {
+            }
         }
     }
     public GameObject rotationPoint;
     public GameObject desiredCameraPos;
     public GameObject realCameraPos;
-    void GetLocal()
+    IEnumerator GetLocal()
     {
+        yield return new WaitForEndOfFrame();
         try
         {
             if (!CustomEmotesAPI.localMapper)
@@ -746,7 +760,7 @@ public class BoneMapper : MonoBehaviour
                     Destroy(personalTrigger); // removes trigger from localplayer so you can't see it
                     isServer = playerController.IsServer && playerController.IsOwner;
                     HealthbarAnimator.Setup(this);
-
+                    FixLocalArms();
 
                     Camera c = playerController.gameplayCamera;
                     if (c is not null)
@@ -767,8 +781,14 @@ public class BoneMapper : MonoBehaviour
                         thirdPersonConstraint = EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, realCameraPos.transform, false);
                         thirdPersonConstraint.debug = true;
 
-
-                        cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, this.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head), false));
+                        if (basePlayerModelSMR[0].bones[32].name == "spine.004")//probably scavenger
+                        {
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, basePlayerModelSMR[0].bones[32], false));
+                        }
+                        else//not scavenger or someone broke the bone order :(
+                        {
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head), false));
+                        }
 
                         GameObject cameraRotationObjectLmao = new GameObject();
                         cameraRotationObjectLmao.transform.SetParent(c.transform);
@@ -784,13 +804,46 @@ public class BoneMapper : MonoBehaviour
         {
             DebugClass.Log(e);
         }
+        if (!CustomEmotesAPI.localMapper)
+        {
+            StartCoroutine(GetLocal());
+        }
+    }
+    internal void FixLocalArms()
+    {
+        int x = 0;
+        for (int i = 0; i < basePlayerModelSMR[1].bones.Length; i++)
+        {
+            EmoteConstraint e = basePlayerModelSMR[1].bones[i].GetComponent<EmoteConstraint>();
+            if (e is not null)
+            {
+                int startX = x;
+                for (; x < basePlayerModelSMR[0].bones.Length; x++)
+                {
+                    if (basePlayerModelSMR[1].bones[i].name == basePlayerModelSMR[0].bones[x].name)
+                    {
+                        e.AddSource(basePlayerModelSMR[1].bones[i], basePlayerModelSMR[0].bones[x]);
+                        e.forceGlobalTransforms = true;
+                        break;
+                    }
+                    if (x == startX - 1)
+                    {
+                        break;
+                    }
+                    if (startX > 0 && x == basePlayerModelSMR[0].bones.Length - 1)
+                    {
+                        x = -1;
+                    }
+                }
+            }
+        }
     }
     bool ranSinceLastAnim = false; //this is probably really jank but it's been 2 years since I touched this part and I'm afraid to break something, I should come back to this later though...
     void TwoPartThing()
     {
-        if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
+        if (!ranSinceLastAnim)
         {
-            if (!ranSinceLastAnim)
+            if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
             {
                 if (!twopart)
                 {
@@ -838,11 +891,11 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
             }
-        }
-        else
-        {
-            //a1.enabled = false;
-            twopart = false;
+            else
+            {
+                //a1.enabled = false;
+                twopart = false;
+            }
         }
     }
     void Health()
@@ -907,10 +960,6 @@ public class BoneMapper : MonoBehaviour
         {
             LocalFunctions();
         }
-        else
-        {
-            GetLocal();
-        }
         TwoPartThing();
         Health();
         SetDeltaPosition();
@@ -968,7 +1017,7 @@ public class BoneMapper : MonoBehaviour
         try
         {
             //just skip it all if we aren't playing anything
-            if (emoteSkeletonAnimator.GetCurrentAnimatorStateInfo(0).IsName("none"))
+            if (!emoteSkeletonAnimator.enabled)
             {
                 return;
             }
@@ -1080,14 +1129,7 @@ public class BoneMapper : MonoBehaviour
             }
         }
 
-        if (currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
-        {
-            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, true, spot);
-        }
-        else
-        {
-            EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, false, spot);
-        }
+        EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp, spot);
     }
     public void RemoveProp(int propPos)
     {
@@ -1115,6 +1157,9 @@ public class BoneMapper : MonoBehaviour
         if (playerController is not null)
         {
             playersToMappers.Remove(playerController.gameObject);
+        if (worldProp)
+        {
+            return;
         }
         playersToMappers.Remove(mapperBody);
         try
@@ -1226,7 +1271,7 @@ public class BoneMapper : MonoBehaviour
                             ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                             if (smr == basePlayerModelSMR.First())
                             {
-                                ec.localTransforms = currentClip.localTransforms;
+                                ec.SetLocalTransforms(currentClip.localTransforms);
                             }
                         }
                         else if (dontAnimateUs.Contains(smr.bones[i].name))
@@ -1360,5 +1405,10 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
+    }
+    public void AttachItemHolderToTransform(Transform target)
+    {
+        itemHolderPosition.gameObject.GetComponent<EmoteConstraint>().AddSource(itemHolderPosition, target);
+        itemHolderPosition.gameObject.GetComponent<EmoteConstraint>().ActivateConstraints();
     }
 }

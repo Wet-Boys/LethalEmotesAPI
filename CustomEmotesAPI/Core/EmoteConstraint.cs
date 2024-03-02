@@ -19,8 +19,14 @@ public class EmoteConstraint : MonoBehaviour
     bool hasEverActivatedConstraints = false;
     public bool onlyY = false;
     public bool debug = false;
-    public bool localTransforms = false;
+    public bool localTransforms { get; private set; } = false;
+    public bool forceGlobalTransforms = false;
     internal bool needToFix = true;
+    public bool SetLocalTransforms(bool input)
+    {
+        localTransforms = !forceGlobalTransforms && input;
+        return localTransforms;
+    }
     void LateUpdate()
     {
         ActUponConstraints();
@@ -57,7 +63,7 @@ public class EmoteConstraint : MonoBehaviour
     }
     public void ActivateConstraints()
     {
-        if (!constraintActive)
+        if (!constraintActive && emoteBone is not null)
         {
             if (firstTime2)
             {

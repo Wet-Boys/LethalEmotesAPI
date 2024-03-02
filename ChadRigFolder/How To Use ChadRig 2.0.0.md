@@ -1,0 +1,3 @@
+The main purpose of the [2.0.0 rig](https://github.com/Wet-Boys/LethalEmotesAPI/blob/main/ChadRigFolder/UnsavedTrashs_ChadRigTM2.0.0_ScavEdition.blend) is to have more accurate animations.
+
+Once you have your new blend file with your animation in Unity, set it to humanoid as usual, but instead of creating the avatar from the blend file itself, copy the [avatar from the ChadRigAvatar.asset](https://github.com/Wet-Boys/LethalEmotesAPI/blob/main/ChadRigFolder/ChadRigAvatar.asset) (import that into unity)
