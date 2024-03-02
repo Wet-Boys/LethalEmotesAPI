@@ -61,10 +61,15 @@ public static class EmoteUiManager
     internal static string GetEmoteModName(string emoteKey) => _stateController!.EmoteDb.GetModName(emoteKey);
     
     internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
-    
+    internal static IReadOnlyCollection<string> EmotePoolBlacklist => _stateController!.EmotePoolBlacklist;
+
+
     internal static void AddToRandomPoolBlacklist(string emoteKey) => _stateController?.AddToRandomPoolBlacklist(emoteKey);
 
     internal static void RemoveFromRandomPoolBlacklist(string emoteKey) => _stateController?.RemoveFromRandomPoolBlacklist(emoteKey);
+    internal static void AddToEmoteBlacklist(string emoteKey) => _stateController?.AddToEmoteBlacklist(emoteKey);
+
+    internal static void RemoveFromEmoteBlacklist(string emoteKey) => _stateController?.RemoveFromEmoteBlacklist(emoteKey);
 
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {

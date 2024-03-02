@@ -209,6 +209,21 @@ public class BoneMapper : MonoBehaviour
 
         currEvent = 0;
         currentClipName = s;
+        if (s == "none")
+        {
+            emoteSkeletonAnimator.Play("none", -1, 0f);
+            twopart = false;
+            prevClip = currentClip;
+            currentClip = null;
+            NewAnimation(null);
+            CustomEmotesAPI.Changed(s, this);
+
+            return;
+        }
+        if (BlacklistSettings.emotesDisabled.Contains(s))
+        {
+            return;
+        }
         if (s != "none")
         {
             prevClip = currentClip;
@@ -255,19 +270,6 @@ public class BoneMapper : MonoBehaviour
             }
             StartCoroutine(lockBonesAfterAFrame());
         }
-
-        if (s == "none")
-        {
-            emoteSkeletonAnimator.Play("none", -1, 0f);
-            twopart = false;
-            prevClip = currentClip;
-            currentClip = null;
-            NewAnimation(null);
-            CustomEmotesAPI.Changed(s, this);
-
-            return;
-        }
-
         AnimatorOverrideController animController = new AnimatorOverrideController(emoteSkeletonAnimator.runtimeAnimatorController);
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {

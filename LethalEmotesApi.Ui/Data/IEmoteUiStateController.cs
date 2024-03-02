@@ -23,11 +23,15 @@ public interface IEmoteUiStateController
     public IEmoteDb EmoteDb { get; }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
+    public IReadOnlyCollection<string> EmotePoolBlacklist { get; }
 
     public void AddToRandomPoolBlacklist(string emoteKey);
 
     public void RemoveFromRandomPoolBlacklist(string emoteKey);
-    
+    public void AddToEmoteBlacklist(string emoteKey);
+
+    public void RemoveFromEmoteBlacklist(string emoteKey);
+
     #region Loading Config Data
 
     public EmoteWheelSetData LoadEmoteWheelSetData();

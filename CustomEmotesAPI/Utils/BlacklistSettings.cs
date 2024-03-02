@@ -8,6 +8,7 @@ namespace LethalEmotesAPI.Utils
     public class BlacklistSettings
     {
         public static List<string> emotesExcludedFromRandom = [];
+        public static List<string> emotesDisabled = [];
 
         public static void AddToExcludeList(string emoteName)
         {
@@ -22,6 +23,7 @@ namespace LethalEmotesAPI.Utils
 
         public static void RemoveFromExcludeList(string emoteName)
         {
+            RemoveFromDisabledList(emoteName);
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
             emotesExcludedFromRandom.Remove(emoteName);
             if (CustomEmotesAPI.randomClipList.Contains(emoteName))
@@ -52,6 +54,38 @@ namespace LethalEmotesAPI.Utils
                 sb.Remove(sb.Length - 1, 1);
             }
             list.Value = sb.ToString();
+        }
+
+
+
+
+
+
+
+
+
+        //Disable List
+        public static void AddToDisabledList(string emoteName)
+        {
+            AddToExcludeList(emoteName);
+            emoteName = BoneMapper.GetRealAnimationName(emoteName);
+            CustomEmotesAPI.randomClipList.Remove(emoteName);
+            if (emotesExcludedFromRandom.Contains(emoteName))
+                return;
+
+            emotesExcludedFromRandom.Add(emoteName);
+            SaveExcludeListToBepinSex(Settings.DisabledEmotes);
+        }
+
+        public static void RemoveFromDisabledList(string emoteName)
+        {
+            emoteName = BoneMapper.GetRealAnimationName(emoteName);
+            emotesExcludedFromRandom.Remove(emoteName);
+            if (CustomEmotesAPI.randomClipList.Contains(emoteName))
+                return;
+
+            CustomEmotesAPI.randomClipList.Add(emoteName);
+            SaveExcludeListToBepinSex(Settings.DisabledEmotes);
         }
     }
 }

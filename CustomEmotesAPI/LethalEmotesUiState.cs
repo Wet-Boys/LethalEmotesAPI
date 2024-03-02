@@ -74,7 +74,8 @@ public class LethalEmotesUiState : IEmoteUiStateController
     }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist => BlacklistSettings.emotesExcludedFromRandom;
-    
+    public IReadOnlyCollection<string> EmotePoolBlacklist => BlacklistSettings.emotesDisabled;
+
     public void AddToRandomPoolBlacklist(string emoteKey)
     {
         BlacklistSettings.AddToExcludeList(emoteKey);
@@ -83,6 +84,16 @@ public class LethalEmotesUiState : IEmoteUiStateController
     public void RemoveFromRandomPoolBlacklist(string emoteKey)
     {
         BlacklistSettings.RemoveFromExcludeList(emoteKey);
+    }
+
+    public void AddToEmoteBlacklist(string emoteKey)
+    {
+        BlacklistSettings.AddToDisabledList(emoteKey);
+    }
+
+    public void RemoveFromEmoteBlacklist(string emoteKey)
+    {
+        BlacklistSettings.RemoveFromDisabledList(emoteKey);
     }
 
     internal static void FixLegacyEmotes()
