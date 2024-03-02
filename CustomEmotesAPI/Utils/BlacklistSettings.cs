@@ -65,27 +65,44 @@ namespace LethalEmotesAPI.Utils
 
 
         //Disable List
+        public static void LoadDisabledListFromBepinSex(ConfigEntry<string> list)
+        {
+            string csvList = list.Value;
+            foreach (var item in csvList.Split('ඞ'))
+            {
+                AddToDisabledList(item);
+            }
+        }
         public static void AddToDisabledList(string emoteName)
         {
-            AddToExcludeList(emoteName);
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
-            CustomEmotesAPI.randomClipList.Remove(emoteName);
-            if (emotesExcludedFromRandom.Contains(emoteName))
+            DebugClass.Log($"excluding {emoteName} before we disable it");
+            AddToExcludeList(emoteName);
+            if (emotesDisabled.Contains(emoteName))
                 return;
 
-            emotesExcludedFromRandom.Add(emoteName);
-            SaveExcludeListToBepinSex(Settings.DisabledEmotes);
+            emotesDisabled.Add(emoteName);
+            SaveDisabledListToBepinSex(Settings.DisabledEmotes);
         }
 
         public static void RemoveFromDisabledList(string emoteName)
         {
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
-            emotesExcludedFromRandom.Remove(emoteName);
-            if (CustomEmotesAPI.randomClipList.Contains(emoteName))
-                return;
-
-            CustomEmotesAPI.randomClipList.Add(emoteName);
-            SaveExcludeListToBepinSex(Settings.DisabledEmotes);
+            emotesDisabled.Remove(emoteName);
+            SaveDisabledListToBepinSex(Settings.DisabledEmotes);
+        }
+        public static void SaveDisabledListToBepinSex(ConfigEntry<string> list)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in emotesDisabled)
+            {
+                sb.Append($"{item}ඞ");
+            }
+            if (sb.ToString().EndsWith('ඞ'))
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+            list.Value = sb.ToString();
         }
     }
 }
