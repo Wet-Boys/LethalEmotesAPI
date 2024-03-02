@@ -15,10 +15,6 @@ namespace LethalEmotesAPI.Patches
             Transform cosmeticRoot = mapper.basePlayerModelAnimator.transform;
             CosmeticApplication cosmeticApplication = cosmeticRoot.GetComponent<CosmeticApplication>();
             List<string> cosmetics = CosmeticRegistry.locallySelectedCosmetics;
-            if (cosmeticApplication.spawnedCosmetics.Count != 0)
-            {
-                return false;
-            }
             if (cosmeticApplication)
             {
                 cosmeticApplication.ClearCosmetics();
@@ -40,11 +36,22 @@ namespace LethalEmotesAPI.Patches
         internal static void TurnOffCosmetics(BoneMapper mapper)
         {
             Transform cosmeticRoot = mapper.basePlayerModelAnimator.transform;
-            CosmeticApplication cosmeticApplication = cosmeticRoot.GetComponent<CosmeticApplication>();
-            if (cosmeticApplication)
+            CosmeticApplication[] cosmeticApplications = cosmeticRoot.GetComponents<CosmeticApplication>();
+            foreach (var item in cosmeticApplications)
             {
-                cosmeticApplication.ClearCosmetics();
+                if (item)
+                {
+                    foreach (var cosmetic in item.spawnedCosmetics)
+                    {
+                        cosmetic.gameObject.layer = 23;//I hate layer 23 so much but everyone does it cause mirror mod does it so I guess I fall in line :/
+                        foreach (var t in cosmetic.gameObject.GetComponentsInChildren<Transform>())
+                        {
+                            t.gameObject.layer = 23;
+                        }
+                    }
+                }
             }
+
         }
     }
 }

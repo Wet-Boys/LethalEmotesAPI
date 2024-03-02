@@ -27,6 +27,8 @@ using TMPro;
 using System.Linq;
 using BepInEx.Bootstrap;
 using LethalEmotesAPI.Patches;
+using LethalEmotesAPI.Core;
+using LethalEmotesAPI.Patches.ModCompat;
 
 namespace EmotesAPI
 {
@@ -36,13 +38,16 @@ namespace EmotesAPI
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("LCThirdPerson", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("me.swipez.melonloader.morecompany", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("Ooseykins.LethalVRM", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("io.daxcess.lcvr", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.potatoepet.AdvancedCompany", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.1.10";
+        public const string VERSION = "1.3.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -66,26 +71,20 @@ namespace EmotesAPI
         {
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
-        public static List<string> allClipNames = new List<string>();
         public static List<string> randomClipList = new List<string>();
-        public static List<int> blacklistedClips = new List<int>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
         public static bool MoreCompanyPresent;
-        public static void BlackListEmote(string name)
-        {
-            for (int i = 0; i < allClipNames.Count; i++)
-            {
-                if (allClipNames[i] == name)
-                {
-                    blacklistedClips.Add(i);
-                    return;
-                }
-            }
-        }
+        public static bool VRMPresent;
+        public static bool AdvancedCompanyPresent;
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
+        }
+        [Obsolete("Does nothing, but not removing to not brick stuff")]
+        public static void BlackListEmote(string name)
+        {
+            //lmao this does nothing
         }
         internal static bool GetKey(ConfigEntry<KeyboardShortcut> entry)
         {
@@ -113,7 +112,8 @@ namespace EmotesAPI
         public static CustomEmotesAPI instance;
         private void PlayerControllerStart(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { 0, 1, 2, 3 });
+            GameObject g = new GameObject();
+            g.AddComponent<AudioContainer>().StartCoroutine(ImportPlayerSkeleton(self));
             orig(self);
             if (self.IsServer && EmoteNetworker.instance == null)
             {
@@ -121,21 +121,60 @@ namespace EmotesAPI
                 networker.GetComponent<NetworkObject>().Spawn(true);
             }
         }
+        IEnumerator ImportPlayerSkeleton(PlayerControllerB player)
+        {
+            yield return new WaitForEndOfFrame();
+            int SMR1 = 0, SMR2 = 0;
+            //this may seem hacky, but I would argue mods inserting SMRs into the bone structure is more hacky so I'm just being safe
+            for (int i = 0; i < player.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>().Length; i++)
+            {
+                if (player.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == player.thisPlayerModelLOD1)
+                {
+                    SMR1 = i;
+                }
+                else if (player.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()[i] == player.thisPlayerModelArms)
+                {
+                    SMR2 = i;
+                }
+            }
+            AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
+
+            //TODO this cleanup is not working?????
+            //try
+            //{
+            //    Destroy(gameObject);
+            //}
+            //catch (Exception)
+            //{
+            //}
+        }
         private static Hook playerControllerStartHook;
 
 
         public static List<GameObject> networkedObjects = new List<GameObject>();
         private void NetworkManagerStart(Action<GameNetworkManager> orig, GameNetworkManager self)
         {
-            orig(self);
-            emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
-            //emoteNetworker.AddComponent<NetworkObject>();
-            emoteNetworker.AddComponent<EmoteNetworker>();
-            GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
-            foreach (var item in networkedObjects)
+            try
             {
-                GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(item);
+                LethalEmotesUiState.FixLegacyEmotes();
+
+                emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
+
+                emoteNetworker.AddComponent<EmoteNetworker>();
+
+                GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(emoteNetworker);
+
+                foreach (var item in networkedObjects)
+                {
+                    GameNetworkManager.Instance.GetComponent<NetworkManager>().AddNetworkPrefab(item);
+                }
             }
+            catch (Exception)
+            {
+                DebugClass.Log($"Couldn't setup LethalEmotesAPI's networker");
+            }
+            orig(self);
+
         }
         private static Hook networkManagerStartHook;
         private void StartOfRoundUpdate(Action<StartOfRound> orig, StartOfRound self)
@@ -150,6 +189,7 @@ namespace EmotesAPI
         public static GameObject baseHUDObject;
         public static GameObject selfRedHUDObject;
         public static TextMeshPro currentEmoteText;
+        public static Camera hudCamera;
         private void HUDManagerAwake(Action<HUDManager> orig, HUDManager self)
         {
             orig(self);
@@ -172,7 +212,13 @@ namespace EmotesAPI
             orig(self, health, hurtPlayer);
             if (hudObject is not null)
             {
-                hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                try
+                {
+                    hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
         private static Hook hudManagerUpdateHealthUIHook;
@@ -289,30 +335,38 @@ namespace EmotesAPI
         }
         private static Hook GrabbableObjectLateUpdateHook;
 
-        //private void EnemyAiStart(Action<ForestGiantAI> orig, ForestGiantAI self)
-        //{
-        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/giant5.prefab", [0]);
-        //    orig(self);
-        //}
-        //private static Hook EnemyAiStartHook;
+        private void StartPerformingEmoteClientRpc(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            orig(self);
+            try
+            {
+                DebugClass.Log($"we are playing on {self.gameObject}");
+                BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
+                if (mapper.emoteSkeletonAnimator.enabled)
+                {
+                    PlayAnimation("none", mapper);
+                }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"couldn't find bonemapper? {e}");
+            }
+        }
+        private static Hook StartPerformingEmoteClientRpcHook;
 
-        //private void BlobAIEnemyAiStart(Action<BlobAI> orig, BlobAI self)
-        //{
-        //    AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/blob1.prefab", [0]);
-        //    orig(self);
-        //}
-        //private static Hook BlobAIEnemyAiStartHook;
+
         private static GameObject emoteNetworker;
 
 
         //Vector3 prevCamPosition = Vector3.zero;
         internal static void AutoWalking(PlayerControllerB player)
         {
-            if (player == StartOfRound.Instance.localPlayerController)
+            if (player == StartOfRound.Instance.localPlayerController && player is not null)
             {
                 if (localMapper)
                 {
                     bool originalIsNotZero = player.moveInputVector != Vector2.zero;
+                    BoneMapper.moving = originalIsNotZero;
                     if (localMapper.autoWalkSpeed != 0)
                     {
                         if (localMapper.overrideMoveSpeed)
@@ -366,6 +420,9 @@ namespace EmotesAPI
             LCThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("LCThirdPerson");
             ModelReplacementAPIPresent = Chainloader.PluginInfos.ContainsKey("meow.ModelReplacementAPI");
             MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
+            VRMPresent = Chainloader.PluginInfos.ContainsKey("Ooseykins.LethalVRM");
+            AdvancedCompanyPresent = Chainloader.PluginInfos.ContainsKey("com.potatoepet.AdvancedCompany");
+
 
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
@@ -418,9 +475,20 @@ namespace EmotesAPI
                 ModelReplacementAPICompat.SetupViewStateHook();
             }
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
-            //SetupHook(typeof(ForestGiantAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(EnemyAiStart), EnemyAiStartHook);
-            //SetupHook(typeof(BlobAI), typeof(CustomEmotesAPI), "Start", BindingFlags.Public, nameof(BlobAIEnemyAiStart), BlobAIEnemyAiStartHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
 
+            CentipedePatches.PatchAll();
+            if (VRMPresent)
+            {
+                VRMCompat.SetupUpdateVisibilityHook();
+            }
+            if (AdvancedCompanyPresent)
+            {
+                AdvancedCompanyCompat.SetupUpdateVisibilityHook();
+            }
+
+
+            EnemySkeletons.SetupEnemyHooks();
 
             AnimationReplacements.RunAll();
 
@@ -446,9 +514,10 @@ namespace EmotesAPI
                 {
                 }
             }
-            
+
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
-            
+
+            DebugCommands.Debugcommands();
             AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim") }, looping = false, visible = false });
             AddNonAnimatingEmote("none");
             //AddCustomAnimation(new AnimationClipParams() { animationClip = new AnimationClip[] { Assets.Load<AnimationClip>($"assets/BayonettaTest.anim") }, looping = false, visible = false });
@@ -458,6 +527,7 @@ namespace EmotesAPI
             var ScrollD = new InputAction("ScrollDOWN", binding: "<Mouse>/Scroll/Down");
             ScrollU.Enable();
             ScrollD.Enable();
+            Settings.SetHealthbarRequest();
 
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
@@ -469,20 +539,24 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
-            //EmotesInputSettings.Instance.ligmaballs.started += Ligmaballs_started;
+            //EmotesInputSettings.Instance.LigmaBalls.started += LigmaBalls_started;
+            EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
         }
 
-        //private void Ligmaballs_started(InputAction.CallbackContext obj)
-        //{
-        //    foreach (var item in GetAllBoneMappers())
-        //    {
-        //        if (item.playerController is null)
-        //        {
-        //            int rand = UnityEngine.Random.Range(0, randomClipList.Count);
-        //            PlayAnimation(randomClipList[rand], item);
-        //        }
-        //    }
-        //}
+        bool yote = true;
+        private void LigmaBalls_started(InputAction.CallbackContext obj)
+        {
+            yote = !yote;
+            if (yote)
+            {
+                localMapper.UnlockBones();
+            }
+            else
+            {
+                localMapper.LockBones();
+            }
+        }
+
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
         {
             if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
@@ -620,13 +694,13 @@ namespace EmotesAPI
             return GameObject.Instantiate(BoneMapper.allWorldProps[propPos].prop);
         }
 
+
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
             var ownerPlugin = Assembly.GetCallingAssembly().GetBepInPlugin();
-            
+
             if (visible)
             {
-                allClipNames.Add(emoteName);
                 if (!BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
                 {
                     randomClipList.Add(emoteName);
@@ -637,6 +711,7 @@ namespace EmotesAPI
             if (ownerPlugin is not null)
                 EmoteUiManager.GetStateController()!.EmoteDb.AssociateEmoteKeyWithMod(emoteName, ownerPlugin.Name);
         }
+        [Obsolete("Use EmoteImporter.ImportEmote instead")]
         public static void AddCustomAnimation(AnimationClipParams animationClipParams)
         {
             if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name))
@@ -680,17 +755,9 @@ namespace EmotesAPI
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._primaryAudioClips, animationClipParams._secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams._primaryDMCAFreeAudioClips, animationClipParams._secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms, false);
             if (animationClipParams.visible)
             {
-                if (animationClipParams.customName != "")
-                {
-                    allClipNames.Add(animationClipParams.customName);
-                }
-                else
-                {
-                    allClipNames.Add(animationClipParams.animationClip[0].name);
-                }
                 if (!BlacklistSettings.emotesExcludedFromRandom.Contains(animationClipParams.animationClip[0].name))
                 {
                     randomClipList.Add(animationClipParams.animationClip[0].name);
@@ -698,28 +765,24 @@ namespace EmotesAPI
             }
             BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
         }
-
-        public static GameObject animationControllerHolder;
-        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
+        public static BoneMapper ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int[] meshPos, bool hideMeshes = true)
         {
-            if (!animationControllerHolder)
-            {
-                animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-            }
-            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
+            GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
+            BoneMapper b = AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
+            g.transform.SetParent(b.transform);
+            return b;
         }
-        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
+        public static BoneMapper ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int[] meshPos, bool hideMeshes = true)
         {
-            if (!animationControllerHolder)
-            {
-                animationControllerHolder = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
-            }
-            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = animationControllerHolder.GetComponent<Animator>().runtimeAnimatorController;
-            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
+            return ImportArmature(bodyPrefab, rigToAnimate, false, meshPos, hideMeshes);
         }
         public static void PlayAnimation(string animationName, int pos = -2)
         {
+            if (localMapper is null || !localMapper.canEmote)
+            {
+                return;
+            }
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
@@ -728,6 +791,10 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
+            if (mapper is null || !mapper.canEmote)
+            {
+                return;
+            }
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
@@ -753,8 +820,15 @@ namespace EmotesAPI
         }
         public delegate void AnimationChanged(string newAnimation, BoneMapper mapper);
         public static event AnimationChanged animChanged;
+        static int requestCounter = 0;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            if (mapper is null)
+            {
+                DebugClass.Log("AnimChanged called on null BoneMapper!");
+                return;
+            }
+
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
             
             mapper.currentClipName = newAnimation;
@@ -763,25 +837,20 @@ namespace EmotesAPI
             
             if (mapper == localMapper)
             {
+                if (requestCounter != 0 && CustomEmotesAPI.hudObject is not null)
+                {
+                    requestCounter--;
+                    HealthbarAnimator.FinishHealthbarAnimateRequest();
+                }
                 if (newAnimation == "none")
                 {
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
-                    if (hudObject is not null)
-                    {
-                        hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
-                        baseHUDObject.SetActive(true);
-                        selfRedHUDObject.SetActive(true);
-                    }
                 }
-                else
+                else if (CustomEmotesAPI.hudObject is not null)
                 {
-                    if (hudObject is not null)
-                    {
-                        hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
-                        baseHUDObject.SetActive(false);
-                        selfRedHUDObject.SetActive(false);
-                    }
+                    requestCounter++;
+                    HealthbarAnimator.StartHealthbarAnimateRequest();
                 }
 
             }
@@ -837,6 +906,7 @@ namespace EmotesAPI
                 if (mapper.local && hudObject is not null)
                 {
                     CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0); //remove text top left
+                    CustomEmotesAPI.currentEmoteText.text = "";
                 }
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {

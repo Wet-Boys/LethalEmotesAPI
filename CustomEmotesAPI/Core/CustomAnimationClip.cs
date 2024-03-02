@@ -20,7 +20,7 @@ public class CustomAnimationClip : MonoBehaviour
     public int startPref, joinPref;
     public JoinSpot[] joinSpots;
     public bool useSafePositionReset;
-    public string customName;
+    public string customInternalName;
     public Action<BoneMapper> customPostEventCodeSync;
     public Action<BoneMapper> customPostEventCodeNoSync;
 
@@ -36,9 +36,11 @@ public class CustomAnimationClip : MonoBehaviour
     public float audioLevel = .5f;
     public bool thirdPerson = false;
     public string displayName = "";
+    public bool localTransforms = false;
     public BepInPlugin ownerPlugin;
+    public bool usesNewImportSystem = false;
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f, bool thirdPerson = false, string displayName = "", BepInPlugin ownerPlugin = null)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f, bool thirdPerson = false, string displayName = "", BepInPlugin ownerPlugin = null, bool localTransforms = false, bool usesNewImportSystem = false)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -122,14 +124,14 @@ public class CustomAnimationClip : MonoBehaviour
             _joinSpots = new JoinSpot[0];
         joinSpots = _joinSpots;
         this.useSafePositionReset = safePositionReset;
-        this.customName = customName;
-        if (customName != "")
+        this.customInternalName = customName;
+        this.usesNewImportSystem = usesNewImportSystem;
+        if (!usesNewImportSystem)
         {
-            BoneMapper.customNamePairs.Add(customName, _clip[0].name);
-        }
-        else
-        {
-            this.customName = clip[0].name;
+            if (customName != "")
+            {
+                BoneMapper.customNamePairs.Add(customName, _clip[0].name);
+            }
         }
         BoneMapper.listOfCurrentEmoteAudio.Add(new List<AudioSource>());
         this.lockType = lockType;
@@ -137,6 +139,12 @@ public class CustomAnimationClip : MonoBehaviour
         this.audioLevel = audioLevel;
         this.thirdPerson = thirdPerson;
         this.displayName = displayName;
+        if (displayName == "")
+        {
+            DebugClass.Log($"display name wasn't set, using {this.customInternalName}");
+            this.displayName = this.customInternalName;
+        }
         this.ownerPlugin = ownerPlugin;
+        this.localTransforms = localTransforms;
     }
 }

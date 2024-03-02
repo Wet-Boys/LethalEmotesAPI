@@ -58,6 +58,14 @@ public class EmoteNetworker : NetworkBehaviour
         }
 
         BoneMapper map = bodyObject.GetComponentInChildren<BoneMapper>();
+        if (map.playerController is not null && animation != "none")
+        {
+            map.playerController.performingEmote = false;
+            if (map.playerController.IsOwner)
+            {
+                map.playerController.StopPerformingEmoteServerRpc();
+            }
+        }
         DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject}");
 
         map.PlayAnim(animation, pos, eventNum);
@@ -106,7 +114,7 @@ public class EmoteNetworker : NetworkBehaviour
 
         BoneMapper joinerMapper = bodyObject.GetComponentInChildren<BoneMapper>();
 
-        joinerMapper.PlayAnim("none", 0);
+        joinerMapper.PlayAnim("none", 0, -1);
 
         joinerMapper.currentEmoteSpot = spotObject.GetComponentsInChildren<EmoteLocation>()[posInArray].gameObject;
 

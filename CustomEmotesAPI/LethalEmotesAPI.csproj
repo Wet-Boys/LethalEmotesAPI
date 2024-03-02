@@ -29,9 +29,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.2" />
     <PackageReference Include="notnotnotswipez-MoreCompany" Version="1.7.4" />
+    <PackageReference Include="Ooseykins-LethalVRM" Version="1.0.7" publicize="true" />
+    <PackageReference Include="PotatoePet-AdvancedCompany" Version="1.0.112" publicize="true" />
     <PackageReference Include="Rune580-LethalCompany_InputUtils" Version="0.4.4" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" />
   </ItemGroup>

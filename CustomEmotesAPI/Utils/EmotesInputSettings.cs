@@ -30,7 +30,8 @@ namespace LethalEmotesAPI
 
         [InputAction("<Mouse>/middleButton", Name = "CustomEmotesAPI: Third Person Toggle")]
         public InputAction ThirdPersonToggle { get; set; }
-        //[InputAction("<Keyboard>/p", Name = "Fuck you")]
-        //public InputAction ligmaballs { get; set; }
+
+        //[InputAction("<Keyboard>/h", Name = "CustomEmotesAPI: Third Person Toggle")]
+        //public InputAction LigmaBalls { get; set; }
     }
 }

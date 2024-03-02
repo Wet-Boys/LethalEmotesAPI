@@ -1,3 +1,51 @@
+- Version 1.3.0: Added new way to import emotes which allows more than one mod to have the same emote. This should address the issue where there are like 20 different emotes that are duplicated across multiple mods.
+
+- Version 1.2.16: Fixed issue where we were breaking the bodycam mod
+
+- Version 1.2.15: Upped LethalEmotesAPI priority in GameNetworkManager's Start but added a try catch block to attempt to sidestep some conflicts 
+
+- Version 1.2.14: Fixed issue where I was destroying cosmetics when other mods still need them
+
+- Version 1.2.13: Changed the third person camera to truly use the spectator camera's culling mask. This means it will only be able to see what you can see while spectating players (but it does mean if the spectator camera get's messed up, well... but this is better than the previous solution). Fixed issue when combing emotes from emotes api and toomanyemotes at the same time. The only conflict was when both played at the same time, so now emotes properly end when the other gets played to prevent this.
+
+- Version 1.2.12: I suck
+
+- Version 1.2.11: emergency fix oooooooooooooooooooooooooooooooooops
+
+- Version 1.2.10: Hardened code on spawning to prevent conflicts with weird mod configurations
+
+- Version 1.2.9: Fixed issue where I was locking the camera when I wasn't supposed to
+
+- Verison 1.2.8: Fixed coil heads eating their own ass
+
+- Version 1.2.7: Quick fix preventing spaghettification if your first emote has bones ignored from it's animation (literally no use case right now but just future proofing it)
+
+- Version 1.2.6: Fixed audio sync issues, hopefully people will no longer be suffering randomly. Added useLocalTransforms to AnimationClipParams, this is primarily for if you are trying to do something like an upper body only animation where you  ignore the legs/pelvis
+
+- Version 1.2.5: Fixed head not having proper mapping for emotes.
+
+- Version 1.2.4: Fixed the first time any first person emote played, it would be camera locked.
+
+- Version 1.2.3: Fixed being able to emoting during AC's terminal, fixed emote text not always showing up top
+
+- Verison 1.2.2: Fixed a critical incompatibility issue I caused. Fixed first person arms not working when animating
+
+- Version 1.2.1: Fixed the HealthbarAnimator from not spawning in the correct spot
+
+- Version 1.2.0: Exposed the healthbar animator you can create and remove requests with HealthbarAnimator.StartHealthbarAnimateRequest() and HealthbarAnimator.FinishHealthbarAnimateRequest()
+
+- Version 1.1.16: Fixed cosmetic issues with MoreCompany/AdvancedCompany
+
+- Version 1.1.15: Made the VR mod a soft dependency purely to let it load first since the IL code injections conflict otherwise
+
+- Version 1.1.14: Fixed respawning in latecompany causing emotes to t-pose on the floor
+
+- Version 1.1.13: Fixed VRM t-posing
+
+- Version 1.1.12: Fixed quite a few bugs
+
+- Version 1.1.11: Added enemy skeletons, do with that as you will
+
 - Version 1.1.10: Probably fixed issue with morecompany cosmetics not being removed
 
 - Version 1.1.9: Fixed incompat with fov mod. Fixed morecompany cosmetics not showing up (fixed? added)

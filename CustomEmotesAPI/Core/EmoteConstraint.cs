@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 
+[DefaultExecutionOrder(-2)]
 public class EmoteConstraint : MonoBehaviour
 {
     public Transform originalBone;
@@ -13,9 +15,12 @@ public class EmoteConstraint : MonoBehaviour
     public bool constraintActive = false;
     public bool revertTransform;
     bool firstTime = true;
+    bool firstTime2 = true;
     bool hasEverActivatedConstraints = false;
     public bool onlyY = false;
     public bool debug = false;
+    public bool localTransforms = false;
+    internal bool needToFix = true;
     void LateUpdate()
     {
         ActUponConstraints();
@@ -24,14 +29,29 @@ public class EmoteConstraint : MonoBehaviour
     {
         if (constraintActive)
         {
-            if (onlyY)
+            if (localTransforms)
             {
-                originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+                if (onlyY)
+                {
+                    originalBone.localPosition = new Vector3(originalBone.localPosition.x, emoteBone.localPosition.y, originalBone.localPosition.z);
+                }
+                else
+                {
+                    originalBone.localPosition = emoteBone.localPosition;
+                    originalBone.localRotation = emoteBone.localRotation;
+                }
             }
             else
             {
-                originalBone.position = emoteBone.position;
-                originalBone.rotation = emoteBone.rotation;
+                if (onlyY)
+                {
+                    originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+                }
+                else
+                {
+                    originalBone.position = emoteBone.position;
+                    originalBone.rotation = emoteBone.rotation;
+                }
             }
         }
     }
@@ -39,11 +59,34 @@ public class EmoteConstraint : MonoBehaviour
     {
         if (!constraintActive)
         {
-            originalPosition = originalBone.localPosition;
-            originalRotation = originalBone.localRotation;
-            hasEverActivatedConstraints = true;
-            constraintActive = true;
-            onlyY = false;
+            if (firstTime2)
+            {
+                firstTime2 = false;
+                gameObject.GetComponent<MonoBehaviour>().StartCoroutine(FirstTimeActiveFix(this));
+            }
+            else
+            {
+                originalPosition = originalBone.localPosition;
+                originalRotation = originalBone.localRotation;
+                hasEverActivatedConstraints = true;
+                constraintActive = true;
+                onlyY = false;
+            }
+        }
+    }
+    internal IEnumerator FirstTimeActiveFix(EmoteConstraint e)//this is used for some enemies that just don't like to have their emote constraints work unless I do this? Not really sure why but it's not a huge deal tbh
+    {
+        e.enabled = false;
+        yield return new WaitForEndOfFrame();
+        e.enabled = true;
+        if (e.onlyY)
+        {
+            e.ActivateConstraints();
+            e.onlyY = true;
+        }
+        else
+        {
+            e.ActivateConstraints();
         }
     }
     public void DeactivateConstraints()
@@ -69,11 +112,27 @@ public class EmoteConstraint : MonoBehaviour
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
     }
-    internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target)
+    internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target, bool needToFix)
     {
         EmoteConstraint constraint = gameObject.AddComponent<EmoteConstraint>();
         constraint.AddSource(gameObject.transform, target);
         constraint.revertTransform = mapper.revertTransform;
+        constraint.needToFix = needToFix;
         return constraint;
+    }
+
+    void Start()
+    {
+        StartCoroutine(FixConstraints());
+    }
+    IEnumerator FixConstraints()
+    {
+        yield return new WaitForEndOfFrame();
+        if (needToFix)
+        {
+            ActivateConstraints();
+            yield return new WaitForEndOfFrame();
+            DeactivateConstraints();
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using BepInEx;
+using LethalEmotesAPI.ImportV2;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
 
@@ -29,6 +30,9 @@ namespace EmotesAPI
         public int joinPref = -1; // Spot in animationClip array where a BoneMapper will play when there is at least one other instance of said emote playing, -1 is random, -2 is sequential, anything else is what you make it to be
         public JoinSpot[] joinSpots = null; // Array of join spots which will appear when the animation is playing
         public bool useSafePositionReset = false; // Unused in Lethal Company
+        /// <summary>
+        /// If using EmoteImporter.ImportEmote, use displayName instead
+        /// </summary>
         public string customName = ""; // Custom name for emote, if not specified, the first emote from animationClip will be used as the name
         public Action<BoneMapper> customPostEventCodeSync = null; // if declared, will fire when an emote plays audio with sync enabled
         public Action<BoneMapper> customPostEventCodeNoSync = null;// if declared, will fire when an emote plays audio with sync disabled
@@ -37,6 +41,7 @@ namespace EmotesAPI
         public float audioLevel = .5f; // determines the volume of the emote in terms of alerting enemies, 0 is nothing, 1 is max
         public bool thirdPerson = false; // If true, will default animation to third person, although there are user settings to override this in either direction
         public string displayName = ""; //If specified, will replace the name of the emote in the top left corner when emoting. Use this primarily for hidden emotes that you still want to show up there.
+        public bool useLocalTransforms = false;
 
         /// <summary>
         /// <see cref="BepInPlugin"/> of the mod that created this <see cref="AnimationClipParams"/>.

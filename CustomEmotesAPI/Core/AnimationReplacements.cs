@@ -4,6 +4,7 @@ using System.Security.Permissions;
 using System.Text;
 using GameNetcodeStuff;
 using LethalEmotesAPI.Utils;
+using EmotesAPI;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -14,10 +15,14 @@ internal static class AnimationReplacements
         ChangeAnims();
     }
     internal static bool setup = false;
-    internal static void Import(GameObject prefab, string skeleton, int[] pos, bool hidemesh = true)
+    internal static BoneMapper Import(GameObject prefab, string skeleton, int[] pos, bool hidemesh = true)
     {
-        Assets.Load<GameObject>(skeleton).GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
-        AnimationReplacements.ApplyAnimationStuff(prefab, GameObject.Instantiate(Assets.Load<GameObject>(skeleton)), pos, hidemesh, revertBonePositions: true);
+        GameObject g = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab"));
+        GameObject emoteSkeleton = GameObject.Instantiate(Assets.Load<GameObject>(skeleton));
+        emoteSkeleton.GetComponent<Animator>().runtimeAnimatorController = g.GetComponent<Animator>().runtimeAnimatorController;
+        BoneMapper b = AnimationReplacements.ApplyAnimationStuff(prefab, emoteSkeleton, pos, hidemesh, revertBonePositions: true);
+        g.transform.SetParent(emoteSkeleton.transform);
+        return b;
     }
     public static void DebugBones(GameObject fab)
     {
@@ -59,14 +64,14 @@ internal static class AnimationReplacements
         ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
     }
 
-    internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int[] pos, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
+    internal static BoneMapper ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int[] pos, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
     {
         try
         {
             if (!animcontroller.GetComponentInChildren<Animator>().avatar.isHuman)
             {
                 DebugClass.Log($"{animcontroller}'s avatar isn't humanoid, please fix it in unity!");
-                return;
+                return null;
             }
         }
         catch (Exception e)
@@ -134,41 +139,6 @@ internal static class AnimationReplacements
             throw;
         }
 
-
-        //since this game is jank and has A UNIQUE SKINNEDMESHRENDERER FOR EACH LOD, I am just going to enforce proper SMR labeling. This probably won't be that big of a deal since I imagine the need for people setting up their own emote skeletons will be FAR less than ROR2
-        //try
-        //{
-        //    int matchingBones = 0;
-        //    while (true)
-        //    {
-        //        foreach (var smr1bone in smr1.bones) //smr is SkinnedMeshRenderer
-        //        {
-        //            foreach (var smr2bone in smr2.bones)
-        //            {
-        //                if (smr1bone.name == smr2bone.name)
-        //                {
-        //                    matchingBones++;
-        //                }
-        //            }
-        //        }
-        //        if (matchingBones < 1 && pos + 1 < bodyPrefab.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
-        //        {
-        //            pos++;
-        //            smr2 = bodyPrefab.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
-        //            matchingBones = 0;
-        //        }
-        //        else
-        //        {
-        //            break;
-        //        }
-        //    }
-        //}
-        //catch (Exception e)
-        //{
-        //    DebugClass.Log($"Had issue while checking matching bones: {e}");
-        //    throw;
-        //}
-
         var test = animcontroller.AddComponent<BoneMapper>();
         try
         {
@@ -200,7 +170,7 @@ internal static class AnimationReplacements
             throw;
         }
         test.revertTransform = revertBonePositions;
-
+        return test;
     }
 }
 
