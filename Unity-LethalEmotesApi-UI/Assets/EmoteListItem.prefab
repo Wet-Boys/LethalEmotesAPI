@@ -604,6 +604,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   label: {fileID: 2282145272262992105}
   blacklistToggle: {fileID: 5326279805958892969}
+  visibilityToggle: {fileID: 565719386430926793}
   selectImage: {fileID: 6255788805227424473}
   modLabel: {fileID: 7175857151734016797}
   dragDropController: {fileID: 0}
