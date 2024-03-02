@@ -6,17 +6,19 @@ using UnityEngine.UI;
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class EmoteVisibilityToggle : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public EmoteListItem? emoteListItem;
-    public Image? toggleImage;
+    public Image? visibilityImage;
+    public Sprite? enabledSprite;
+    public Sprite? disabledSprite;
 
     private string? _emoteKey;
-    private bool InBlacklist => EmoteUiManager.RandomPoolBlacklist.Contains(_emoteKey);
+    private bool IsVisible => EmoteUiManager.EmotePoolBlacklist.Contains(_emoteKey);
 
     protected override void Start()
     {
-        base.Awake();
+        base.Start();
         UpdateState();
     }
 
@@ -36,28 +38,28 @@ public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerE
     {
         if (string.IsNullOrEmpty(_emoteKey))
             return;
-        
-        if (InBlacklist)
+
+        if (IsVisible)
         {
-            EmoteUiManager.RemoveFromRandomPoolBlacklist(_emoteKey);
+            EmoteUiManager.AddToEmoteBlacklist(_emoteKey);
         }
         else
         {
-            EmoteUiManager.AddToRandomPoolBlacklist(_emoteKey);
+            EmoteUiManager.RemoveFromEmoteBlacklist(_emoteKey);
         }
         
         UpdateState();
     }
-    
+
     public void UpdateState()
     {
         if (string.IsNullOrEmpty(_emoteKey))
             return;
-        
-        if (toggleImage is null)
+
+        if (visibilityImage is null || enabledSprite is null || disabledSprite is null)
             return;
 
-        toggleImage.enabled = InBlacklist;
+        visibilityImage.sprite = IsVisible ? enabledSprite : disabledSprite;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
