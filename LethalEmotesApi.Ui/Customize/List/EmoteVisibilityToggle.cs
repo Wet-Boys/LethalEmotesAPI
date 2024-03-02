@@ -14,7 +14,7 @@ public class EmoteVisibilityToggle : UIBehaviour, IPointerEnterHandler, IPointer
     public Sprite? disabledSprite;
 
     private string? _emoteKey;
-    private bool IsVisible => EmoteUiManager.EmotePoolBlacklist.Contains(_emoteKey);
+    private bool IsVisible => !EmoteUiManager.EmotePoolBlacklist.Contains(_emoteKey);
 
     protected override void Start()
     {
