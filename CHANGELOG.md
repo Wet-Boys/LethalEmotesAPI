@@ -1,3 +1,5 @@
+- Version 1.6.0: Added a local emote blacklist. By clicking the eye icon in the emote list, you can disable an emote for yourself only. Others will still be able to use and see the emote but you will not. Fixed an oversight with sync timers when an emote only syncs audio and not animations
+
 - Version 1.5.2: Updated netcode patcher to 3.3.4, might help with ping related issues, idk ymmv
 
 - Version 1.5.1: Updated some internal methods to be much more optimized. Should give a bit of a performance boost
