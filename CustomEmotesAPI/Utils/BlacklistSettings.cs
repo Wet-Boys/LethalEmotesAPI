@@ -76,7 +76,6 @@ namespace LethalEmotesAPI.Utils
         public static void AddToDisabledList(string emoteName)
         {
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
-            DebugClass.Log($"excluding {emoteName} before we disable it");
             AddToExcludeList(emoteName);
             if (emotesDisabled.Contains(emoteName))
                 return;

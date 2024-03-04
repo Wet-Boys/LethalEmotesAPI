@@ -274,11 +274,10 @@ public class BoneMapper : MonoBehaviour
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
-            //DebugClass.Log($"--------------  adding audio object {currentClip.syncPos}");
-        }
-        if (currentClip.syncronizeAnimation && CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
-        {
-            CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+            if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
+            {
+                CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+            }
         }
         if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
         {
