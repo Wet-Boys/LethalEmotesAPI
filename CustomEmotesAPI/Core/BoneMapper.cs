@@ -88,6 +88,7 @@ public class BoneMapper : MonoBehaviour
     public int networkId;
     public bool canThirdPerson = true;
     internal bool canEmote = false;
+    public bool isValidPlayer = false;
 
     public static string GetRealAnimationName(string animationName)
     {
@@ -208,6 +209,21 @@ public class BoneMapper : MonoBehaviour
 
         currEvent = 0;
         currentClipName = s;
+        if (s == "none")
+        {
+            emoteSkeletonAnimator.Play("none", -1, 0f);
+            twopart = false;
+            prevClip = currentClip;
+            currentClip = null;
+            NewAnimation(null);
+            CustomEmotesAPI.Changed(s, this);
+
+            return;
+        }
+        if (BlacklistSettings.emotesDisabled.Contains(s))
+        {
+            return;
+        }
         if (s != "none")
         {
             prevClip = currentClip;
@@ -254,28 +270,14 @@ public class BoneMapper : MonoBehaviour
             }
             StartCoroutine(lockBonesAfterAFrame());
         }
-
-        if (s == "none")
-        {
-            emoteSkeletonAnimator.Play("none", -1, 0f);
-            twopart = false;
-            prevClip = currentClip;
-            currentClip = null;
-            NewAnimation(null);
-            CustomEmotesAPI.Changed(s, this);
-
-            return;
-        }
-
         AnimatorOverrideController animController = new AnimatorOverrideController(emoteSkeletonAnimator.runtimeAnimatorController);
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
-            //DebugClass.Log($"--------------  adding audio object {currentClip.syncPos}");
-        }
-        if (currentClip.syncronizeAnimation && CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
-        {
-            CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+            if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
+            {
+                CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+            }
         }
         if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
         {
@@ -556,6 +558,7 @@ public class BoneMapper : MonoBehaviour
         {
             enemyController = mapperBody.GetComponent<EnemyAI>();
         }
+        isValidPlayer = playerController is not null;
         playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
@@ -864,7 +867,7 @@ public class BoneMapper : MonoBehaviour
     }
     void Health()
     {
-        if (playerController is not null)
+        if (isValidPlayer)
         {
             if (playerController.isPlayerDead && local && currentClip is not null)
             {

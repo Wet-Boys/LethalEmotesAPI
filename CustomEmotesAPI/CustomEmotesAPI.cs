@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.5.2";
+        public const string VERSION = "1.6.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -459,6 +459,7 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             BlacklistSettings.LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
+            BlacklistSettings.LoadDisabledListFromBepinSex(Settings.DisabledEmotes);
 
             var targetMethod = typeof(PlayerControllerB).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -833,6 +834,11 @@ namespace EmotesAPI
             {
                 animationName = BoneMapper.customNamePairs[animationName];
             }
+            string s = BoneMapper.GetRealAnimationName(animationName);
+            if (BlacklistSettings.emotesDisabled.Contains(s))
+            {
+                return;
+            }
             EmoteNetworker.instance.SyncEmote(StartOfRound.Instance.localPlayerController.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
@@ -844,6 +850,11 @@ namespace EmotesAPI
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
+            }
+            string s = BoneMapper.GetRealAnimationName(animationName);
+            if (BlacklistSettings.emotesDisabled.Contains(s))
+            {
+                return;
             }
             EmoteNetworker.instance.SyncEmote(mapper.mapperBody.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }

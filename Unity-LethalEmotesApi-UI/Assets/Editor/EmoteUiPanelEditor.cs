@@ -71,7 +71,8 @@ namespace Editor
         
         private class StubbedState : IEmoteUiStateController
         {
-            private readonly List<string> _blacklist = new();
+            private readonly List<string> _randomBlacklist = new();
+            private readonly List<string> _emoteBlacklist = new();
 
             private EmoteWheelSetData _data = null;
             
@@ -93,13 +94,22 @@ namespace Editor
 
             public void AddToRandomPoolBlacklist(string emoteKey)
             {
-                if (_blacklist.Contains(emoteKey))
+                if (_randomBlacklist.Contains(emoteKey))
                     return;
                 
-                _blacklist.Add(emoteKey);
+                _randomBlacklist.Add(emoteKey);
             }
 
-            public void RemoveFromRandomPoolBlacklist(string emoteKey) => _blacklist.Remove(emoteKey);
+            public void RemoveFromRandomPoolBlacklist(string emoteKey) => _randomBlacklist.Remove(emoteKey);
+            public void AddToEmoteBlacklist(string emoteKey)
+            {
+                if (_emoteBlacklist.Contains(emoteKey))
+                    return;
+                
+                _emoteBlacklist.Add(emoteKey);
+            }
+
+            public void RemoveFromEmoteBlacklist(string emoteKey) => _emoteBlacklist.Remove(emoteKey);
 
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {
@@ -123,7 +133,8 @@ namespace Editor
             public IEmoteDb EmoteDb { get; }
 
             public IReadOnlyCollection<string> EmoteKeys { get; } = new[] { "none" };
-            public IReadOnlyCollection<string> RandomPoolBlacklist => _blacklist.ToArray();
+            public IReadOnlyCollection<string> RandomPoolBlacklist => _randomBlacklist.ToArray();
+            public IReadOnlyCollection<string> EmotePoolBlacklist => _emoteBlacklist.ToArray();
             public float EmoteVolume { get; set; }
             public bool HideJoinSpots { get; set; }
             public int RootMotionType { get; set; }
