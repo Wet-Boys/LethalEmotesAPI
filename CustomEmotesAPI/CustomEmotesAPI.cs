@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.6.0";
+        public const string VERSION = "1.6.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -332,16 +332,22 @@ namespace EmotesAPI
 
         private void GrabbableObjectLateUpdate(Action<GrabbableObject> orig, GrabbableObject self)
         {
-            if (self.playerHeldBy is not null)
+            try
             {
-                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy.gameObject];
-                if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
+                if (self.playerHeldBy is not null)
                 {
-                    foreach (var item in mapper.itemHolderConstraints)
+                    BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy.gameObject];
+                    if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
                     {
-                        item.ActUponConstraints();
+                        foreach (var item in mapper.itemHolderConstraints)
+                        {
+                            item.ActUponConstraints();
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
             }
             orig(self);
         }
@@ -368,13 +374,21 @@ namespace EmotesAPI
 
         private void Jump_performed(Action<PlayerControllerB, InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
         {
-            if (localMapper is not null && localMapper.playerController == self)
+            try
             {
-                if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                if (localMapper is not null && localMapper.playerController == self)
                 {
-                    return;
+                    if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                    {
+                        return;
+                    }
                 }
             }
+            catch(Exception e)
+            {
+                DebugClass.Log($"EmotesAPI: {e}");
+            }
+
             orig(self, context);
         }
         private static Hook Jump_performedHook;

@@ -644,6 +644,15 @@ public class BoneMapper : MonoBehaviour
         }
         StartCoroutine(preventEmotesInSpawnAnimation());
         StartCoroutine(GetLocal());
+
+        GameObject g = new GameObject();
+        g.name = "BoneMapperHolder";
+        g.transform.SetParent(transform.parent);
+        g.transform.localEulerAngles = transform.localEulerAngles;
+        g.transform.position = transform.position;
+        transform.SetParent(g.transform);
+        transform.localEulerAngles = Vector3.zero;
+        transform.localPosition = Vector3.zero;
     }
     public IEnumerator SetupHandConstraint()
     {
