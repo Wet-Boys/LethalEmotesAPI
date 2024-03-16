@@ -1,10 +1,6 @@
-﻿using MoreCompany;
-using MoreCompany.Cosmetics;
-using System;
+﻿using MoreCompany.Cosmetics;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using static PlayerSettings;
 
 namespace LethalEmotesAPI.Patches
 {
