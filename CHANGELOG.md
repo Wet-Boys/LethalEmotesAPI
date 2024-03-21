@@ -1,3 +1,5 @@
+- Version 1.6.3: Fixed mod compat.
+
 - Version 1.6.2: Fixed a longstanding issue with Start->Loop animations which caused them to not sync properly due to an overlap in the animation controller.
 
 - Version 1.6.1: Fixed a rare issue with GrabbableObjectLateUpdate throwing errors. Move the bonemapper a tad bit in the heirarchy, fixing a future issue I noticed.
