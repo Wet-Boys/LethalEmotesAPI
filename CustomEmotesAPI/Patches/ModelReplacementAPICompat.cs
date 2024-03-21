@@ -27,6 +27,5 @@ namespace LethalEmotesAPI.Patches
             return orig(self);
         }
         internal static Hook GetViewStateHook;
-
     }
 }
