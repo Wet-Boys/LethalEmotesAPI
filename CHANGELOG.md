@@ -1,3 +1,5 @@
+- Version 1.6.2: Fixed a longstanding issue with Start->Loop animations which caused them to not sync properly due to an overlap in the animation controller.
+
 - Version 1.6.1: Fixed a rare issue with GrabbableObjectLateUpdate throwing errors. Move the bonemapper a tad bit in the heirarchy, fixing a future issue I noticed.
 
 - Version 1.6.0: Added a local emote blacklist. By clicking the eye icon in the emote list, you can disable an emote for yourself only. Others will still be able to use and see the emote but you will not. Fixed an oversight with sync timers when an emote only syncs audio and not animations
