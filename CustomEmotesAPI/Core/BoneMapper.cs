@@ -359,7 +359,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     animController["Floss"] = currentClip.secondaryClip[pos];
                     animator.runtimeAnimatorController = animController;
-                    animator.Play("Loop", -1, ((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length);
+                    animator.Play("Loop", -1, (((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length/* + .25f*/) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length)/* - 0.0815217f*/);
                 }
                 else
                 {
