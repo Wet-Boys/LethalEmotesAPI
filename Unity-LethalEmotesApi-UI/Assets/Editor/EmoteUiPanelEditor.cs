@@ -110,6 +110,8 @@ namespace Editor
             }
 
             public void RemoveFromEmoteBlacklist(string emoteKey) => _emoteBlacklist.Remove(emoteKey);
+            
+            public void RefreshBothLists() { }
 
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {

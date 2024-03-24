@@ -2,7 +2,6 @@ using LethalEmotesApi.Ui.Animation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Wheel;
 
@@ -15,6 +14,7 @@ public class SegmentLabel : UIBehaviour
     
     public RectTransform? targetLabel;
     public TextMeshProUGUI? targetText;
+    public RectTransform? missingLabel;
 
     private RectTransform? _rectTransform;
     private string? _emoteKey;
@@ -28,7 +28,7 @@ public class SegmentLabel : UIBehaviour
         }
     }
 
-    protected DrivenRectTransformTracker Tracker;
+    protected DrivenRectTransformTracker tracker;
 
     protected SegmentLabel()
     {
@@ -39,13 +39,15 @@ public class SegmentLabel : UIBehaviour
     {
         base.OnEnable();
         
-        if(targetLabel is null)
+        if (targetLabel is null || missingLabel is null)
             return;
         
-        Tracker.Add(this, targetLabel, DrivenTransformProperties.Rotation);
+        tracker.Add(this, targetLabel, DrivenTransformProperties.Rotation);
+        tracker.Add(this, missingLabel, DrivenTransformProperties.Rotation);
 
         var worldRot = RectTransform.eulerAngles;
         targetLabel.localEulerAngles = -worldRot;
+        missingLabel.localEulerAngles = -worldRot;
         
         UpdateText();
     }
@@ -54,7 +56,7 @@ public class SegmentLabel : UIBehaviour
     {
         base.OnDisable();
         
-        Tracker.Clear();
+        tracker.Clear();
     }
 
     public void SetEmote(string? emoteKey)
@@ -65,9 +67,21 @@ public class SegmentLabel : UIBehaviour
 
     private void UpdateText()
     {
-        if (targetText is null || _emoteKey is null)
+        if (targetText is null || missingLabel is null || _emoteKey is null)
             return;
-        targetText.SetText(EmoteUiManager.GetEmoteName(_emoteKey));
+
+        var emoteName = EmoteUiManager.GetEmoteName(_emoteKey);
+
+        if (!EmoteUiManager.EmoteDb.EmoteExists(_emoteKey))
+        {
+            targetText.SetText("");
+            missingLabel.gameObject.SetActive(true);
+        }
+        else
+        {
+            missingLabel.gameObject.SetActive(false);
+            targetText.SetText(emoteName);
+        }
     }
 
     public void TweenScale(Vector3 targetScale, float duration, bool ignoreTimeScale)
