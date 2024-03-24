@@ -1,4 +1,5 @@
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -54,7 +55,10 @@ public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerE
         
         visibilityToggle.UpdateState();
     }
-    
+    private void UpdateStateBroadcast()
+    {
+        UpdateState();
+    }
     public void UpdateState()
     {
         if (string.IsNullOrEmpty(_emoteKey))
@@ -62,7 +66,6 @@ public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerE
         
         if (toggleImage is null)
             return;
-
         toggleImage.enabled = InBlacklist;
     }
 

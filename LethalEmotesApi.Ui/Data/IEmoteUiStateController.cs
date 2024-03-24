@@ -31,6 +31,7 @@ public interface IEmoteUiStateController
     public void AddToEmoteBlacklist(string emoteKey);
 
     public void RemoveFromEmoteBlacklist(string emoteKey);
+    public void RefreshBothLists();
 
     #region Loading Config Data
 
@@ -50,4 +51,5 @@ public interface IEmoteUiStateController
     public bool EmotesAlertEnemies { get; set; }
     public int DmcaFree { get; set; }
     public int ThirdPerson { get; set; }
+    public bool UseGlobalSettings { get; set; }
 }

@@ -71,6 +71,9 @@ public static class EmoteUiManager
 
     internal static void RemoveFromEmoteBlacklist(string emoteKey) => _stateController?.RemoveFromEmoteBlacklist(emoteKey);
 
+    internal static void RefreshBothLists() => _stateController?.RefreshBothLists();
+
+
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
         return _stateController!.LoadEmoteWheelSetData();
@@ -202,5 +205,10 @@ public static class EmoteUiManager
     {
         get => _stateController!.ThirdPerson;
         set => _stateController!.ThirdPerson = value;
+    }
+    public static bool UseGlobalSettings
+    {
+        get => _stateController!.UseGlobalSettings;
+        set => _stateController!.UseGlobalSettings = value;
     }
 }

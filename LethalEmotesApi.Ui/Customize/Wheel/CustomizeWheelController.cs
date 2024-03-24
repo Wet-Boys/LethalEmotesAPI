@@ -253,7 +253,11 @@ public class CustomizeWheelController : UIBehaviour, IScrollHandler
         EmoteUiManager.SaveEmoteWheelSetData(newData);
         UpdateState();
     }
-
+    private void UpdateStateBroadcast()
+    {
+        _wheelIndex = 0;
+        UpdateState();
+    }
     private void UpdateState()
     {
         LoadWheelIndex(_wheelIndex);

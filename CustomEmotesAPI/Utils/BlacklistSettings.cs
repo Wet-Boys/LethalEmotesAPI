@@ -10,6 +10,14 @@ namespace LethalEmotesAPI.Utils
         public static List<string> emotesExcludedFromRandom = [];
         public static List<string> emotesDisabled = [];
 
+        public static void RefreshBothLists()
+        {
+            emotesExcludedFromRandom.Clear();
+            emotesDisabled.Clear();
+            CustomEmotesAPI.randomClipList.Clear();
+            LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
+            LoadDisabledListFromBepinSex(Settings.DisabledEmotes);
+        }
         public static void AddToExcludeList(string emoteName)
         {
             emoteName = BoneMapper.GetRealAnimationName(emoteName);

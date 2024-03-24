@@ -26,7 +26,10 @@ public class EmoteVolumeSlider : MonoBehaviour
         UpdateSliderValue();
         EnsureListener();
     }
-
+    private void UpdateStateBroadcast()
+    {
+        UpdateSliderValue();
+    }
     private void UpdateSliderValue()
     {
         if (volumeSlider is null)
