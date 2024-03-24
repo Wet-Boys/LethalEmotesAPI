@@ -95,6 +95,10 @@ public class LethalEmotesUiState : IEmoteUiStateController
     {
         BlacklistSettings.RemoveFromDisabledList(emoteKey);
     }
+    public void RefreshBothLists()
+    {
+        BlacklistSettings.RefreshBothLists();
+    }
 
     internal static void FixLegacyEmotes()
     {
@@ -162,5 +166,10 @@ public class LethalEmotesUiState : IEmoteUiStateController
     {
         get => (int)Settings.thirdPersonType.Value;
         set => Settings.thirdPersonType.Value = (ThirdPersonType)value;
+    }
+    public bool UseGlobalSettings
+    {
+        get => Settings.useGlobalConfig.Value;
+        set => Settings.useGlobalConfig.Value = value;
     }
 }

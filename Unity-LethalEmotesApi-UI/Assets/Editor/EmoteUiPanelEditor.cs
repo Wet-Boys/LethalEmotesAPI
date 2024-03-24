@@ -141,6 +141,7 @@ namespace Editor
             public bool EmotesAlertEnemies { get; set; }
             public int DmcaFree { get; set; }
             public int ThirdPerson { get; set; }
+            public bool UseGlobalSettings { get; set; }
         }
     }
 }

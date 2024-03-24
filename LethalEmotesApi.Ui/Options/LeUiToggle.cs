@@ -40,4 +40,9 @@ public abstract class LeUiToggle : MonoBehaviour
     protected abstract bool GetCurrentValue();
 
     protected abstract void SetCurrentValue(bool value);
+
+    private void UpdateStateBroadcast()
+    {
+        UpdateCheckbox();
+    }
 }
