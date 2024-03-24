@@ -28,17 +28,13 @@ public class EmoteDb : IEmoteDb
             return emoteKey;
 
         var clip = BoneMapper.animClips[emoteKey];
-
-
         
         if (clip is not null && clip.usesNewImportSystem)
         {
             return string.IsNullOrEmpty(clip.displayName) ? emoteKey : clip.displayName;
         }
-        else
-        {
-            return clip is null || string.IsNullOrEmpty(clip.customInternalName) ? emoteKey : clip.customInternalName; //this is just the old return
-        }
+
+        return clip is null || string.IsNullOrEmpty(clip.customInternalName) ? emoteKey : clip.customInternalName; //this is just the old return
     }
 
     private IReadOnlyCollection<string> _emoteModNames;

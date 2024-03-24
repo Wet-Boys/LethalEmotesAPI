@@ -31,6 +31,7 @@ public interface IEmoteUiStateController
     public void AddToEmoteBlacklist(string emoteKey);
 
     public void RemoveFromEmoteBlacklist(string emoteKey);
+    
     public void RefreshBothLists();
 
     #region Loading Config Data
@@ -44,7 +45,9 @@ public interface IEmoteUiStateController
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave);
 
     #endregion
-    
+
+    #region Settings
+
     public float EmoteVolume { get; set; }
     public bool HideJoinSpots { get; set; }
     public int RootMotionType { get; set; }
@@ -52,4 +55,6 @@ public interface IEmoteUiStateController
     public int DmcaFree { get; set; }
     public int ThirdPerson { get; set; }
     public bool UseGlobalSettings { get; set; }
+
+    #endregion
 }
