@@ -1294,7 +1294,7 @@ public class BoneMapper : MonoBehaviour
                     item.ActivateConstraints();
                 }
             }
-            else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing)
+            else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing && Settings.rootMotionType.Value != RootMotionType.None)
             {
                 foreach (var item in cameraConstraints)
                 {
