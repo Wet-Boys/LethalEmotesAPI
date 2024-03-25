@@ -11,6 +11,7 @@ public class UseGlobalSettings : LeUiToggle
     {
         EmoteUiManager.UseGlobalSettings = value;
         EmoteUiManager.RefreshBothLists();
+        EmoteUiManager.EmoteUiInstance.ReloadData();
         GetComponentInParent<CustomizePanel>().gameObject.BroadcastMessage("UpdateStateBroadcast");
     }
 }
