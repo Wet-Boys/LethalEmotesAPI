@@ -393,7 +393,10 @@ public class BoneMapper : MonoBehaviour
     public static void PreviewAnimations(Animator animator, string animation)
     {
         AnimatorOverrideController animController = new AnimatorOverrideController(animator.runtimeAnimatorController);
-        CustomAnimationClip customClip = animClips[GetRealAnimationName(animation)];
+        animation = GetRealAnimationName(animation);
+        if (!animClips.ContainsKey(animation))
+            return;
+        CustomAnimationClip customClip = animClips[animation];
         if (customClip is null || !customClip.animates)
         {
             return;
