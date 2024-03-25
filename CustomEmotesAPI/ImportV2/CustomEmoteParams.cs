@@ -151,6 +151,10 @@ namespace LethalEmotesAPI.ImportV2
         /// </summary>
         public bool nonAnimatingEmote = false;
 
+        /// <summary>
+        /// Determines if the emote can be joined by pressing the join key. Mainly only want to turn this off for specific emote types.
+        /// </summary>
+        public bool allowJoining = true;
 
 
 

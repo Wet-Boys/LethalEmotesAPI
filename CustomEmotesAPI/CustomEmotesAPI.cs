@@ -669,13 +669,13 @@ namespace EmotesAPI
                             {
                                 if (mapper != localMapper)
                                 {
-                                    if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                                    if (!nearestMapper && mapper.currentClip.allowJoining)
                                     {
                                         nearestMapper = mapper;
                                     }
                                     else if (nearestMapper)
                                     {
-                                        if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                        if (mapper.currentClip.allowJoining && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
                                         {
                                             nearestMapper = mapper;
                                         }
