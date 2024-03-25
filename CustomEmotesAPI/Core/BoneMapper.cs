@@ -762,7 +762,13 @@ public class BoneMapper : MonoBehaviour
 
                         if (basePlayerModelSMR[0].bones[32].name == "spine.004")//probably scavenger
                         {
-                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, basePlayerModelSMR[0].bones[32], false));
+                            GameObject camHolder = new GameObject();
+                            camHolder.name = "EmotesAPICameraHolderThing";
+                            camHolder.transform.parent = basePlayerModelSMR[0].bones[32];
+                            camHolder.transform.localEulerAngles = Vector3.zero;
+                            camHolder.transform.position = c.transform.parent.position;
+                            camHolder.transform.localPosition += new Vector3(0, .045f, 0);
+                            cameraConstraints.Add(EmoteConstraint.AddConstraint(c.transform.parent.gameObject, this, camHolder.transform, false));
                         }
                         else//not scavenger or someone broke the bone order :(
                         {
