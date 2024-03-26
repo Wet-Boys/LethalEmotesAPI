@@ -14,7 +14,13 @@ namespace LethalEmotesAPI.Utils
         {
             emotesExcludedFromRandom.Clear();
             emotesDisabled.Clear();
-            CustomEmotesAPI.randomClipList.Clear();
+            foreach (var item in emotesExcludedFromRandom)
+            {
+                if (!CustomEmotesAPI.randomClipList.Contains(item))
+                {
+                    CustomEmotesAPI.randomClipList.Add(item);
+                }
+            }
             LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
             LoadDisabledListFromBepinSex(Settings.DisabledEmotes);
         }
