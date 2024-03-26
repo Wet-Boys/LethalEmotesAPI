@@ -79,7 +79,7 @@ public class SegmentLabel : UIBehaviour
 
             var modName = EmoteUiManager.GetEmoteModName(_emoteKey);
             
-            missingText.SetText($"'{emoteName}'\nRequires\n`{modName}`");
+            missingText.SetText($"<color=#FFFFFF>{emoteName}</color>\nRequires\n<color=#FFFFFF>{modName}</color>");
             
             missingLabel.gameObject.SetActive(true);
         }
