@@ -104,8 +104,11 @@ public static class EmoteUiManager
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
         _emoteDisplayData = _stateController!.LoadEmoteWheelSetDisplayData();
-        
-        return _stateController.LoadEmoteWheelSetData();
+        var wheelSetData = _stateController.LoadEmoteWheelSetData();
+
+        _emoteDisplayData.LoadFromWheelSetData(wheelSetData);
+
+        return wheelSetData;
     }
 
     internal static void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
