@@ -15,6 +15,7 @@ public class SegmentLabel : UIBehaviour
     public RectTransform? targetLabel;
     public TextMeshProUGUI? targetText;
     public RectTransform? missingLabel;
+    public TextMeshProUGUI? missingText;
 
     private RectTransform? _rectTransform;
     private string? _emoteKey;
@@ -67,7 +68,7 @@ public class SegmentLabel : UIBehaviour
 
     private void UpdateText()
     {
-        if (targetText is null || missingLabel is null || _emoteKey is null)
+        if (targetText is null || missingLabel is null || missingText is null || _emoteKey is null)
             return;
 
         var emoteName = EmoteUiManager.GetEmoteName(_emoteKey);
@@ -75,6 +76,11 @@ public class SegmentLabel : UIBehaviour
         if (!EmoteUiManager.EmoteDb.EmoteExists(_emoteKey))
         {
             targetText.SetText("");
+
+            var modName = EmoteUiManager.GetEmoteModName(_emoteKey);
+            
+            missingText.SetText($"'{emoteName}'\nRequires\n`{modName}`");
+            
             missingLabel.gameObject.SetActive(true);
         }
         else

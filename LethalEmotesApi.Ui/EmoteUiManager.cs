@@ -10,6 +10,8 @@ public static class EmoteUiManager
 {
     internal static IEmoteUiStateController? _stateController;
     internal static EmoteUiPanel? EmoteUiInstance;
+
+    private static EmoteWheelSetDisplayData? _emoteDisplayData;
     
     public static void RegisterStateController(IEmoteUiStateController stateController)
     {
@@ -59,10 +61,32 @@ public static class EmoteUiManager
 
     internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteDb.EmoteKeys;
 
-    internal static string GetEmoteName(string emoteKey) => _stateController!.EmoteDb.GetEmoteName(emoteKey);
+    internal static string GetEmoteName(string emoteKey)
+    {
+        var emoteDb = _stateController!.EmoteDb;
 
-    internal static string GetEmoteModName(string emoteKey) => _stateController!.EmoteDb.GetModName(emoteKey);
-    
+        if (emoteDb.EmoteExists(emoteKey))
+            return emoteDb.GetEmoteName(emoteKey);
+
+        if (_emoteDisplayData is null)
+            return emoteKey;
+
+        return _emoteDisplayData.EmoteKeyEmoteNameLut.GetValueOrDefault(emoteKey, emoteKey);
+    }
+
+    internal static string GetEmoteModName(string emoteKey)
+    {
+        var emoteDb = _stateController!.EmoteDb;
+        
+        if (emoteDb.EmoteExists(emoteKey))
+            return emoteDb.GetModName(emoteKey);
+        
+        if (_emoteDisplayData is null)
+            return "Unknown";
+
+        return _emoteDisplayData.EmoteKeyModNameLut.GetValueOrDefault(emoteKey, "Unknown");
+    }
+
     internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
     
     internal static IReadOnlyCollection<string> EmotePoolBlacklist => _stateController!.EmotePoolBlacklist;
@@ -76,16 +100,20 @@ public static class EmoteUiManager
     internal static void RemoveFromEmoteBlacklist(string emoteKey) => _stateController?.RemoveFromEmoteBlacklist(emoteKey);
 
     internal static void RefreshBothLists() => _stateController?.RefreshBothLists();
-
-
+    
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
-        return _stateController!.LoadEmoteWheelSetData();
+        _emoteDisplayData = _stateController!.LoadEmoteWheelSetDisplayData();
+        
+        return _stateController.LoadEmoteWheelSetData();
     }
 
     internal static void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
         _stateController!.SaveEmoteWheelSetData(dataToSave);
+        
+        _emoteDisplayData = EmoteWheelSetDisplayData.FromEmoteWheelSetData(dataToSave);
+        _stateController.SaveEmoteWheelSetDisplayData(_emoteDisplayData);
 
         if (EmoteUiInstance is null)
             return;

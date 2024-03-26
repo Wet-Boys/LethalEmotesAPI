@@ -38,11 +38,15 @@ public interface IEmoteUiStateController
 
     public EmoteWheelSetData LoadEmoteWheelSetData();
 
+    public EmoteWheelSetDisplayData LoadEmoteWheelSetDisplayData();
+
     #endregion
     
     #region Saving Config Data
 
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave);
+    
+    public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave);
 
     #endregion
 
