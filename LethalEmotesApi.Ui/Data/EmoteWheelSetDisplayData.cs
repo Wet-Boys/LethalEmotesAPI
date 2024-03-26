@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LethalEmotesApi.Ui.Data;
 
@@ -9,22 +10,28 @@ public class EmoteWheelSetDisplayData
     public Dictionary<string, string> EmoteKeyModNameLut { get; set; } = new();
     public Dictionary<string, string> EmoteKeyEmoteNameLut { get; set; } = new();
 
-    public static EmoteWheelSetDisplayData FromEmoteWheelSetData(EmoteWheelSetData wheelSetData)
+    public EmoteWheelSetDisplayData LoadFromWheelSetData(EmoteWheelSetData wheelSetData)
     {
+        var wheelEmoteKeys = wheelSetData.EmoteWheels.SelectMany(wheel => wheel.Emotes);
+
+        EmoteKeyModNameLut = EmoteKeyModNameLut.Where(kvp => wheelEmoteKeys.Contains(kvp.Key))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        
+        EmoteKeyEmoteNameLut = EmoteKeyEmoteNameLut.Where(kvp => wheelEmoteKeys.Contains(kvp.Key))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        
         var stateController = EmoteUiManager.GetStateController()!;
         var emoteDb = stateController.EmoteDb;
 
-        var displayData = new EmoteWheelSetDisplayData();
-        
-        foreach (var wheel in wheelSetData.EmoteWheels)
+        foreach (var emoteKey in wheelEmoteKeys)
         {
-            foreach (var emoteKey in wheel.Emotes)
-            {
-                displayData.EmoteKeyModNameLut[emoteKey] = emoteDb.GetModName(emoteKey);
-                displayData.EmoteKeyEmoteNameLut[emoteKey] = emoteDb.GetEmoteName(emoteKey);
-            }
+            if (!EmoteKeyModNameLut.ContainsKey(emoteKey))
+                EmoteKeyModNameLut[emoteKey] = emoteDb.GetModName(emoteKey);
+
+            if (!EmoteKeyEmoteNameLut.ContainsKey(emoteKey))
+                EmoteKeyEmoteNameLut[emoteKey] = emoteDb.GetEmoteName(emoteKey);
         }
 
-        return displayData;
+        return this;
     }
 }

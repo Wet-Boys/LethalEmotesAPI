@@ -112,7 +112,7 @@ public static class EmoteUiManager
     {
         _stateController!.SaveEmoteWheelSetData(dataToSave);
         
-        _emoteDisplayData = EmoteWheelSetDisplayData.FromEmoteWheelSetData(dataToSave);
+        _emoteDisplayData = _emoteDisplayData!.LoadFromWheelSetData(dataToSave);
         _stateController.SaveEmoteWheelSetDisplayData(_emoteDisplayData);
 
         if (EmoteUiInstance is null)
