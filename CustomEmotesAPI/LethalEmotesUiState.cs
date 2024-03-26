@@ -102,7 +102,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
 
     internal static void FixLegacyEmotes()
     {
-        EmoteWheelSetData e = EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
+        EmoteWheelSetData e = EmoteWheelSetDataConverter.EmoteWheelSetDataFromJson(Settings.EmoteWheelSetDataEntryString.Value);
         foreach (var wheel in e.EmoteWheels)
         {
             for (int i = 0; i < wheel.Emotes.Length; i++)
@@ -124,12 +124,22 @@ public class LethalEmotesUiState : IEmoteUiStateController
     }
     public EmoteWheelSetData LoadEmoteWheelSetData()
     {
-
-        return EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
+        return EmoteWheelSetDataConverter.EmoteWheelSetDataFromJson(Settings.EmoteWheelSetDataEntryString.Value);
     }
+
+    public EmoteWheelSetDisplayData LoadEmoteWheelSetDisplayData()
+    {
+        return EmoteWheelSetDataConverter.EmoteWheelSetDisplayDataFromJson(Settings.EmoteWheelSetDisplayDataString.Value);
+    }
+
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
         Settings.EmoteWheelSetDataEntryString.Value = dataToSave.ToJson();
+    }
+
+    public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave)
+    {
+        Settings.EmoteWheelSetDisplayDataString.Value = dataToSave.ToJson();
     }
 
     public float EmoteVolume

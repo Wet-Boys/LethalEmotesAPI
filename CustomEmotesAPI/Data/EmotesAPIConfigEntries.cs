@@ -20,6 +20,7 @@ namespace LethalEmotesAPI.Data
         public ConfigEntry<ThirdPersonType> thirdPersonType;
         public ConfigEntry<bool> StopEmoteWhenLockedToStopsEmote;
         public ConfigEntry<string> EmoteWheelSetDataEntryString;
+        public ConfigEntry<string> EmoteWheelSetDisplayDataString;
         public ConfigEntry<string> RandomEmoteBlacklist;
         public ConfigEntry<string> DisabledEmotes;
         public ConfigEntry<bool> PermanentEmotingHealthbar;
@@ -28,9 +29,10 @@ namespace LethalEmotesAPI.Data
             HideJoinSpots = file.Bind<bool>(sectionPrefix + "Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             rootMotionType = file.Bind<RootMotionType>(sectionPrefix + "Controls", "Camera Lock Settings", RootMotionType.Normal, "Switch head locking between all emotes, no emotes, or let each emote decide.");
             EmotesAlertEnemies = file.Bind<bool>(sectionPrefix + "Misc", "Emotes Alert Enemies", true, "If turned on, emotes will alert enemies like other sound sources.");
-            EmotesVolume = file.Bind<float>(sectionPrefix + "Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
+            EmotesVolume = file.Bind<float>(sectionPrefix + "Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a separate slider if you want a different audio balance.");
             DMCAFree = file.Bind<DMCAType>(sectionPrefix + "Misc", "DMCA Free Songs", DMCAType.Normal, "0: All songs will be normal. 1: All songs will use normal/DMCA friendly depending on the import settings. 2: All songs will be muted if DMCA is listed. 3: All songs will use DMCA friendly versions or none at all");
             EmoteWheelSetDataEntryString = file.Bind(sectionPrefix + "No Touch", "Emote Wheel Set Data", EmoteWheelSetData.Default().ToJson(), "Json data of emote wheel");
+            EmoteWheelSetDisplayDataString = file.Bind(sectionPrefix + "No Touch", "Emote Wheel Set Display Data", new EmoteWheelSetDisplayData().ToJson(), "Json data of emote wheel display");
             RandomEmoteBlacklist = file.Bind<string>(sectionPrefix + "No Touch", "Blacklisted emotes", "none", "Emotes which will not show up when pressing the random emote key, probably don't want to touch this here");
             DisabledEmotes = file.Bind<string>(sectionPrefix + "No Touch", "Disabled Emotes", "", "Emotes on this list will not actually play when called to play, probably don't want to touch this here");
             thirdPersonType = file.Bind<ThirdPersonType>(sectionPrefix + "Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");

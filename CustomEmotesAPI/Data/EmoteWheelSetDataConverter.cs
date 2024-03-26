@@ -13,8 +13,19 @@ internal static class EmoteWheelSetDataConverter
         return text;
     }
     
-    internal static EmoteWheelSetData FromJson(string text)
+    internal static EmoteWheelSetData EmoteWheelSetDataFromJson(string text)
     {
         return (EmoteWheelSetData)JsonConvert.DeserializeObject(text, typeof(EmoteWheelSetData));
+    }
+
+    internal static string ToJson(this EmoteWheelSetDisplayData data)
+    {
+        var text = JsonConvert.SerializeObject(data, Formatting.None);
+        return text;
+    }
+
+    internal static EmoteWheelSetDisplayData EmoteWheelSetDisplayDataFromJson(string text)
+    {
+        return (EmoteWheelSetDisplayData)JsonConvert.DeserializeObject(text, typeof(EmoteWheelSetDisplayData));
     }
 }

@@ -110,6 +110,8 @@ namespace Editor
             }
 
             public void RemoveFromEmoteBlacklist(string emoteKey) => _emoteBlacklist.Remove(emoteKey);
+            
+            public void RefreshBothLists() { }
 
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {
@@ -125,10 +127,17 @@ namespace Editor
                 return _data;
             }
 
+            public EmoteWheelSetDisplayData LoadEmoteWheelSetDisplayData()
+            {
+                return new EmoteWheelSetDisplayData();
+            }
+
             public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
             {
                 _data = dataToSave;
             }
+
+            public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave) { }
 
             public IEmoteDb EmoteDb { get; }
 

@@ -49,6 +49,7 @@ namespace EmotesAPI
         public static ConfigEntry<ThirdPersonType> thirdPersonType => GetCurrentConfig().thirdPersonType;
         public static ConfigEntry<bool> StopEmoteWhenLockedToStopsEmote => GetCurrentConfig().StopEmoteWhenLockedToStopsEmote;
         public static ConfigEntry<string> EmoteWheelSetDataEntryString => GetCurrentConfig().EmoteWheelSetDataEntryString;
+        public static ConfigEntry<string> EmoteWheelSetDisplayDataString => GetCurrentConfig().EmoteWheelSetDisplayDataString;
         public static ConfigEntry<string> RandomEmoteBlacklist => GetCurrentConfig().RandomEmoteBlacklist;
         public static ConfigEntry<string> DisabledEmotes => GetCurrentConfig().DisabledEmotes;
         public static ConfigEntry<bool> PermanentEmotingHealthbar => GetCurrentConfig().PermanentEmotingHealthbar;
@@ -60,12 +61,18 @@ namespace EmotesAPI
         }
 
         internal static GameObject picker;
-        private static void GenerateConfigs()
+
+        internal static string GetGlobalSettingsDir()
         {
             var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            var SaveDir = Path.Combine(userDir, "AppData", "LocalLow", "ZeekerssRBLX", "Lethal Company");
-            string PersistentDir = Path.Combine(SaveDir, "LethalEmotesAPI.cfg");
-            ConfigFile global = new ConfigFile(PersistentDir, true, CustomEmotesAPI.instance.Info.Metadata);
+            var saveDir = Path.Combine(userDir, "AppData", "LocalLow", "ZeekerssRBLX", "Lethal Company");
+            return Path.Combine(saveDir, "LethalEmotesAPI");
+        }
+        
+        private static void GenerateConfigs()
+        {
+            string globalConfigPath = Path.Combine(GetGlobalSettingsDir(), "global.cfg");
+            ConfigFile global = new ConfigFile(globalConfigPath, true, CustomEmotesAPI.instance.Info.Metadata);
             useGlobalConfig = global.Bind<bool>("Global Settings", "Use Global Config", true, "When true, all EmotesAPI settings will be the same across profiles. When false, each profile will have its own settings.");
             useGlobalConfig.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
             useGlobalConfig.SettingChanged += HideJoinSpots_SettingChanged;
