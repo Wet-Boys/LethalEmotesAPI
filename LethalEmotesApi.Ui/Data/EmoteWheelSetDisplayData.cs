@@ -25,10 +25,12 @@ public class EmoteWheelSetDisplayData
 
         foreach (var emoteKey in wheelEmoteKeys)
         {
-            if (!EmoteKeyModNameLut.ContainsKey(emoteKey))
+            var emoteExists = emoteDb.EmoteExists(emoteKey);
+            
+            if (!EmoteKeyModNameLut.ContainsKey(emoteKey) || emoteExists)
                 EmoteKeyModNameLut[emoteKey] = emoteDb.GetModName(emoteKey);
 
-            if (!EmoteKeyEmoteNameLut.ContainsKey(emoteKey))
+            if (!EmoteKeyEmoteNameLut.ContainsKey(emoteKey) || emoteExists)
                 EmoteKeyEmoteNameLut[emoteKey] = emoteDb.GetEmoteName(emoteKey);
         }
 
