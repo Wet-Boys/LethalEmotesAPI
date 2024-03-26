@@ -24,7 +24,8 @@ namespace LethalEmotesAPI.Data
         public ConfigEntry<string> RandomEmoteBlacklist;
         public ConfigEntry<string> DisabledEmotes;
         public ConfigEntry<bool> PermanentEmotingHealthbar;
-
+        private ConfigFile configFile;
+        private string sectionPrefix;
         public EmotesAPIConfigEntries(ConfigFile file, string sectionPrefix) {
             HideJoinSpots = file.Bind<bool>(sectionPrefix + "Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             rootMotionType = file.Bind<RootMotionType>(sectionPrefix + "Controls", "Camera Lock Settings", RootMotionType.Normal, "Switch head locking between all emotes, no emotes, or let each emote decide.");
@@ -38,10 +39,10 @@ namespace LethalEmotesAPI.Data
             thirdPersonType = file.Bind<ThirdPersonType>(sectionPrefix + "Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");
             StopEmoteWhenLockedToStopsEmote = file.Bind<bool>(sectionPrefix + "Misc", "Stop Emote When Locked Player Stops Emote", true, "If you are locked to a player for an emote (determined by emote mods themselves), you will stop emoting and unlock yourself if the other person stops emoting");
             PermanentEmotingHealthbar = file.Bind<bool>(sectionPrefix + "Misc", "Permanent Healthbar Animation", false, "Keeps the fun lil guy in the top left animating at all times");
-
             HideJoinSpots.SettingChanged += Settings.HideJoinSpots_SettingChanged;
             PermanentEmotingHealthbar.SettingChanged += Settings.PermanentEmotingHealthbar_SettingChanged;
-
+            configFile = file;
+            this.sectionPrefix = sectionPrefix;
 
             LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<RootMotionType>(rootMotionType, false));
             LethalConfigManager.AddConfigItem(new FloatSliderConfigItem(EmotesVolume, new FloatSliderOptions { Min = 0, Max = 100, RequiresRestart = false }));
@@ -51,6 +52,13 @@ namespace LethalEmotesAPI.Data
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(PermanentEmotingHealthbar, false));
+        }
+        public void CopyFromConfig(EmotesAPIConfigEntries sourceConfig)
+        {
+            foreach (var item in sourceConfig.configFile.Keys)
+            {
+                configFile[new ConfigDefinition(sectionPrefix + item.Section, item.Key)].SetSerializedValue(sourceConfig.configFile[item].GetSerializedValue());
+            }
         }
     }
 }

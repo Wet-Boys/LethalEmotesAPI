@@ -72,13 +72,18 @@ namespace EmotesAPI
         private static void GenerateConfigs()
         {
             string globalConfigPath = Path.Combine(GetGlobalSettingsDir(), "global.cfg");
+            bool globalIsNew = !File.Exists(globalConfigPath);
             ConfigFile global = new ConfigFile(globalConfigPath, true, CustomEmotesAPI.instance.Info.Metadata);
             useGlobalConfig = global.Bind<bool>("Global Settings", "Use Global Config", true, "When true, all EmotesAPI settings will be the same across profiles. When false, each profile will have its own settings.");
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(useGlobalConfig, false));
             useGlobalConfig.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
             useGlobalConfig.SettingChanged += HideJoinSpots_SettingChanged;
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(useGlobalConfig, false));
             globalConfig = new EmotesAPIConfigEntries(global, "Global ");
             localConfig = new EmotesAPIConfigEntries(CustomEmotesAPI.instance.Config, "");
+            if (globalIsNew)
+            {
+                globalConfig.CopyFromConfig(localConfig);
+            }
         }
 
         public static EmotesAPIConfigEntries GetCurrentConfig()
