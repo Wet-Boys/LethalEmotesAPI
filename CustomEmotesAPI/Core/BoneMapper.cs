@@ -89,7 +89,6 @@ public class BoneMapper : MonoBehaviour
     public bool canThirdPerson = true;
     internal bool canEmote = false;
     public bool isValidPlayer = false;
-
     public static string GetRealAnimationName(string animationName)
     {
         if (customNamePairs.ContainsKey(animationName))
@@ -650,7 +649,7 @@ public class BoneMapper : MonoBehaviour
 
         GameObject g = new GameObject();
         g.name = "BoneMapperHolder";
-        g.transform.SetParent(transform.parent);
+        g.transform.SetParent(mapperBody.transform);
         g.transform.localEulerAngles = transform.localEulerAngles;
         g.transform.position = transform.position;
         transform.SetParent(g.transform);
