@@ -106,7 +106,7 @@ public static class EmoteUiManager
         _emoteDisplayData = _stateController!.LoadEmoteWheelSetDisplayData();
         var wheelSetData = _stateController.LoadEmoteWheelSetData();
 
-        _emoteDisplayData.LoadFromWheelSetData(wheelSetData);
+        _stateController.SaveEmoteWheelSetDisplayData(_emoteDisplayData.LoadFromWheelSetData(wheelSetData));
 
         return wheelSetData;
     }
