@@ -1,3 +1,5 @@
+- Version 1.7.1: Fixed scaling not being accurate (by about .1216 times) Added BoneRefs to all emote bones so that they can easily reference their counterparts
+
 - Version 1.7.0: Quite a few new features! Global config is now a thing. Whenever you launch without a global config present, it will create one based off the current local config file, then after that it will be fully seperate, feel free to use either. The emote wheel will now tell you in more detail when you have emotes on it that are not currently installed. You can now join emotes of all kinds (unless the emote specifically says otherwise: CustomEmoteParams.allowJoining = false) not sure why I didn't have this be the case from the start but oh well. Your head during emotes will now be more alligned with the actual head, it was always kinda short as I've found, this is no longer the case. Fixed a few NREs when highlighting broken emotes in the customize menu. Reparented the BoneMapper so that crouching during an emote no longer moves you slightly backwards.
 
 - Version 1.6.3: Fixed mod compat.
