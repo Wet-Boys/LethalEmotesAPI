@@ -113,13 +113,27 @@ public class EmoteConstraint : MonoBehaviour
     {
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
-        emoteBone.gameObject.AddComponent<BoneRef>().target = originalBone;
+        if (emoteBone.GetComponent<BoneRef>() is not null)
+        {
+            emoteBone.GetComponent<BoneRef>().target = originalBone;
+        }
+        else
+        {
+            emoteBone.gameObject.AddComponent<BoneRef>().target = originalBone;
+        }
     }
     internal void AddSource(Transform originalBone, Transform emoteBone)
     {
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
-        emoteBone.gameObject.AddComponent<BoneRef>().target = originalBone;
+        if (emoteBone.GetComponent<BoneRef>() is not null)
+        {
+            emoteBone.GetComponent<BoneRef>().target = originalBone;
+        }
+        else
+        {
+            emoteBone.gameObject.AddComponent<BoneRef>().target = originalBone;
+        }
     }
     internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target, bool needToFix)
     {
