@@ -653,8 +653,9 @@ public class BoneMapper : MonoBehaviour
         g.transform.localEulerAngles = transform.localEulerAngles;
         g.transform.position = transform.position;
         transform.SetParent(g.transform);
-        transform.localEulerAngles = Vector3.zero;
-        transform.localPosition = Vector3.zero;
+        //transform.localEulerAngles = Vector3.zero;
+        //transform.localPosition = Vector3.zero;
+        g.transform.localPosition = Vector3.zero;
     }
     public IEnumerator SetupHandConstraint()
     {

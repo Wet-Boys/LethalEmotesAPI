@@ -1,3 +1,5 @@
+- Version 1.7.3: Fixed issue with some enemies emoting in the ground due to new BoneMapper heirarchy changes
+
 - Version 1.7.2: Minor fix around BoneRefs
 
 - Version 1.7.1: Fixed scaling not being accurate (by about .1216 times) Added BoneRefs to all emote bones so that they can easily reference their counterparts
