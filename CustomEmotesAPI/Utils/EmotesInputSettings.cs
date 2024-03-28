@@ -19,10 +19,10 @@ namespace LethalEmotesAPI
         [InputAction("<Mouse>/rightButton", Name = "CustomEmotesAPI: Cycle Wheel Right")]
         public InputAction Right { get; set; }
 
-        [InputAction("<Keyboard>/f", Name = "CustomEmotesAPI: Play Random Emote")]
+        [InputAction("<Keyboard>/comma", Name = "CustomEmotesAPI: Play Random Emote")]
         public InputAction RandomEmote {  get; set; }
 
-        [InputAction("<Keyboard>/v", Name = "CustomEmotesAPI: Join Emote")]
+        [InputAction("<Keyboard>/period", Name = "CustomEmotesAPI: Join Emote")]
         public InputAction JoinEmote { get; set; }
 
         [InputAction("", Name = "Stop emoting")]
