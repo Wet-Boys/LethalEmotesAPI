@@ -109,6 +109,12 @@ namespace LethalEmotesAPI.Core
                     case "Peeper":
                         AnimationReplacements.Import(self.gameObject, "assets/fineilldoitmyself/Peeper2.prefab", [0]);
                         break;
+                    case "RadMech":
+                        AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/Mech1.prefab", [0]);
+                        break;
+                    case "Butler":
+                        AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/Butler.prefab", [0]);
+                        break;
                     default:
                         DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;
