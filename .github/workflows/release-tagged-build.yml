@@ -49,12 +49,26 @@ jobs:
     - name: Build Thunderstore Package
       run: ./build.sh --target=BuildThunderstore
 
+    - name: Build NuGet Package
+      run: ./build.sh --configuration=Release --target=BuildNuGet
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: input-utils
+        name: lethal-emotes-api
         path: CustomEmotesAPI/bin/Debug/netstandard2.1/upload/
         retention-days: 15
+
+    - name: Get NuGet Package path
+      run: |
+        for fn in CustomEmotesAPI/bin/Release/netstandard2.1/artifacts/*.nupkg; do echo "NUGET_PKG_PATH=${fn}" >> "$GITHUB_ENV"; done;
+      shell: bash
+      continue-on-error: true
+    
+    - name: Push NuGet Package
+      run: dotnet nuget push "${NUGET_PKG_PATH}" --api-key $NUGET_API_TOKEN --source https://api.nuget.org/v3/index.json
+      env:
+        NUGET_API_TOKEN: ${{ secrets.NUGET_LETHAL_COMPNAY_KEY }}
 
     - name: Delete old release if it already exists
       run: gh release delete --yes "${RELEASE_VERSION}"
