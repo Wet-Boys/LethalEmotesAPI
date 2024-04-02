@@ -6,6 +6,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.UI;
 
 namespace LethalEmotesAPI.Utils
 {
@@ -87,7 +88,14 @@ namespace LethalEmotesAPI.Utils
                 if (CustomEmotesAPI.hudObject is not null)
                 {
                     CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822.5184f, -235.6528f, 1074.747f);
-                    CustomEmotesAPI.baseHUDObject.SetActive(false);
+                    try
+                    {
+                        CustomEmotesAPI.baseHUDObject.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+                    }
+                    catch (Exception)
+                    {
+                        CustomEmotesAPI.baseHUDObject.SetActive(false);
+                    }
                     CustomEmotesAPI.selfRedHUDObject.SetActive(false);
                 }
             }
@@ -96,7 +104,14 @@ namespace LethalEmotesAPI.Utils
                 if (CustomEmotesAPI.hudObject is not null)
                 {
                     CustomEmotesAPI.hudAnimator.transform.localPosition = new Vector3(-822, -235, 1100);
-                    CustomEmotesAPI.baseHUDObject.SetActive(true);
+                    try
+                    {
+                        CustomEmotesAPI.baseHUDObject.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+                    }
+                    catch (Exception)
+                    {
+                        CustomEmotesAPI.baseHUDObject.SetActive(true);
+                    }
                     CustomEmotesAPI.selfRedHUDObject.SetActive(true);
                 }
             }
