@@ -1,3 +1,5 @@
+- Version 1.7.5: Changed how we disable the hud to work better with other mods.
+
 - Version 1.7.4: Added v50 enemies. This update is not required to work with v50 though.
 
 - Version 1.7.3: Fixed issue with some enemies emoting in the ground due to new BoneMapper heirarchy changes
