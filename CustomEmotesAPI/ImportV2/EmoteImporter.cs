@@ -4,11 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
 namespace LethalEmotesAPI.ImportV2
 {
     public class EmoteImporter
     {
+        internal static InputActionMap actionMap = new InputActionMap("LethalEmotesApiInputActionMap");
         public static void ImportEmote(CustomEmoteParams animationClipParams)
         {
             if (animationClipParams.internalName == "")
@@ -69,8 +72,33 @@ namespace LethalEmotesAPI.ImportV2
                     CustomEmotesAPI.randomClipList.Add(animationClipParams.internalName);
                 }
             }
+            InputAction emoteAction = new InputAction(animationClipParams.internalName, binding: "");
+            emoteAction.Enable();
+            emoteAction.started += EmoteAction_started;
+
+    //        InputActionReference actionRef = InputActionReference.Create(emoteAction);
+    //        var rebind = actionRef.action.PerformInteractiveRebinding()
+    //.OnMatchWaitForAnother(0.1f)
+    //.WithControlsHavingToMatchPath("<Keyboard>")
+    //.WithControlsHavingToMatchPath("<Mouse>")
+    //.WithCancelingThrough("<Keyboard>/escape")
+    ////.OnComplete(operation => OnRebindComplete(operation, this))
+    ////.OnCancel(_ => FinishRebinding())
+    //.Start();
+
+
+
+
             BoneMapper.animClips.Add(animationClipParams.internalName, clip);
 
+        }
+
+        private static void EmoteAction_started(InputAction.CallbackContext obj)
+        {
+            if (CustomEmotesAPI.localMapper is not null)
+            {
+                CustomEmotesAPI.PlayAnimation(obj.action.name);
+            }
         }
     }
 }
