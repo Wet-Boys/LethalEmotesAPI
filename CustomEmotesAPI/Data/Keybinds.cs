@@ -10,8 +10,8 @@ namespace LethalEmotesAPI.Data
 {
     public static class Keybinds
     {
-        public static Dictionary<string, string> keyBindOverrideStorage = new Dictionary<string, string>();
-        internal static Dictionary<string, InputActionReference> inputRefs = new Dictionary<string, InputActionReference>();
+        public static Dictionary<string, string> keyBindOverrideStorage = new Dictionary<string, string>();//stores all emotes that have ever been loaded with their corresponding input path thing
+        internal static Dictionary<string, InputActionReference> inputRefs = new Dictionary<string, InputActionReference>();//all the currently loaded emotes have an InputActionReference which you can get here
         public static void LoadKeybinds()
         {
             keyBindOverrideStorage = (Dictionary<string, string>)JsonConvert.DeserializeObject(Settings.EmoteKeyBinds.Value, typeof(Dictionary<string, string>));
