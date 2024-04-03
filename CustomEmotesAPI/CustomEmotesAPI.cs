@@ -156,7 +156,7 @@ namespace EmotesAPI
         {
             try
             {
-
+                Keybinds.SaveKeybinds();
                 emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
 
                 emoteNetworker.AddComponent<EmoteNetworker>();
@@ -474,6 +474,7 @@ namespace EmotesAPI
             Settings.RunAll();
             BlacklistSettings.LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
             BlacklistSettings.LoadDisabledListFromBepinSex(Settings.DisabledEmotes);
+            Keybinds.LoadKeybinds();
 
             var targetMethod = typeof(PlayerControllerB).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);

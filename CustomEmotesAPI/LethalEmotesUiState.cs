@@ -99,6 +99,10 @@ public class LethalEmotesUiState : IEmoteUiStateController
     {
         BlacklistSettings.RefreshBothLists();
     }
+    public void SaveKeybinds()
+    {
+        Keybinds.SaveKeybinds();
+    }
 
     internal static void FixLegacyEmotes()
     {
