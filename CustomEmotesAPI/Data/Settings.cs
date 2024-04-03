@@ -53,7 +53,7 @@ namespace EmotesAPI
         public static ConfigEntry<string> RandomEmoteBlacklist => GetCurrentConfig().RandomEmoteBlacklist;
         public static ConfigEntry<string> DisabledEmotes => GetCurrentConfig().DisabledEmotes;
         public static ConfigEntry<bool> PermanentEmotingHealthbar => GetCurrentConfig().PermanentEmotingHealthbar;
-
+        public static ConfigEntry<string> EmoteKeyBinds => GetCurrentConfig().EmoteKeyBinds;
         public static void RunAll()
         {
             GenerateConfigs();
