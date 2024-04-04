@@ -115,6 +115,10 @@ namespace Editor
             
             public InputActionReference? GetEmoteKeybind(string emoteKey) => null;
             
+            public void EnableKeybinds() { }
+    
+            public void DisableKeybinds() { }
+            
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {
                 _data ??= new EmoteWheelSetData
