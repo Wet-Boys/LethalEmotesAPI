@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace LethalEmotesApi.Ui;
 
@@ -50,6 +51,11 @@ public static class EmoteUiManager
     internal static void UnlockPlayerInput()
     {
         _stateController?.UnlockPlayerInput();
+    }
+
+    internal static void EnableKeybinds()
+    {
+        _stateController?.EnableKeybinds();
     }
 
     internal static void PlayAnimationOn(Animator animator, string emoteKey)
@@ -101,6 +107,14 @@ public static class EmoteUiManager
 
     internal static void RefreshBothLists() => _stateController?.RefreshBothLists();
     
+    internal static InputActionReference? GetEmoteKeybind(string? emoteKey)
+    {
+        if (emoteKey is null)
+            return null;
+
+        return _stateController?.GetEmoteKeybind(emoteKey);
+    }
+
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
         _emoteDisplayData = _stateController!.LoadEmoteWheelSetDisplayData();
@@ -123,6 +137,8 @@ public static class EmoteUiManager
         
         EmoteUiInstance.ReloadData();
     }
+    
+    internal static void SaveKeybinds() => _stateController?.SaveKeybinds();
 
     public static bool IsEmoteWheelsOpen() => EmoteUiInstance is
         { IsOpen: true, CurrentView: EmoteUiPanel.UiView.EmoteWheels };
@@ -169,6 +185,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.Show();
+        _stateController?.DisableKeybinds();
     }
 
     public static void CloseEmoteWheels()
@@ -180,6 +197,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.Hide();
+        _stateController?.EnableKeybinds();
     }
 
     public static void CloseCustomizationPanel()
@@ -191,6 +209,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.Hide();
+        _stateController?.EnableKeybinds();
     }
 
     public static void CloseUiGracefully()
@@ -204,6 +223,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.CloseGracefully();
+        _stateController?.EnableKeybinds();
     }
 
     public static float EmoteVolume

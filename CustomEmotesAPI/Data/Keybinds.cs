@@ -4,40 +4,71 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace LethalEmotesAPI.Data
 {
     public static class Keybinds
     {
-        public static Dictionary<string, string> keyBindOverrideStorage = new Dictionary<string, string>();//stores all emotes that have ever been loaded with their corresponding input path thing
-        internal static Dictionary<string, InputActionReference> inputRefs = new Dictionary<string, InputActionReference>();//all the currently loaded emotes have an InputActionReference which you can get here
+        private static InputActionAsset _inputActionAsset;
+        private static readonly InputActionMap ActionMap = new("LethalEmotesAPI Emote Keybinds");
+        
+        public static Dictionary<string, string> keyBindOverrideStorage = new();//stores all emotes that have ever been loaded with their corresponding input path thing
+        private static readonly Dictionary<string, InputActionReference> InputRefs = new(); // Cache refs for faster look-ups 
+        
         public static void LoadKeybinds()
         {
+            if (_inputActionAsset is null)
+            {
+                _inputActionAsset = ScriptableObject.CreateInstance<InputActionAsset>();
+                _inputActionAsset.AddActionMap(ActionMap);
+            }
+            
             keyBindOverrideStorage = (Dictionary<string, string>)JsonConvert.DeserializeObject(Settings.EmoteKeyBinds.Value, typeof(Dictionary<string, string>));
         }
+        
         public static void SaveKeybinds()
         {
-            foreach (var inputRefKey in inputRefs.Keys)
+            foreach (var (actionId, inputRef) in InputRefs)
             {
-                if (keyBindOverrideStorage.ContainsKey(inputRefKey))
-                {
-                    keyBindOverrideStorage[inputRefKey] = inputRefs[inputRefKey].action.name;
-                }
+                keyBindOverrideStorage[actionId] = inputRef.action.bindings[0].effectivePath;
             }
-            Settings.EmoteKeyBinds.Value = JsonConvert.SerializeObject(keyBindOverrideStorage.Select(kvp => !string.IsNullOrEmpty(kvp.Value)));
+
+            keyBindOverrideStorage = keyBindOverrideStorage.Where(kvp => !string.IsNullOrEmpty(kvp.Value))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            Settings.EmoteKeyBinds.Value = JsonConvert.SerializeObject(keyBindOverrideStorage);
         }
+        
         public static void FullReloadKeybinds()
         {
             LoadKeybinds();
-            foreach (var inputRef in inputRefs.Values)
+            foreach (var action in ActionMap.actions)
             {
-                inputRef.action.RemoveAllBindingOverrides();
-                if (keyBindOverrideStorage.ContainsKey(inputRef.action.name))
+                action.RemoveAllBindingOverrides();
+                if (keyBindOverrideStorage.ContainsKey(action.name))
                 {
-                    inputRef.action.ApplyBindingOverride(keyBindOverrideStorage[inputRef.action.name]);
+                    action.ApplyBindingOverride(keyBindOverrideStorage[action.name]);
                 }
             }
         }
+
+        internal static InputActionReference GetOrCreateInputRef(string actionId)
+        {
+            if (InputRefs.TryGetValue(actionId, out var inputRef))
+                return inputRef;
+            
+            var action = ActionMap.AddAction(actionId);
+            action.AddBinding("");
+            
+            inputRef = InputActionReference.Create(action);
+            InputRefs[actionId] = inputRef;
+
+            return inputRef;
+        }
+
+        internal static void EnableKeybinds() => ActionMap.Enable();
+        
+        internal static void DisableKeybinds() => ActionMap.Disable();
     }
 }

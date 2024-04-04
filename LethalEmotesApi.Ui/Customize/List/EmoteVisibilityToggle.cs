@@ -1,5 +1,4 @@
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,47 +6,27 @@ using UnityEngine.UI;
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteVisibilityToggle : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class EmoteVisibilityToggle : EmoteListItemChildInteractable, IPointerClickHandler
 {
-    public EmoteListItem? emoteListItem;
     public Image? visibilityImage;
     public Sprite? enabledSprite;
     public Sprite? disabledSprite;
-    public EmoteBlacklistToggle? blacklistToggle; 
+    public EmoteBlacklistToggle? blacklistToggle;
         
-    private string? _emoteKey;
-    private bool IsVisible => !EmoteUiManager.EmotePoolBlacklist.Contains(_emoteKey);
-
-    protected override void Start()
-    {
-        base.Start();
-        UpdateState();
-    }
-
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        UpdateState();
-    }
-
-    public void SetEmoteKey(string emoteKey)
-    {
-        _emoteKey = emoteKey;
-        UpdateState();
-    }
+    private bool IsVisible => !EmoteUiManager.EmotePoolBlacklist.Contains(currentEmoteKey);
 
     public void Toggle()
     {
-        if (string.IsNullOrEmpty(_emoteKey))
+        if (string.IsNullOrEmpty(currentEmoteKey))
             return;
 
         if (IsVisible)
         {
-            EmoteUiManager.AddToEmoteBlacklist(_emoteKey);
+            EmoteUiManager.AddToEmoteBlacklist(currentEmoteKey);
         }
         else
         {
-            EmoteUiManager.RemoveFromEmoteBlacklist(_emoteKey);
+            EmoteUiManager.RemoveFromEmoteBlacklist(currentEmoteKey);
         }
         
         UpdateState();
@@ -57,28 +36,16 @@ public class EmoteVisibilityToggle : UIBehaviour, IPointerEnterHandler, IPointer
         
         blacklistToggle.UpdateState();
     }
-    private void UpdateStateBroadcast()
+    
+    public override void UpdateState()
     {
-        UpdateState();
-    }
-    public void UpdateState()
-    {
-        if (string.IsNullOrEmpty(_emoteKey))
+        if (string.IsNullOrEmpty(currentEmoteKey))
             return;
 
         if (visibilityImage is null || enabledSprite is null || disabledSprite is null)
             return;
+        
         visibilityImage.sprite = IsVisible ? enabledSprite : disabledSprite;
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        emoteListItem!.OnPointerExit(eventData);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        emoteListItem!.OnPointerEnter(eventData);
     }
 
     public void OnPointerClick(PointerEventData eventData)
