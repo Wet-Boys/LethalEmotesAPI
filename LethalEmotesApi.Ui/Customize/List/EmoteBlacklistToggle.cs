@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteBlacklistToggle : EmoteListItemChildInteractable, IPointerClickHandler
+public class EmoteBlacklistToggle : EmoteListItemChildInteractable
 {
     public Image? toggleImage;
     public EmoteVisibilityToggle? visibilityToggle;
@@ -70,8 +70,10 @@ public class EmoteBlacklistToggle : EmoteListItemChildInteractable, IPointerClic
         tooltip.SetActive(false);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public override void OnPointerClick(PointerEventData eventData)
     {
+        base.OnPointerClick(eventData);
+        
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
         

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace LethalEmotesApi.Ui.Customize.List;
 
-public class EmoteKeybindButton : EmoteListItemChildInteractable, IPointerClickHandler
+public class EmoteKeybindButton : EmoteListItemChildInteractable
 {
     public TextMeshProUGUI? keybindLabel;
     public TextMeshProUGUI? placeholderLabel;
@@ -131,8 +131,10 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable, IPointerClickH
         tooltip.SetActive(false);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public override void OnPointerClick(PointerEventData eventData)
     {
+        base.OnPointerClick(eventData);
+        
         if (eventData.button == PointerEventData.InputButton.Left)
             StartRebind();
 
@@ -199,7 +201,7 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable, IPointerClickH
         EmoteUiManager.SaveKeybinds();
     }
 
-    private static void CancelExistingRebind()
+    public static void CancelExistingRebind()
     {
         if (_rebindTarget is null)
             return;
