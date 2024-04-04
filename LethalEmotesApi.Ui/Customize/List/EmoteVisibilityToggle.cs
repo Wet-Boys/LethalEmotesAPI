@@ -72,8 +72,10 @@ public class EmoteVisibilityToggle : EmoteListItemChildInteractable, IPointerCli
         tooltip.SetActive(false);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public override void OnPointerClick(PointerEventData eventData)
     {
+        base.OnPointerClick(eventData);
+        
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
         

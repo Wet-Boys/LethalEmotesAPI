@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.List;
 
-public abstract class EmoteListItemChildInteractable : UIBehaviour, IPointerEnterHandler, IPointerExitHandler
+public abstract class EmoteListItemChildInteractable : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public EmoteListItem? emoteListItem;
     public GameObject? tooltip;
@@ -59,5 +59,10 @@ public abstract class EmoteListItemChildInteractable : UIBehaviour, IPointerEnte
     public virtual void OnPointerExit(PointerEventData eventData)
     {
         emoteListItem!.OnPointerEnter(eventData);
+    }
+
+    public virtual void OnPointerClick(PointerEventData eventData)
+    {
+        EventSystem.current.SetSelectedGameObject(gameObject);
     }
 }
