@@ -7,6 +7,7 @@ using LethalEmotesApi.Ui.Db;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
 using LethalEmotesApi.Ui;
+using UnityEngine.InputSystem;
 
 namespace LethalEmotesAPI;
 
@@ -95,14 +96,17 @@ public class LethalEmotesUiState : IEmoteUiStateController
     {
         BlacklistSettings.RemoveFromDisabledList(emoteKey);
     }
+    
     public void RefreshBothLists()
     {
         BlacklistSettings.RefreshBothLists();
     }
-    public void SaveKeybinds()
-    {
-        Keybinds.SaveKeybinds();
-    }
+
+    public InputActionReference GetEmoteKeybind(string emoteKey) => Keybinds.GetOrCreateInputRef(emoteKey);
+
+    public void EnableKeybinds() => Keybinds.EnableKeybinds();
+
+    public void DisableKeybinds() => Keybinds.DisableKeybinds();
 
     internal static void FixLegacyEmotes()
     {
@@ -126,6 +130,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
         }
         Settings.EmoteWheelSetDataEntryString.Value = e.ToJson();
     }
+
     public EmoteWheelSetData LoadEmoteWheelSetData()
     {
         return EmoteWheelSetDataConverter.EmoteWheelSetDataFromJson(Settings.EmoteWheelSetDataEntryString.Value);
@@ -144,6 +149,11 @@ public class LethalEmotesUiState : IEmoteUiStateController
     public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave)
     {
         Settings.EmoteWheelSetDisplayDataString.Value = dataToSave.ToJson();
+    }
+
+    public void SaveKeybinds()
+    {
+        Keybinds.SaveKeybinds();
     }
 
     public float EmoteVolume

@@ -11,6 +11,7 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
     public TextMeshProUGUI? label;
     public EmoteBlacklistToggle? blacklistToggle;
     public EmoteVisibilityToggle? visibilityToggle;
+    public EmoteKeybindButton? emoteKeybind;
     public Image? selectImage;
     public TextMeshProUGUI? modLabel;
     public EmoteDragDropController? dragDropController;
@@ -73,11 +74,12 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
         
         modLabel.SetText(EmoteUiManager.GetEmoteModName(EmoteKey));
 
-        if (blacklistToggle is null || visibilityToggle is null)
+        if (blacklistToggle is null || visibilityToggle is null || emoteKeybind is null)
             return;
 
         blacklistToggle.SetEmoteKey(EmoteKey);
         visibilityToggle.SetEmoteKey(EmoteKey);
+        emoteKeybind.SetEmoteKey(EmoteKey);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

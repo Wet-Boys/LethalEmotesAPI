@@ -158,20 +158,23 @@ public class CustomAnimationClip : MonoBehaviour
         this.preventsMovement = preventsMovement;
         this.allowJoining = allowJoining;
 
+        if (string.IsNullOrEmpty(customInternalName)) // Can't create an action with an empty name.
+            return;
 
+        Keybinds.keyBindOverrideStorage.TryAdd(customInternalName, "");
+        
+        Keybinds.DisableKeybinds();
 
-        if (!Keybinds.keyBindOverrideStorage.ContainsKey(customInternalName))
-        {
-            Keybinds.keyBindOverrideStorage.Add(customInternalName, "");
-        }
-        InputAction emoteAction = new InputAction(customInternalName);
-        emoteAction.Enable();
-        emoteAction.started += EmoteAction_started;
+        var emoteActionRef = Keybinds.GetOrCreateInputRef(customInternalName);
+        emoteActionRef.action.Enable();
+        emoteActionRef.action.started += EmoteAction_started;
+        
         if (Keybinds.keyBindOverrideStorage[customInternalName] != "")
         {
-            emoteAction.ApplyBindingOverride(Keybinds.keyBindOverrideStorage[customInternalName]);
+            emoteActionRef.action.ApplyBindingOverride(Keybinds.keyBindOverrideStorage[customInternalName]);
         }
-        Keybinds.inputRefs.Add(customInternalName, InputActionReference.Create(emoteAction));
+        
+        Keybinds.EnableKeybinds();
     }
 
     private static void EmoteAction_started(InputAction.CallbackContext obj)

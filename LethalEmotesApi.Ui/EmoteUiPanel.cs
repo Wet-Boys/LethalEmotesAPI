@@ -64,6 +64,7 @@ public class EmoteUiPanel : MonoBehaviour
         
         EmoteUiManager.UnlockMouseInput();
         EmoteUiManager.UnlockPlayerInput();
+        EmoteUiManager.EnableKeybinds();
 
         IsOpen = false;
     }
