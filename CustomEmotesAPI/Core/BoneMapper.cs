@@ -1223,18 +1223,21 @@ public class BoneMapper : MonoBehaviour
     {
         UnlockBones();
         transform.localPosition = Vector3.zero;
-        foreach (var item in currentClip.soloIgnoredBones)
+        if (currentClip is not null)
         {
-            if (emoteSkeletonAnimator.GetBoneTransform(item))
-                dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
-        }
-        foreach (var item in currentClip.rootIgnoredBones)
-        {
-            if (emoteSkeletonAnimator.GetBoneTransform(item))
-                dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
-            foreach (var bone in emoteSkeletonAnimator.GetBoneTransform(item).GetComponentsInChildren<Transform>())
+            foreach (var item in currentClip.soloIgnoredBones)
             {
-                dontAnimateUs.Add(bone.name);
+                if (emoteSkeletonAnimator.GetBoneTransform(item))
+                    dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
+            }
+            foreach (var item in currentClip.rootIgnoredBones)
+            {
+                if (emoteSkeletonAnimator.GetBoneTransform(item))
+                    dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
+                foreach (var bone in emoteSkeletonAnimator.GetBoneTransform(item).GetComponentsInChildren<Transform>())
+                {
+                    dontAnimateUs.Add(bone.name);
+                }
             }
         }
         if (!jank)
@@ -1253,7 +1256,10 @@ public class BoneMapper : MonoBehaviour
                             ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                             if (smr == basePlayerModelSMR.First())
                             {
-                                ec.SetLocalTransforms(currentClip.localTransforms);
+                                if (currentClip is not null)
+                                {
+                                    ec.SetLocalTransforms(currentClip.localTransforms);
+                                }
                             }
                         }
                         else if (dontAnimateUs.Contains(smr.bones[i].name))
@@ -1295,6 +1301,10 @@ public class BoneMapper : MonoBehaviour
         }
         else
         {
+            if (currentClip is null)
+            {
+                return;
+            }
             if (Settings.rootMotionType.Value != RootMotionType.None &&
 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
