@@ -358,7 +358,6 @@ namespace EmotesAPI
             orig(self);
             try
             {
-                DebugClass.Log($"we are playing on {self.gameObject}");
                 BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
                 if (mapper.emoteSkeletonAnimator.enabled)
                 {
