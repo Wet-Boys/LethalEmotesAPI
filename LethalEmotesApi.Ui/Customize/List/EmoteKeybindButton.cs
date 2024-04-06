@@ -1,4 +1,5 @@
 using System.Linq;
+using LethalEmotesApi.Ui.Customize.RebindConflict;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -168,6 +169,9 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable
 
     private void OnRebindComplete(InputActionRebindingExtensions.RebindingOperation operation)
     {
+        if (currentEmoteKey is null)
+            return;
+        
         var bindingPath = operation.action.bindings.First().overridePath;
         if (bindingPath is null)
         {
@@ -177,7 +181,6 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable
 
         // Array of emote keys that have the same bind path, excluding the current emote key.
         var emoteKeys = EmoteUiManager.GetEmoteKeysForBindPath(bindingPath)
-            .Where(emoteKey => emoteKey != currentEmoteKey)
             .ToArray();
         
         if (emoteKeys.Length <= 0) // No conflicting emote keys
@@ -185,8 +188,10 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable
             FinishRebind();
             return;
         }
+
+        _rebinding = false;
         
-        // Todo
+        RebindConflictController.CreateConflictModal(currentEmoteKey, emoteKeys);
     }
 
     private void FinishRebind()

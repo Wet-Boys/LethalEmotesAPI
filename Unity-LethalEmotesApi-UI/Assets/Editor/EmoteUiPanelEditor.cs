@@ -122,6 +122,8 @@ namespace Editor
 
             public string[] GetEmoteKeysForBindPath(string bindPath) => Array.Empty<string>();
             
+            public void LoadKeybinds() { }
+            
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {
                 _data ??= new EmoteWheelSetData

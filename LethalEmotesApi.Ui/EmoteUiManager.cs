@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
@@ -142,6 +141,8 @@ public static class EmoteUiManager
     }
     
     internal static void SaveKeybinds() => _stateController?.SaveKeybinds();
+    
+    internal static void LoadKeybinds() => _stateController?.LoadKeybinds();
 
     public static bool IsEmoteWheelsOpen() => EmoteUiInstance is
         { IsOpen: true, CurrentView: EmoteUiPanel.UiView.EmoteWheels };

@@ -143,6 +143,8 @@ public class LethalEmotesUiState : IEmoteUiStateController
         return EmoteWheelSetDataConverter.EmoteWheelSetDisplayDataFromJson(Settings.EmoteWheelSetDisplayDataString.Value);
     }
 
+    public void LoadKeybinds() => Keybinds.LoadKeybinds();
+
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
         Settings.EmoteWheelSetDataEntryString.Value = dataToSave.ToJson();
@@ -153,10 +155,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
         Settings.EmoteWheelSetDisplayDataString.Value = dataToSave.ToJson();
     }
 
-    public void SaveKeybinds()
-    {
-        Keybinds.SaveKeybinds();
-    }
+    public void SaveKeybinds() => Keybinds.SaveKeybinds();
 
     public float EmoteVolume
     {

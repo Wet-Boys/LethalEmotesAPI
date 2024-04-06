@@ -50,6 +50,8 @@ public interface IEmoteUiStateController
     public EmoteWheelSetData LoadEmoteWheelSetData();
 
     public EmoteWheelSetDisplayData LoadEmoteWheelSetDisplayData();
+    
+    public void LoadKeybinds();
 
     #endregion
     

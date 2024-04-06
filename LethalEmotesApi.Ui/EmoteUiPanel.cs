@@ -1,4 +1,5 @@
 ﻿using LethalEmotesApi.Ui.Customize;
+using LethalEmotesApi.Ui.Customize.RebindConflict;
 using LethalEmotesApi.Ui.Wheel;
 using TMPro;
 using UnityEngine;
@@ -135,6 +136,8 @@ public class EmoteUiPanel : MonoBehaviour
 
     public void HideCustomizePanel()
     {
+        RebindConflictController.CancelExisting();
+        
         if (customizePanel is null)
             return;
         

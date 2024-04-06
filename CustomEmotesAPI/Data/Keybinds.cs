@@ -26,6 +26,17 @@ namespace LethalEmotesAPI.Data
             }
             
             keyBindOverrideStorage = (Dictionary<string, string>)JsonConvert.DeserializeObject(Settings.EmoteKeyBinds.Value, typeof(Dictionary<string, string>));
+            if (keyBindOverrideStorage is null)
+                return;
+
+            foreach (var (key, bindingOverride) in keyBindOverrideStorage)
+            {
+                if (!InputRefs.TryGetValue(key, out var inputRef))
+                    continue;
+                
+                inputRef.action.RemoveAllBindingOverrides();
+                inputRef.action.ApplyBindingOverride(bindingOverride);
+            }
         }
         
         public static void SaveKeybinds()
