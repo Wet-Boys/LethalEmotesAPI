@@ -43,6 +43,8 @@ public interface IEmoteUiStateController
     
     public void DisableKeybinds();
 
+    public string[] GetEmoteKeysForBindPath(string bindPath);
+
     #region Loading Config Data
 
     public EmoteWheelSetData LoadEmoteWheelSetData();

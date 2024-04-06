@@ -115,6 +115,9 @@ public static class EmoteUiManager
         return _stateController?.GetEmoteKeybind(emoteKey);
     }
 
+    internal static string[] GetEmoteKeysForBindPath(string bindPath) =>
+        _stateController!.GetEmoteKeysForBindPath(bindPath);
+
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
         _emoteDisplayData = _stateController!.LoadEmoteWheelSetDisplayData();

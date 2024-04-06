@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -157,12 +158,35 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable
             .WithControlsHavingToMatchPath("<Keyboard>")
             .WithControlsHavingToMatchPath("<Mouse>")
             .WithCancelingThrough("<Keyboard>/escape")
-            .OnComplete(_ => FinishRebind())
+            .OnComplete(OnRebindComplete)
             .OnCancel(_ => FinishRebind())
             .Start();
 
         _rebinding = true;
         SetRebinding();
+    }
+
+    private void OnRebindComplete(InputActionRebindingExtensions.RebindingOperation operation)
+    {
+        var bindingPath = operation.action.bindings.First().overridePath;
+        if (bindingPath is null)
+        {
+            FinishRebind();
+            return;
+        }
+
+        // Array of emote keys that have the same bind path, excluding the current emote key.
+        var emoteKeys = EmoteUiManager.GetEmoteKeysForBindPath(bindingPath)
+            .Where(emoteKey => emoteKey != currentEmoteKey)
+            .ToArray();
+        
+        if (emoteKeys.Length <= 0) // No conflicting emote keys
+        {
+            FinishRebind();
+            return;
+        }
+        
+        // Todo
     }
 
     private void FinishRebind()

@@ -107,6 +107,8 @@ public class LethalEmotesUiState : IEmoteUiStateController
     public void EnableKeybinds() => Keybinds.EnableKeybinds();
 
     public void DisableKeybinds() => Keybinds.DisableKeybinds();
+    
+    public string[] GetEmoteKeysForBindPath(string bindPath) => Keybinds.GetEmoteKeysForBindPath(bindPath);
 
     internal static void FixLegacyEmotes()
     {

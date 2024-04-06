@@ -15,7 +15,7 @@ namespace LethalEmotesAPI.Data
         private static readonly InputActionMap ActionMap = new("LethalEmotesAPI Emote Keybinds");
         
         public static Dictionary<string, string> keyBindOverrideStorage = new();//stores all emotes that have ever been loaded with their corresponding input path thing
-        private static readonly Dictionary<string, InputActionReference> InputRefs = new(); // Cache refs for faster look-ups 
+        private static readonly Dictionary<string, InputActionReference> InputRefs = new(); // Cache refs for faster look-ups
         
         public static void LoadKeybinds()
         {
@@ -70,5 +70,12 @@ namespace LethalEmotesAPI.Data
         internal static void EnableKeybinds() => ActionMap.Enable();
         
         internal static void DisableKeybinds() => ActionMap.Disable();
+
+        internal static string[] GetEmoteKeysForBindPath(string bindPath)
+        {
+            return keyBindOverrideStorage.Where(kvp => string.Equals(kvp.Value, bindPath, StringComparison.InvariantCultureIgnoreCase))
+                .Select(kvp => kvp.Key)
+                .ToArray();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Editor.Utils;
 using LethalEmotesApi.Ui;
@@ -118,6 +119,8 @@ namespace Editor
             public void EnableKeybinds() { }
     
             public void DisableKeybinds() { }
+
+            public string[] GetEmoteKeysForBindPath(string bindPath) => Array.Empty<string>();
             
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {

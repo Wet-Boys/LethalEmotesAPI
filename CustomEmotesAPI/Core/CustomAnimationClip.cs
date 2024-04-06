@@ -160,8 +160,6 @@ public class CustomAnimationClip : MonoBehaviour
 
         if (string.IsNullOrEmpty(customInternalName)) // Can't create an action with an empty name.
             return;
-
-        Keybinds.keyBindOverrideStorage.TryAdd(customInternalName, "");
         
         Keybinds.DisableKeybinds();
 
@@ -169,9 +167,9 @@ public class CustomAnimationClip : MonoBehaviour
         emoteActionRef.action.Enable();
         emoteActionRef.action.started += EmoteAction_started;
         
-        if (Keybinds.keyBindOverrideStorage[customInternalName] != "")
+        if (Keybinds.keyBindOverrideStorage.TryGetValue(customInternalName, out var bindingOverride))
         {
-            emoteActionRef.action.ApplyBindingOverride(Keybinds.keyBindOverrideStorage[customInternalName]);
+            emoteActionRef.action.ApplyBindingOverride(bindingOverride);
         }
         
         Keybinds.EnableKeybinds();
