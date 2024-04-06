@@ -9,10 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build", "build\Build.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C126025D-A702-4C8C-840F-85F8AD98A91D}"
 	ProjectSection(SolutionItems) = preProject
+	    .env = .env
 		build-settings.json = build-settings.json
 		build.cake = build.cake
 		build.ps1 = build.ps1
 		cake.config = cake.config
+		CHANGELOG.md = CHANGELOG.md
+		manifest.json = manifest.json
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LethalEmotesApi.Ui", "LethalEmotesApi.Ui\LethalEmotesApi.Ui.csproj", "{2BD82460-7D0C-41EA-8ECC-8D67AD3372E6}"
