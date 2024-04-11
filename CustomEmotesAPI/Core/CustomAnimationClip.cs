@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using BepInEx;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using LethalEmotesAPI.Data;
 
 public class CustomAnimationClip : MonoBehaviour
 {
@@ -155,5 +157,29 @@ public class CustomAnimationClip : MonoBehaviour
         this.animates = animates;
         this.preventsMovement = preventsMovement;
         this.allowJoining = allowJoining;
+
+        if (string.IsNullOrEmpty(customInternalName)) // Can't create an action with an empty name.
+            return;
+        
+        Keybinds.DisableKeybinds();
+
+        var emoteActionRef = Keybinds.GetOrCreateInputRef(customInternalName);
+        emoteActionRef.action.Enable();
+        emoteActionRef.action.started += EmoteAction_started;
+        
+        if (Keybinds.keyBindOverrideStorage.TryGetValue(customInternalName, out var bindingOverride))
+        {
+            emoteActionRef.action.ApplyBindingOverride(bindingOverride);
+        }
+        
+        Keybinds.EnableKeybinds();
+    }
+
+    private static void EmoteAction_started(InputAction.CallbackContext obj)
+    {
+        if (CustomEmotesAPI.localMapper is not null)
+        {
+            CustomEmotesAPI.PlayAnimation(obj.action.name);
+        }
     }
 }

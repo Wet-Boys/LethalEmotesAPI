@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using LethalEmotesApi.Ui.Customize.DragDrop;
 using LethalEmotesApi.Ui.Data;
 using TMPro;
 using UnityEngine;
@@ -27,7 +26,7 @@ public class EmoteList : UIBehaviour
         if (searchInputField is null)
             return;
         
-        searchInputField.onValueChanged.AddListener(SearchFieldUpdated); 
+        searchInputField.onValueChanged.AddListener(SearchFieldUpdated);
     }
 
     protected override void Start()
@@ -40,6 +39,12 @@ public class EmoteList : UIBehaviour
             _customizePanel = GetComponentInParent<CustomizePanel>();
         
         InitList();
+    }
+
+    private void Update()
+    {
+        if (searchInputField is not null && searchInputField.isFocused)
+            EmoteKeybindButton.CancelExistingRebind();
     }
 
     protected override void OnEnable()

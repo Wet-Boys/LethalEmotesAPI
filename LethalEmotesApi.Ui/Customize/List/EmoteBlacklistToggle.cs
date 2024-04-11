@@ -7,45 +7,26 @@ using UnityEngine.UI;
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class EmoteBlacklistToggle : EmoteListItemChildInteractable
 {
-    public EmoteListItem? emoteListItem;
     public Image? toggleImage;
     public EmoteVisibilityToggle? visibilityToggle;
+    public TextMeshProUGUI? tooltipLabel;
 
-    private string? _emoteKey;
-    private bool InBlacklist => EmoteUiManager.RandomPoolBlacklist.Contains(_emoteKey);
-
-    protected override void Start()
-    {
-        base.Awake();
-        UpdateState();
-    }
-
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        UpdateState();
-    }
-
-    public void SetEmoteKey(string emoteKey)
-    {
-        _emoteKey = emoteKey;
-        UpdateState();
-    }
+    private bool InBlacklist => EmoteUiManager.RandomPoolBlacklist.Contains(currentEmoteKey);
 
     public void Toggle()
     {
-        if (string.IsNullOrEmpty(_emoteKey))
+        if (string.IsNullOrEmpty(currentEmoteKey))
             return;
         
         if (InBlacklist)
         {
-            EmoteUiManager.RemoveFromRandomPoolBlacklist(_emoteKey);
+            EmoteUiManager.RemoveFromRandomPoolBlacklist(currentEmoteKey);
         }
         else
         {
-            EmoteUiManager.AddToRandomPoolBlacklist(_emoteKey);
+            EmoteUiManager.AddToRandomPoolBlacklist(currentEmoteKey);
         }
         
         UpdateState();
@@ -55,32 +36,44 @@ public class EmoteBlacklistToggle : UIBehaviour, IPointerEnterHandler, IPointerE
         
         visibilityToggle.UpdateState();
     }
-    private void UpdateStateBroadcast()
+    
+    public override void UpdateState()
     {
-        UpdateState();
-    }
-    public void UpdateState()
-    {
-        if (string.IsNullOrEmpty(_emoteKey))
+        if (string.IsNullOrEmpty(currentEmoteKey))
             return;
         
-        if (toggleImage is null)
+        if (toggleImage is null || tooltipLabel is null)
             return;
+        
         toggleImage.enabled = InBlacklist;
+
+        tooltipLabel.text = $"{(InBlacklist ? "Add to" : "Remove from")} random pool";
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public override void OnPointerEnter(PointerEventData eventData)
     {
-        emoteListItem!.OnPointerExit(eventData);
+        base.OnPointerEnter(eventData);
+        
+        if (tooltip is null)
+            return;
+        
+        tooltip.SetActive(true);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public override void OnPointerExit(PointerEventData eventData)
     {
-        emoteListItem!.OnPointerEnter(eventData);
+        base.OnPointerExit(eventData);
+        
+        if (tooltip is null)
+            return;
+        
+        tooltip.SetActive(false);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public override void OnPointerClick(PointerEventData eventData)
     {
+        base.OnPointerClick(eventData);
+        
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
         

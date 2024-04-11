@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace LethalEmotesApi.Ui.Data;
 
@@ -23,30 +24,44 @@ public interface IEmoteUiStateController
     public IEmoteDb EmoteDb { get; }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
+    
     public IReadOnlyCollection<string> EmotePoolBlacklist { get; }
 
     public void AddToRandomPoolBlacklist(string emoteKey);
 
     public void RemoveFromRandomPoolBlacklist(string emoteKey);
+    
     public void AddToEmoteBlacklist(string emoteKey);
 
     public void RemoveFromEmoteBlacklist(string emoteKey);
     
     public void RefreshBothLists();
 
+    public InputActionReference? GetEmoteKeybind(string emoteKey);
+
+    public void EnableKeybinds();
+    
+    public void DisableKeybinds();
+
+    public string[] GetEmoteKeysForBindPath(string bindPath);
+
     #region Loading Config Data
 
     public EmoteWheelSetData LoadEmoteWheelSetData();
 
     public EmoteWheelSetDisplayData LoadEmoteWheelSetDisplayData();
+    
+    public void LoadKeybinds();
 
     #endregion
     
     #region Saving Config Data
 
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave);
-    
+
     public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave);
+
+    public void SaveKeybinds();
 
     #endregion
 

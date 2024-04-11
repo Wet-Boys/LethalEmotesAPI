@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Editor.Utils;
-using JetBrains.Annotations;
 using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 
 namespace Editor
 {
@@ -112,7 +113,17 @@ namespace Editor
             public void RemoveFromEmoteBlacklist(string emoteKey) => _emoteBlacklist.Remove(emoteKey);
             
             public void RefreshBothLists() { }
+            
+            public InputActionReference? GetEmoteKeybind(string emoteKey) => null;
+            
+            public void EnableKeybinds() { }
+    
+            public void DisableKeybinds() { }
 
+            public string[] GetEmoteKeysForBindPath(string bindPath) => Array.Empty<string>();
+            
+            public void LoadKeybinds() { }
+            
             public EmoteWheelSetData LoadEmoteWheelSetData()
             {
                 _data ??= new EmoteWheelSetData
@@ -131,6 +142,8 @@ namespace Editor
             {
                 return new EmoteWheelSetDisplayData();
             }
+            
+            public void SaveKeybinds() { }
 
             public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
             {

@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
 namespace LethalEmotesAPI.ImportV2
 {
@@ -69,6 +71,7 @@ namespace LethalEmotesAPI.ImportV2
                     CustomEmotesAPI.randomClipList.Add(animationClipParams.internalName);
                 }
             }
+
             BoneMapper.animClips.Add(animationClipParams.internalName, clip);
 
         }

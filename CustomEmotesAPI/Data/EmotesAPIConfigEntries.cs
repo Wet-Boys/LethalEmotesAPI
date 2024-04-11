@@ -24,6 +24,7 @@ namespace LethalEmotesAPI.Data
         public ConfigEntry<string> RandomEmoteBlacklist;
         public ConfigEntry<string> DisabledEmotes;
         public ConfigEntry<bool> PermanentEmotingHealthbar;
+        public ConfigEntry<string> EmoteKeyBinds;
         private ConfigFile configFile;
         private string sectionPrefix;
         public EmotesAPIConfigEntries(ConfigFile file, string sectionPrefix) {
@@ -39,6 +40,7 @@ namespace LethalEmotesAPI.Data
             thirdPersonType = file.Bind<ThirdPersonType>(sectionPrefix + "Controls", "Third Person Settings", ThirdPersonType.Normal, "Switch third person settings between emote decides, all on, or all off");
             StopEmoteWhenLockedToStopsEmote = file.Bind<bool>(sectionPrefix + "Misc", "Stop Emote When Locked Player Stops Emote", true, "If you are locked to a player for an emote (determined by emote mods themselves), you will stop emoting and unlock yourself if the other person stops emoting");
             PermanentEmotingHealthbar = file.Bind<bool>(sectionPrefix + "Misc", "Permanent Healthbar Animation", false, "Keeps the fun lil guy in the top left animating at all times");
+            EmoteKeyBinds = file.Bind<string>(sectionPrefix + "No Touch", "Emote Keybinds", "{}", "Emote Keybinds, don't touch it here, change in the UI");
             HideJoinSpots.SettingChanged += Settings.HideJoinSpots_SettingChanged;
             PermanentEmotingHealthbar.SettingChanged += Settings.PermanentEmotingHealthbar_SettingChanged;
             configFile = file;
