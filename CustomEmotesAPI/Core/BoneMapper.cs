@@ -2,6 +2,7 @@
 using EmotesAPI;
 using GameNetcodeStuff;
 using LethalEmotesAPI;
+using LethalEmotesAPI.Core;
 using LethalEmotesAPI.Patches;
 using LethalEmotesAPI.Patches.ModCompat;
 using LethalEmotesAPI.Utils;
@@ -965,7 +966,7 @@ public class BoneMapper : MonoBehaviour
         if (local && isInThirdPerson)
         {
             //just copying this from the unity docs/spectator camera KEKW
-            Ray ray = new Ray(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position, desiredCameraPos.transform.position - emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position);
+            Ray ray = new Ray(mapperBodyTransform.position, desiredCameraPos.transform.position - mapperBodyTransform.position);
             RaycastHit hit;//                       v PlayerControlerB.walkableSurfacesNoPlayersMask... but it's private and I don't feel like publicizing it lmao
             if (Physics.Raycast(ray, out hit, 10f, 268437761, QueryTriggerInteraction.Ignore))
             {
@@ -975,7 +976,7 @@ public class BoneMapper : MonoBehaviour
             {
                 realCameraPos.transform.position = ray.GetPoint(10.0f);
             }
-            if (Vector3.Distance(realCameraPos.transform.position, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position) > Vector3.Distance(desiredCameraPos.transform.position, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).position))
+            if (Vector3.Distance(realCameraPos.transform.position, mapperBodyTransform.position) > Vector3.Distance(desiredCameraPos.transform.position, mapperBodyTransform.position))
             {
                 realCameraPos.transform.position = desiredCameraPos.transform.position;
             }

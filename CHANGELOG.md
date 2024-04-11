@@ -1,3 +1,5 @@
+- Version 1.8.1: Fixed issue with third person camera clipping into walls with a select few emotes
+
 - Version 1.8.0: Added keybind support. Specifically, in the customize menu you can now assign a keybind to any emote you want. Big thanks to Rune for making the UI work for this
 
 - Version 1.7.5: Changed how we disable the hud to work better with other mods.
