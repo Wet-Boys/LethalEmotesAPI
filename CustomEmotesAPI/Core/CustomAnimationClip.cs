@@ -6,6 +6,7 @@ using BepInEx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using LethalEmotesAPI.Data;
+using LethalEmotesApi.Ui;
 
 public class CustomAnimationClip : MonoBehaviour
 {
@@ -177,6 +178,8 @@ public class CustomAnimationClip : MonoBehaviour
 
     private static void EmoteAction_started(InputAction.CallbackContext obj)
     {
+        if (!EmoteUiManager.CanOpenEmoteWheels())
+            return;
         if (CustomEmotesAPI.localMapper is not null)
         {
             CustomEmotesAPI.PlayAnimation(obj.action.name);
