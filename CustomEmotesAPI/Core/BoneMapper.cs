@@ -589,7 +589,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     for (int x = startingXPoint; x < smr.bones.Length; x++)
                     {
-                        //DebugClass.Log($"comparing:    {smr1.bones[i].name}     {smr.bones[x].name}");
+                        //DebugClass.Log($"comparing:    {emoteSkeletonSMR.bones[i].name} from {emoteSkeletonSMR}   to  {smr.bones[x].name} from {smr}");
                         //DebugClass.Log($"--------------  {smrbone.gameObject.name}   {smr1bone.gameObject.name}      {smrbone.GetComponent<ParentConstraint>()}");
                         if (emoteSkeletonSMR.bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
                         {
@@ -863,7 +863,7 @@ public class BoneMapper : MonoBehaviour
                         }
                         if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                         {
-                            audioObject.GetComponent<AudioManager>().Stop(); //replace this with the audio manager eventually
+                            audioObject.GetComponent<AudioManager>().Stop();
                             if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
                             {
                                 listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
@@ -1072,7 +1072,6 @@ public class BoneMapper : MonoBehaviour
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
-        DebugClass.Log("Spawning Join Spot");
         props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/JoinVisual.prefab")));
         props[props.Count - 1].transform.SetParent(transform);
         //Vector3 scal = transform.lossyScale;

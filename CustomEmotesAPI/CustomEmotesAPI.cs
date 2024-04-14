@@ -47,7 +47,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.8.2";
+        public const string VERSION = "1.9.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -1053,7 +1053,6 @@ namespace EmotesAPI
             mapper.basePlayerModelAnimator.enabled = true;
             mapper.oneFrameAnimatorLeeWay = true;
             mapper.basePlayerModelAnimator.gameObject.SetActive(true);
-            DebugClass.Log($"reenabling");
 
         }
 
