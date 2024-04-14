@@ -1,3 +1,5 @@
+- Version 1.9.0: Added emote skeleton for the new snake boi
+
 - Verison 1.8.2: Fixed keybinds being able to be used during areas they shouldn't, like the terminal
 
 - Version 1.8.1: Fixed issue with third person camera clipping into walls with a select few emotes
