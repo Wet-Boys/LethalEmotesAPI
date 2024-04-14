@@ -45,6 +45,8 @@ namespace LethalEmotesAPI.Utils
         internal static EnemyType giant;
         internal static EnemyType baboonhawk;
         internal static EnemyType manticoil;
+        internal static EnemyType snake;
+
         internal static void RegisterEnemyType(EnemyType type)
         {
             switch (type.enemyName)
@@ -100,6 +102,9 @@ namespace LethalEmotesAPI.Utils
                 case "Manticoil":
                     manticoil = type;
                     break;
+                case "Tulip Snake":
+                    snake = type;
+                    break;
                 default:
                     break;
             }
@@ -127,6 +132,7 @@ namespace LethalEmotesAPI.Utils
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_worm");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_baboon hawk thing");
             CustomEmotesAPI.AddNonAnimatingEmote("spawn_manticoil");
+            CustomEmotesAPI.AddNonAnimatingEmote("spawn_snake bird");
             CustomEmotesAPI.AddNonAnimatingEmote("enemies test dance");
             CustomEmotesAPI.AddNonAnimatingEmote("enemies random dance");
             CustomEmotesAPI.AddNonAnimatingEmote("enemies join dance");
@@ -189,6 +195,9 @@ namespace LethalEmotesAPI.Utils
                     break;
                 case "spawn_manticoil":
                     RoundManager.Instance.SpawnEnemyGameObject(mapper.transform.position, 0, 1, manticoil);
+                    break;
+                case "spawn_snake bird":
+                    RoundManager.Instance.SpawnEnemyGameObject(mapper.transform.position, 0, 1, snake);
                     break;
                 case "enemies test dance":
                     foreach (var item in BoneMapper.allMappers)
