@@ -58,7 +58,7 @@ public class EmoteNetworker : NetworkBehaviour
         }
 
         BoneMapper map = bodyObject.GetComponentInChildren<BoneMapper>();
-        if (map.playerController is not null && animation != "none")
+        if (map.playerController is not null)
         {
             map.playerController.performingEmote = false;
             if (map.playerController.IsOwner)

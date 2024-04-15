@@ -397,7 +397,7 @@ public class BoneMapper : MonoBehaviour
         if (!animClips.ContainsKey(animation))
             return;
         CustomAnimationClip customClip = animClips[animation];
-        if (customClip is null || !customClip.animates)
+        if (customClip is null || customClip.clip is null || customClip.clip[0] is null)
         {
             return;
         }

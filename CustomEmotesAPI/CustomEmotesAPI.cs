@@ -41,6 +41,8 @@ namespace EmotesAPI
     [BepInDependency("Ooseykins.LethalVRM", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("io.daxcess.lcvr", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.potatoepet.AdvancedCompany", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("FlipMods.TooManyEmotes", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("BetterEmotes", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
@@ -77,6 +79,8 @@ namespace EmotesAPI
         public static bool MoreCompanyPresent;
         public static bool VRMPresent;
         public static bool AdvancedCompanyPresent;
+        public static bool TMEPresent;
+        public static bool BetterEmotesPresent;
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
@@ -464,8 +468,8 @@ namespace EmotesAPI
             MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
             VRMPresent = Chainloader.PluginInfos.ContainsKey("Ooseykins.LethalVRM");
             AdvancedCompanyPresent = Chainloader.PluginInfos.ContainsKey("com.potatoepet.AdvancedCompany");
-
-
+            TMEPresent = Chainloader.PluginInfos.ContainsKey("FlipMods.TooManyEmotes");
+            BetterEmotesPresent = Chainloader.PluginInfos.ContainsKey("BetterEmotes");
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
             //}
@@ -531,7 +535,14 @@ namespace EmotesAPI
             {
                 AdvancedCompanyCompat.SetupUpdateVisibilityHook();
             }
-
+            if (TMEPresent)
+            {
+                TooManyEmotesCompat.RegisterAllTooManyEmotesEmotes();
+            }
+            if (BetterEmotesPresent)
+            {
+                BetterEmotesCompat.RegisterAllTooManyEmotesEmotes();
+            }
 
             EnemySkeletons.SetupEnemyHooks();
 
