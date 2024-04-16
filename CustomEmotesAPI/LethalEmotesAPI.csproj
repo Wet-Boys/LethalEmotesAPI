@@ -37,7 +37,7 @@
     <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.8" />
     <PackageReference Include="notnotnotswipez-MoreCompany" Version="1.7.4" />
     <PackageReference Include="Ooseykins-LethalVRM" Version="1.0.7" publicize="true" />
-    <PackageReference Include="Rune580.Mods.LethalCompany.InputUtils" Version="0.7.3" />
+    <PackageReference Include="Rune580.Mods.LethalCompany.InputUtils" Version="0.7.4" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" />
   </ItemGroup>
 

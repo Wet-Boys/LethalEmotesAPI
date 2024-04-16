@@ -11,9 +11,9 @@ public class EmoteUiPanel : MonoBehaviour
     public EmoteWheelsController? emoteWheelsController;
     public CustomizePanel? customizePanel;
     public RectTransform? customizeButton;
-    
+
     private TextMeshProUGUI? _customizeButtonLabel;
-    
+
     public bool IsOpen { get; private set; }
     internal UiView CurrentView { get; private set; } = UiView.EmoteWheels;
 
@@ -39,9 +39,9 @@ public class EmoteUiPanel : MonoBehaviour
 
     public void ReloadData()
     {
-        if(emoteWheelsController is null)
+        if (emoteWheelsController is null)
             return;
-        
+
         emoteWheelsController.ReloadWheels();
     }
 
@@ -62,7 +62,7 @@ public class EmoteUiPanel : MonoBehaviour
         HideCustomizeButton();
         HideEmoteWheels();
         CurrentView = UiView.EmoteWheels;
-        
+
         EmoteUiManager.UnlockMouseInput();
         EmoteUiManager.UnlockPlayerInput();
         EmoteUiManager.EnableKeybinds();
