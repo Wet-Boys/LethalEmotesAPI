@@ -1,23 +1,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using LethalEmotesApi.Ui.Data;
+using LethalEmotesApi.Ui.Elements.Recycle;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteList : UIBehaviour
+public class EmoteList : RecycleListView<EmoteListItem, string>
 {
-    public RectTransform? listContentContainer;
     public TMP_InputField? searchInputField;
-    public GameObject? entryPrefab;
     
     private CustomizePanel? _customizePanel;
-    
-    private readonly List<GameObject> _listObjects = [];
     private SearchableEmoteArray? _searchableEmoteArray;
+
+    private bool _firstUpdate;
+
+    protected override IList<string> ListData => _searchableEmoteArray!.ToArray();
 
     protected override void Awake()
     {
@@ -31,18 +31,22 @@ public class EmoteList : UIBehaviour
 
     protected override void Start()
     {
-        base.Start();
-        
         _searchableEmoteArray = new SearchableEmoteArray(EmoteUiManager.EmoteKeys.ToArray());
-
+    
         if (_customizePanel is null)
             _customizePanel = GetComponentInParent<CustomizePanel>();
         
-        InitList();
+        base.Start();
     }
 
     private void Update()
     {
+        if (!_firstUpdate)
+        {
+            UpdateState();
+            _firstUpdate = true;
+        }
+        
         if (searchInputField is not null && searchInputField.isFocused)
             EmoteKeybindButton.CancelExistingRebind();
     }
@@ -55,8 +59,11 @@ public class EmoteList : UIBehaviour
 
         if (_customizePanel is null)
             _customizePanel = GetComponentInParent<CustomizePanel>();
+
+        if (scrollRect is not null)
+            scrollRect.normalizedPosition = Vector2.one;
         
-        InitList();
+        UpdateState();
     }
 
     protected override void OnDisable()
@@ -73,40 +80,11 @@ public class EmoteList : UIBehaviour
 
         _searchableEmoteArray.Filter = "";
     }
-
-    private void InitList()
+    
+    protected override void OnInstantiateListItem(EmoteListItem instance)
     {
-        if (listContentContainer is null || entryPrefab is null)
-            return;
-
-        if (_listObjects.Count > 0)
-            return;
-        
-        var emoteKeys = _searchableEmoteArray!;
-
-        foreach (var emote in emoteKeys)
-        {
-            if (!EmoteUiManager.GetEmoteVisibility(emote))
-            {
-                continue;
-            }
-            var entryGameObject = Instantiate(entryPrefab, listContentContainer);
-            var entry = entryGameObject.GetComponent<EmoteListItem>();
-            
-            entry.dragDropController = _customizePanel!.dragDropController;
-            entry.previewController = _customizePanel!.previewController;
-            entry.SetEmoteKey(emote);
-            
-            _listObjects.Add(entryGameObject);
-        }
-    }
-
-    private void ClearList()
-    {
-        foreach (var listObject in _listObjects)
-            DestroyImmediate(listObject);
-        
-        _listObjects.Clear();
+        instance.dragDropController = _customizePanel!.dragDropController;
+        instance.previewController = _customizePanel!.previewController;
     }
     
     private void SearchFieldUpdated(string filter)
@@ -116,7 +94,6 @@ public class EmoteList : UIBehaviour
 
         _searchableEmoteArray.Filter = filter;
         
-        ClearList();
-        InitList();
+        UpdateState();
     }
 }

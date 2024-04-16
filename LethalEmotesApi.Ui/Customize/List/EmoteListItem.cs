@@ -1,12 +1,15 @@
 using LethalEmotesApi.Ui.Customize.DragDrop;
 using LethalEmotesApi.Ui.Customize.Preview;
+using LethalEmotesApi.Ui.Elements.Recycle;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Customize.List;
 
-public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPointerEnterHandler, IPointerExitHandler
+[RequireComponent(typeof(RectTransform))]
+public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPointerEnterHandler, IPointerExitHandler, IRecycleViewItem<string>
 {
     public TextMeshProUGUI? label;
     public EmoteBlacklistToggle? blacklistToggle;
@@ -16,8 +19,21 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
     public TextMeshProUGUI? modLabel;
     public EmoteDragDropController? dragDropController;
     public PreviewController? previewController;
+
+    private RectTransform? _rectTransform;
+
+    public int ConstraintIndex { get; set; }
+    
+    public RectTransform RectTransform => _rectTransform!;
     
     public string? EmoteKey { get; private set; }
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        _rectTransform = GetComponent<RectTransform>();
+    }
 
     protected override void Start()
     {
@@ -51,12 +67,6 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
         var go = dragDropController.gameObject;
         eventData.pointerDrag = go;
         ExecuteEvents.Execute(go, eventData, ExecuteEvents.dragHandler);
-    }
-
-    public void SetEmoteKey(string emoteKey)
-    {
-        EmoteKey = emoteKey;
-        UpdateState();
     }
 
     private void UpdateState()
@@ -108,5 +118,11 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
         selectImage.enabled = false;
         
         dragDropController!.OnNotGrab();
+    }
+
+    public void BindData(string emoteKey)
+    {
+        EmoteKey = emoteKey;
+        UpdateState();
     }
 }
