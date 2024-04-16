@@ -10,6 +10,7 @@
     "Unity.TextMeshPro.dll",
     "UnityEngine.dll",
     "UnityEngine.CoreModule.dll",
+    "UnityEngine.TextRenderingModule.dll",
     "Newtonsoft.Json.dll"
   ],
   "ProjectFile": "./CustomEmotesAPI/LethalEmotesApi.csproj",

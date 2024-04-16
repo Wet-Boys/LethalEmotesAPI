@@ -152,9 +152,9 @@ namespace Editor
 
             public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave) { }
 
-            public IEmoteDb EmoteDb { get; }
 
-            public IReadOnlyCollection<string> EmoteKeys { get; } = new[] { "none" };
+            public IEmoteDb EmoteDb { get; } = new StubbedEmoteDb();
+
             public IReadOnlyCollection<string> RandomPoolBlacklist => _randomBlacklist.ToArray();
             public IReadOnlyCollection<string> EmotePoolBlacklist => _emoteBlacklist.ToArray();
             public float EmoteVolume { get; set; }
@@ -164,6 +164,36 @@ namespace Editor
             public int DmcaFree { get; set; }
             public int ThirdPerson { get; set; }
             public bool UseGlobalSettings { get; set; }
+        }
+        
+        private class StubbedEmoteDb: IEmoteDb
+        {
+            public string GetEmoteName(string emoteKey) => emoteKey;
+
+            public void AssociateEmoteKeyWithMod(string emoteKey, string modName) { }
+
+            public string GetModName(string emoteKey) => "N/A";
+            
+            private string[] _emoteKeys;
+            
+            public IReadOnlyCollection<string> EmoteKeys
+            {
+                get
+                {
+                    if (_emoteKeys is null)
+                    {
+                        _emoteKeys = new string[100];
+                        for (int i = 0; i < _emoteKeys.Length; i++)
+                        {
+                            _emoteKeys[i] = $"Emote {i + 1}";
+                        }
+                    }
+
+                    return _emoteKeys;
+                }
+            }
+
+            public IReadOnlyCollection<string> EmoteModNames { get; } = new[] { "N/A" };
         }
     }
 }
