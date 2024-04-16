@@ -164,13 +164,27 @@ public class CustomAnimationClip : MonoBehaviour
         
         Keybinds.DisableKeybinds();
 
-        var emoteActionRef = Keybinds.GetOrCreateInputRef(customInternalName);
-        emoteActionRef.action.Enable();
-        emoteActionRef.action.started += EmoteAction_started;
-        
-        if (Keybinds.keyBindOverrideStorage.TryGetValue(customInternalName, out var bindingOverride))
+        if (usesNewImportSystem)
         {
-            emoteActionRef.action.ApplyBindingOverride(bindingOverride);
+            var emoteActionRef = Keybinds.GetOrCreateInputRef(customInternalName);
+            emoteActionRef.action.Enable();
+            emoteActionRef.action.started += EmoteAction_started;
+
+            if (Keybinds.keyBindOverrideStorage.TryGetValue(customInternalName, out var bindingOverride))
+            {
+                emoteActionRef.action.ApplyBindingOverride(bindingOverride);
+            }
+        }
+        else
+        {
+            var emoteActionRef = Keybinds.GetOrCreateInputRef(clip[0].name);
+            emoteActionRef.action.Enable();
+            emoteActionRef.action.started += EmoteAction_started;
+
+            if (Keybinds.keyBindOverrideStorage.TryGetValue(clip[0].name, out var bindingOverride))
+            {
+                emoteActionRef.action.ApplyBindingOverride(bindingOverride);
+            }
         }
         
         Keybinds.EnableKeybinds();
