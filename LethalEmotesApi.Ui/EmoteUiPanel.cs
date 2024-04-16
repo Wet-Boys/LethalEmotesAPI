@@ -11,9 +11,9 @@ public class EmoteUiPanel : MonoBehaviour
     public EmoteWheelsController? emoteWheelsController;
     public CustomizePanel? customizePanel;
     public RectTransform? customizeButton;
-    
+
     private TextMeshProUGUI? _customizeButtonLabel;
-    
+
     public bool IsOpen { get; private set; }
     internal UiView CurrentView { get; private set; } = UiView.EmoteWheels;
 
@@ -39,9 +39,9 @@ public class EmoteUiPanel : MonoBehaviour
 
     public void ReloadData()
     {
-        if(emoteWheelsController is null)
+        if (emoteWheelsController is null)
             return;
-        
+
         emoteWheelsController.ReloadWheels();
     }
 
@@ -62,7 +62,7 @@ public class EmoteUiPanel : MonoBehaviour
         HideCustomizeButton();
         HideEmoteWheels();
         CurrentView = UiView.EmoteWheels;
-        
+
         EmoteUiManager.UnlockMouseInput();
         EmoteUiManager.UnlockPlayerInput();
         EmoteUiManager.EnableKeybinds();
@@ -82,13 +82,13 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (emoteWheelsController is null)
             return;
-        EmoteUiManager._stateController?.RefreshTME();
         if (CurrentView == UiView.EmoteWheels)
         {
+            EmoteUiManager._stateController?.RefreshTME();
             CloseEmoteWheelsGracefully();
             ShowCustomizePanel();
             CurrentView = UiView.Customize;
-            
+
             EmoteUiManager.LockPlayerInput();
         }
         else if (CurrentView == UiView.Customize)
@@ -103,7 +103,7 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (emoteWheelsController is null)
             return;
-        
+
         emoteWheelsController.Show();
         emoteWheelsController.wheelLabel!.gameObject.SetActive(true);
     }
@@ -112,7 +112,7 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (emoteWheelsController is null)
             return;
-        
+
         emoteWheelsController.Hide();
         emoteWheelsController.wheelLabel!.gameObject.SetActive(false);
     }
@@ -121,7 +121,7 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (emoteWheelsController is null)
             return;
-        
+
         emoteWheelsController.CloseGracefully();
         emoteWheelsController.wheelLabel!.gameObject.SetActive(false);
     }
@@ -130,19 +130,19 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (customizePanel is null)
             return;
-        
+
         customizePanel.gameObject.SetActive(true);
     }
 
     public void HideCustomizePanel()
     {
         RebindConflictController.CancelExisting();
-        
+
         if (customizePanel is null)
             return;
-        
+
         customizePanel.dragDropController!.CancelDrag();
-        
+
         customizePanel.gameObject.SetActive(false);
         EmoteUiManager.UnlockPlayerInput();
         EmoteUiManager.UnlockMouseInput();
@@ -152,15 +152,15 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (customizeButton is null)
             return;
-        
+
         customizeButton.gameObject.SetActive(true);
     }
-    
+
     public void HideCustomizeButton()
     {
         if (customizeButton is null)
             return;
-        
+
         customizeButton.gameObject.SetActive(false);
     }
 

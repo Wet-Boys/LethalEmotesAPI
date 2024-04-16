@@ -38,7 +38,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
                 BoneMapper.animClips.Last().Value.ownerPlugin = TMEPlugin;
             }
 
-            //CustomEmotesAPI.instance.SetupHook(typeof(SessionManager), typeof(TooManyEmotesCompat), "UnlockEmoteLocal", BindingFlags.Public, nameof(UnlockEmoteLocal), UnlockEmoteLocalHook, true);
+            //CustomEmotesAPI.instance.SetupHook(typeof(SessionManager), typeof(TooManyEmotesCompat), "UnlockEmoteLocal", BindingFlags.Public, nameof(UnlockEmoteLocal), UnlockEmoteLocalHook, true, typeof(int), typeof(string));
             CustomEmotesAPI.animChanged += TooManyEmotesHandler;
         }
 
@@ -52,13 +52,16 @@ namespace LethalEmotesAPI.Patches.ModCompat
             //mapper.PlayAnim("none", -1);
             foreach (var item in EmoteController.allEmoteControllers.Values)
             {
-                if (item.IsPerformingCustomEmote() && item.performingEmote == EmotesManager.allUnlockableEmotesDict[newAnimation])
+                if (item.IsPerformingCustomEmote() && item.performingEmote == EmotesManager.allUnlockableEmotesDict[newAnimation] && item.gameObject != mapper.mapperBody)
                 {
                     mapper.mapperBody.GetComponent<EmoteControllerPlayer>().TrySyncingEmoteWithEmoteController(item);
                     return;
                 }
             }
-            mapper.mapperBody.GetComponent<EmoteController>().PerformEmote(EmotesManager.allUnlockableEmotesDict[newAnimation]);
+            if (SessionManager.IsEmoteUnlocked(EmotesManager.allUnlockableEmotesDict[newAnimation]))
+            {
+                mapper.mapperBody.GetComponent<EmoteController>().PerformEmote(EmotesManager.allUnlockableEmotesDict[newAnimation]);
+            }
         }
         internal static void StopEmote(BoneMapper mapper)
         {
@@ -72,10 +75,9 @@ namespace LethalEmotesAPI.Patches.ModCompat
                 BoneMapper.animClips[$"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}"].visibility = SessionManager.IsEmoteUnlocked(item.Value);
             }
         }
-        //private static void UnlockEmoteLocal(Action<UnlockableEmote, string> orig, UnlockableEmote emote, string playerUsername = "")
+        //private static void UnlockEmoteLocal(Action<int, string> orig, int emote, string playerUsername)
         //{
         //    orig(emote, playerUsername);
-
         //}
         //private static Hook UnlockEmoteLocalHook;
     }

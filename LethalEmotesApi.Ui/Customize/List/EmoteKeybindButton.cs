@@ -196,9 +196,9 @@ public class EmoteKeybindButton : EmoteListItemChildInteractable
 
     private void FinishRebind()
     {
-        if (keybindIndicator is null)
+        if (keybindIndicator is null && keybindIndicator)
             return;
-
+        Debug.Log($"{keybindIndicator}");
         keybindIndicator.enabled = false;
         
         if (_rebindingOperation is not null)

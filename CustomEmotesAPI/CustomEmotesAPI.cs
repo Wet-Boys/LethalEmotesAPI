@@ -420,6 +420,21 @@ namespace EmotesAPI
         }
         private static Hook Jump_performedHook;
 
+        private void ConnectClientToPlayerObject(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            orig(self);
+            self.StartCoroutine(ReloadTMEAfterFrame(self));
+        }
+        IEnumerator ReloadTMEAfterFrame(PlayerControllerB self)
+        {
+            yield return new WaitForEndOfFrame();
+            if (TMEPresent)
+            {
+                TooManyEmotesCompat.ReloadTooManyEmotesVisibility();
+            }
+        }
+        private static Hook ConnectClientToPlayerObjectHook;
+
         private static GameObject emoteNetworker;
 
 
@@ -467,13 +482,13 @@ namespace EmotesAPI
             }
         }
 
-        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook, bool isStatic = false)
+        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook, bool isStatic = false, params Type[] paramTypes)
         {
             MethodInfo targetMethod;
             MethodInfo destMethod;
             if (isStatic)
             {
-                targetMethod = targetClass.GetMethods(publicOrNot | System.Reflection.BindingFlags.Static).LastOrDefault(x => x.Name.Equals(targetMethodName));
+                targetMethod = targetClass.GetMethods(publicOrNot | System.Reflection.BindingFlags.Static).FirstOrDefault(x => x.Name.Equals(targetMethodName) && x.GetParameters().All(p => paramTypes.Contains(p.ParameterType)));
                 destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             }
             else
@@ -560,7 +575,7 @@ namespace EmotesAPI
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "Jump_performed", BindingFlags.NonPublic, nameof(Jump_performed), Jump_performedHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StopPerformingEmoteClientRpc", BindingFlags.Public, nameof(StopPerformingEmoteClientRpc), StopPerformingEmoteClientRpcHook);
-
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "ConnectClientToPlayerObject", BindingFlags.Public, nameof(ConnectClientToPlayerObject), ConnectClientToPlayerObjectHook);
             CentipedePatches.PatchAll();
             if (VRMPresent)
             {

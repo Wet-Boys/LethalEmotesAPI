@@ -30,7 +30,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
             SetupBetterEmote(7, "Twerk");
             SetupBetterEmote(8, "Salute");
             SetupBetterEmote(9, "Prisyadka");
-            SetupBetterEmote(0, "Sign");
+            SetupBetterEmote(10, "Sign");
 
 
             CustomEmotesAPI.animChanged += BetterEmotesHandler;

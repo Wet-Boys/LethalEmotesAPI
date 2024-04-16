@@ -11,11 +11,13 @@ namespace LethalEmotesApi.Ui.Wheel;
 public class SegmentLabel : UIBehaviour
 {
     private readonly TweenRunner<Vector3Tween> _scaleTweenRunner = new();
-    
+
     public RectTransform? targetLabel;
     public TextMeshProUGUI? targetText;
     public RectTransform? missingLabel;
     public TextMeshProUGUI? missingText;
+    public RectTransform? lockedLabel;
+    public TextMeshProUGUI? lockedText;
 
     private RectTransform? _rectTransform;
     private string? _emoteKey;
@@ -39,24 +41,27 @@ public class SegmentLabel : UIBehaviour
     protected override void OnEnable()
     {
         base.OnEnable();
-        
+
         if (targetLabel is null || missingLabel is null)
             return;
-        
+
         tracker.Add(this, targetLabel, DrivenTransformProperties.Rotation);
         tracker.Add(this, missingLabel, DrivenTransformProperties.Rotation);
+        tracker.Add(this, lockedLabel, DrivenTransformProperties.Rotation);
+
 
         var worldRot = RectTransform.eulerAngles;
         targetLabel.localEulerAngles = -worldRot;
         missingLabel.localEulerAngles = -worldRot;
-        
+        lockedLabel.localEulerAngles = -worldRot;
+
         UpdateText();
     }
 
     protected override void OnDisable()
     {
         base.OnDisable();
-        
+
         tracker.Clear();
     }
 
@@ -73,20 +78,30 @@ public class SegmentLabel : UIBehaviour
 
         var emoteName = EmoteUiManager.GetEmoteName(_emoteKey);
 
+        lockedLabel.gameObject.SetActive(false);
+        missingLabel.gameObject.SetActive(false);
         if (!EmoteUiManager.EmoteDb.EmoteExists(_emoteKey))
         {
             targetText.SetText("");
 
             var modName = EmoteUiManager.GetEmoteModName(_emoteKey);
-            
+
             missingText.SetText($"<color=#FFFFFF>{emoteName}</color>\n<color=#eed202>Requires</color>\n<color=#FFFFFF>{modName}</color>");
-            
+
             missingLabel.gameObject.SetActive(true);
         }
         else
         {
-            missingLabel.gameObject.SetActive(false);
-            targetText.SetText(emoteName);
+            if (!EmoteUiManager.GetEmoteVisibility(_emoteKey))
+            {
+                targetText.SetText("");
+                lockedText.SetText($"<color=#eed202>Unlock</color>\n{emoteName}\n<color=#eed202>With</color>\nTooManyEmotes");
+                lockedLabel.gameObject.SetActive(true);
+            }
+            else
+            {
+                targetText.SetText(emoteName);
+            }
         }
     }
 
@@ -97,7 +112,7 @@ public class SegmentLabel : UIBehaviour
             _scaleTweenRunner.StopTween();
             return;
         }
-        
+
         Vector3Tween tween = new Vector3Tween
         {
             Duration = duration,
@@ -105,9 +120,9 @@ public class SegmentLabel : UIBehaviour
             TargetValue = targetScale,
             IgnoreTimeScale = ignoreTimeScale
         };
-        
+
         tween.AddOnChangedCallback(TweenScaleChanged);
-        
+
         _scaleTweenRunner.StartTween(tween);
     }
 
