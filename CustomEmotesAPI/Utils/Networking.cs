@@ -1,6 +1,7 @@
 ﻿using EmotesAPI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
@@ -58,12 +59,15 @@ public class EmoteNetworker : NetworkBehaviour
         }
 
         BoneMapper map = bodyObject.GetComponentInChildren<BoneMapper>();
-        if (map.playerController is not null)
+        if (map.playerController is not null && map.playerController.performingEmote)
         {
-            map.playerController.performingEmote = false;
-            if (map.playerController.IsOwner)
+            if (!animation.Contains("BetterEmotes__"))
             {
-                map.playerController.StopPerformingEmoteServerRpc();
+                map.playerController.performingEmote = false;
+                if (map.playerController.IsOwner)
+                {
+                    map.playerController.StopPerformingEmoteServerRpc();
+                }
             }
         }
         DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject}");

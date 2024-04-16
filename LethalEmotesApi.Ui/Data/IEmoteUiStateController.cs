@@ -43,6 +43,8 @@ public interface IEmoteUiStateController
     
     public void DisableKeybinds();
 
+    public void RefreshTME();
+
     public string[] GetEmoteKeysForBindPath(string bindPath);
 
     #region Loading Config Data

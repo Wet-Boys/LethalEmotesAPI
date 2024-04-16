@@ -82,7 +82,7 @@ public class EmoteUiPanel : MonoBehaviour
     {
         if (emoteWheelsController is null)
             return;
-        
+        EmoteUiManager._stateController?.RefreshTME();
         if (CurrentView == UiView.EmoteWheels)
         {
             CloseEmoteWheelsGracefully();

@@ -16,4 +16,5 @@ public interface IEmoteDb
     public string GetModName(string emoteKey);
 
     public bool EmoteExists(string emoteKey) => EmoteKeys.Contains(emoteKey);
+    public bool GetEmoteVisibility(string emoteKey);
 }

@@ -92,6 +92,8 @@ public static class EmoteUiManager
         return _emoteDisplayData.EmoteKeyModNameLut.GetValueOrDefault(emoteKey, "Unknown");
     }
 
+    internal static bool GetEmoteVisibility(string emoteKey) => _stateController!.EmoteDb.GetEmoteVisibility(emoteKey);
+
     internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
     
     internal static IReadOnlyCollection<string> EmotePoolBlacklist => _stateController!.EmotePoolBlacklist;
@@ -105,6 +107,7 @@ public static class EmoteUiManager
     internal static void RemoveFromEmoteBlacklist(string emoteKey) => _stateController?.RemoveFromEmoteBlacklist(emoteKey);
 
     internal static void RefreshBothLists() => _stateController?.RefreshBothLists();
+
     
     internal static InputActionReference? GetEmoteKeybind(string? emoteKey)
     {

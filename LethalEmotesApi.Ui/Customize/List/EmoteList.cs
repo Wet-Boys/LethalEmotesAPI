@@ -86,6 +86,10 @@ public class EmoteList : UIBehaviour
 
         foreach (var emote in emoteKeys)
         {
+            if (!EmoteUiManager.GetEmoteVisibility(emote))
+            {
+                continue;
+            }
             var entryGameObject = Instantiate(entryPrefab, listContentContainer);
             var entry = entryGameObject.GetComponent<EmoteListItem>();
             

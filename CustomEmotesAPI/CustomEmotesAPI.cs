@@ -365,7 +365,14 @@ namespace EmotesAPI
                 BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
                 if (mapper.emoteSkeletonAnimator.enabled)
                 {
-                    PlayAnimation("none", mapper);
+                    if (mapper.currentClip is not null)
+                    {
+                        if (mapper.currentClip.rootIgnoredBones.Contains(HumanBodyBones.Hips) || !mapper.currentClip.animates)
+                        {
+                            return;
+                        }
+                    }
+                    mapper.PlayAnim("none", -1);
                 }
             }
             catch (Exception e)
@@ -374,6 +381,23 @@ namespace EmotesAPI
             }
         }
         private static Hook StartPerformingEmoteClientRpcHook;
+        private void StopPerformingEmoteClientRpc(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            orig(self);
+            try
+            {
+                BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
+                if (mapper.emoteSkeletonAnimator.enabled && mapper.canStop && (mapper.currentClipName.Contains("__BetterEmotes") || mapper.currentClipName.Contains("TooManyEmotes__")))
+                {
+                    mapper.PlayAnim("none", -1);
+                }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"couldn't find bonemapper? {e}");
+            }
+        }
+        private static Hook StopPerformingEmoteClientRpcHook;
 
         private void Jump_performed(Action<PlayerControllerB, InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
         {
@@ -443,10 +467,20 @@ namespace EmotesAPI
             }
         }
 
-        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook)
+        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook, bool isStatic = false)
         {
-            MethodInfo targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
-            MethodInfo destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            MethodInfo targetMethod;
+            MethodInfo destMethod;
+            if (isStatic)
+            {
+                targetMethod = targetClass.GetMethods(publicOrNot | System.Reflection.BindingFlags.Static).LastOrDefault(x => x.Name.Equals(targetMethodName));
+                destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            }
+            else
+            {
+                targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
+                destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            }
             hook = new Hook(targetMethod, destMethod, this);
 
         }
@@ -525,6 +559,7 @@ namespace EmotesAPI
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "Jump_performed", BindingFlags.NonPublic, nameof(Jump_performed), Jump_performedHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StopPerformingEmoteClientRpc", BindingFlags.Public, nameof(StopPerformingEmoteClientRpc), StopPerformingEmoteClientRpcHook);
 
             CentipedePatches.PatchAll();
             if (VRMPresent)
@@ -535,11 +570,11 @@ namespace EmotesAPI
             {
                 AdvancedCompanyCompat.SetupUpdateVisibilityHook();
             }
-            if (TMEPresent)
+            if (TMEPresent && Settings.ImportTME.Value)
             {
                 TooManyEmotesCompat.RegisterAllTooManyEmotesEmotes();
             }
-            if (BetterEmotesPresent)
+            if (BetterEmotesPresent && Settings.ImportBetterEmotes.Value)
             {
                 BetterEmotesCompat.RegisterAllTooManyEmotesEmotes();
             }
@@ -702,7 +737,7 @@ namespace EmotesAPI
                             string animationName;
                             if (nearestMapper.currentClip.usesNewImportSystem)
                             {
-                                animationName = nearestMapper.currentClip.customInternalName;
+                                animationName = nearestMapper.currentClip.joinEmote;
                             }
                             else
                             {

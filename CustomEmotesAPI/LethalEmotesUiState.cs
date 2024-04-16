@@ -8,6 +8,7 @@ using LethalEmotesAPI.Utils;
 using UnityEngine;
 using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem;
+using LethalEmotesAPI.Patches.ModCompat;
 
 namespace LethalEmotesAPI;
 
@@ -56,6 +57,13 @@ public class LethalEmotesUiState : IEmoteUiStateController
             return false;
 
         return !localPlayer.inTerminalMenu && !localPlayer.isTypingChat && !localPlayer.quickMenuManager.isMenuOpen;
+    }
+    public void RefreshTME()
+    {
+        if (CustomEmotesAPI.TMEPresent)
+        {
+            TooManyEmotesCompat.ReloadTooManyEmotesVisibility();
+        }
     }
 
     public void PlayAnimationOn(Animator animator, string emoteKey)

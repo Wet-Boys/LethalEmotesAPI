@@ -1,15 +1,19 @@
 ﻿using BepInEx;
 using BetterEmote.AssetScripts;
+using BetterEmote.Patches;
 using BetterEmote.Utils;
 using EmotesAPI;
 using LethalEmotesAPI.ImportV2;
 using LethalEmotesAPI.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using static UniJSON.JsonFormatter;
 
 namespace LethalEmotesAPI.Patches.ModCompat
 {
@@ -25,33 +29,45 @@ namespace LethalEmotesAPI.Patches.ModCompat
             SetupBetterEmote(6, "The Griddy");
             SetupBetterEmote(7, "Twerk");
             SetupBetterEmote(8, "Salute");
-            SetupBetterEmote(9, "Squat Kick");
-            SetupBetterEmote(0, "Custom Sign");
+            SetupBetterEmote(9, "Prisyadka");
+            SetupBetterEmote(0, "Sign");
 
 
-            CustomEmotesAPI.animChanged += TooManyEmotesHandler;
+            CustomEmotesAPI.animChanged += BetterEmotesHandler;
         }
 
-        private static void TooManyEmotesHandler(string newAnimation, BoneMapper mapper)
+        private static void BetterEmotesHandler(string newAnimation, BoneMapper mapper)
         {
             if (!newAnimation.Contains("BetterEmotes__"))
             {
                 return;
             }
-            //mapper.PlayAnim("none", -1);
+            if (CustomEmotesAPI.TMEPresent && !mapper.prevClipName.Contains("BetterEmotes__"))
+            {
+                TooManyEmotesCompat.StopEmote(mapper);
+            }
             if (mapper.local)
             {
                 newAnimation = newAnimation.Split($"BetterEmotes__").Last();
                 InputAction.CallbackContext context = default(InputAction.CallbackContext);
-                mapper.playerController.PerformEmote(context, int.Parse(newAnimation));
+                mapper.StartCoroutine(PlayBetterEmote(context, newAnimation, mapper));
             }
+        }
+        internal static IEnumerator PlayBetterEmote(InputAction.CallbackContext context, string newAnimation, BoneMapper mapper)
+        {
+            mapper.canStop = false;
+            yield return new WaitForEndOfFrame();
+            EmoteKeybindPatch.onEmoteKeyPerformed(context, (Emote)int.Parse(newAnimation));
+            yield return new WaitForEndOfFrame();
+            mapper.canStop = true;
         }
         public static void SetupBetterEmote(int num, string displayName)
         {
             CustomEmoteParams param = new CustomEmoteParams();
             param.displayName = displayName;
             param.internalName = $"BetterEmotes__{num}";
-            param.nonAnimatingEmote = true;
+            param.rootBonesToIgnore = [HumanBodyBones.Hips];
+            param.primaryAnimationClips = [Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/BindPose.anim")];
             EmoteImporter.ImportEmote(param);
             BoneMapper.animClips.Last().Value.ownerPlugin = BetterEmotesPlugin;
         }
