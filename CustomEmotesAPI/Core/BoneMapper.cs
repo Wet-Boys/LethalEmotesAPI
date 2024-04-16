@@ -954,11 +954,12 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        bool yes = !CustomEmotesAPI.LCThirdPersonPresent && (currentClip is not null && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on) && canThirdPerson);
-        //if (local)
-        //{
-        //    DebugClass.Log(yes);
-        //}
+        bool yes = 
+            !CustomEmotesAPI.LCThirdPersonPresent 
+            && currentClip is not null 
+            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on) 
+            && canThirdPerson
+            && temporarilyThirdPerson != TempThirdPerson.off;
         return yes;
     }
     public void CameraControls()
