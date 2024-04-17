@@ -54,6 +54,8 @@ namespace EmotesAPI
         public static ConfigEntry<string> DisabledEmotes => GetCurrentConfig().DisabledEmotes;
         public static ConfigEntry<bool> PermanentEmotingHealthbar => GetCurrentConfig().PermanentEmotingHealthbar;
         public static ConfigEntry<string> EmoteKeyBinds => GetCurrentConfig().EmoteKeyBinds;
+        public static ConfigEntry<bool> ImportTME => GetCurrentConfig().ImportTME;
+        public static ConfigEntry<bool> ImportBetterEmotes => GetCurrentConfig().ImportBetterEmotes;
         public static void RunAll()
         {
             GenerateConfigs();

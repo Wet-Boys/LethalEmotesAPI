@@ -25,6 +25,7 @@ public class SearchableEmoteArray : IReadOnlyList<string>
     private int[] CreateLut(IEnumerable<string> emoteKeys)
     {
         return emoteKeys
+            .Where(key => EmoteUiManager.GetEmoteVisibility(key))
             .Select((key, index) => new KeyValuePair<string, int>(key, index))
             .OrderBy(kvp => EmoteUiManager.GetEmoteName(kvp.Key))
             .Where(kvp => MatchesFilter(kvp.Key, Filter))
