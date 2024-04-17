@@ -3,6 +3,7 @@ using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui;
 
@@ -231,6 +232,10 @@ public static class EmoteUiManager
         
         EmoteUiInstance.CloseGracefully();
         _stateController?.EnableKeybinds();
+    }
+    public static float GetUIScale()
+    {
+        return EmoteUiInstance.transform.parent.GetComponent<Canvas>().scaleFactor;
     }
 
     public static float EmoteVolume

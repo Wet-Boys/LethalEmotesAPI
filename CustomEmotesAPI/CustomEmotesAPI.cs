@@ -411,7 +411,7 @@ namespace EmotesAPI
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 DebugClass.Log($"EmotesAPI: {e}");
             }
@@ -645,8 +645,21 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
+            EmotesInputSettings.Instance.GamepadEmoteWheel.performed += GamepadEmoteWheel_performed;
             //EmotesInputSettings.Instance.LigmaBalls.started += LigmaBalls_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+        }
+
+        bool lockingForMouseInput = false;
+        private void GamepadEmoteWheel_performed(InputAction.CallbackContext obj)
+        {
+            if (EmoteUiManager.IsEmoteWheelsOpen())
+            {
+                UnityEngine.Cursor.visible = false;
+                Vector2 middleOfScreen = new Vector2(Screen.width / 2f, Screen.height / 2f);
+                Vector2 pos = obj.ReadValue<Vector2>() * 45 * EmoteUiManager.GetUIScale();
+                Mouse.current.WarpCursorPosition(middleOfScreen + pos);
+            }
         }
 
         bool yote = true;
@@ -697,10 +710,13 @@ namespace EmotesAPI
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
         {
             var btn = (ButtonControl)ctx.control;
-
             if (btn.wasPressedThisFrame)
             {
                 EmoteUiManager.OpenEmoteWheels();
+                if (!(ctx.control.ToString().Contains("Keyboard") || ctx.control.ToString().Contains("Mouse")))
+                {
+                    UnityEngine.Cursor.visible = false;
+                }
             }
 
             if (btn.wasReleasedThisFrame)
