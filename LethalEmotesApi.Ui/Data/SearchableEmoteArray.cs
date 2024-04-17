@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace LethalEmotesApi.Ui.Data;
 
@@ -25,9 +24,9 @@ public class SearchableEmoteArray : IReadOnlyList<string>
     private int[] CreateLut(IEnumerable<string> emoteKeys)
     {
         return emoteKeys
-            .Where(EmoteUiManager.GetEmoteVisibility)
             .Select((key, index) => new KeyValuePair<string, int>(key, index))
             .OrderBy(kvp => EmoteUiManager.GetEmoteName(kvp.Key))
+            .Where(kvp => EmoteUiManager.GetEmoteVisibility(kvp.Key))
             .Where(kvp => MatchesFilter(kvp.Key, Filter))
             .Select(kvp => kvp.Value)
             .ToArray();
