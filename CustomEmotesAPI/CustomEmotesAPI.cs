@@ -811,7 +811,11 @@ namespace EmotesAPI
 
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
-            worldProp.AddComponent<NetworkObject>();
+            if (!worldProp.GetComponent<NetworkObject>())
+            {
+                DebugClass.Log($"Adding a NetworkObject to {worldProp}, but you should really be doing this in Unity!");
+                worldProp.AddComponent<NetworkObject>();
+            }
             networkedObjects.Add(worldProp);
             worldProp.AddComponent<BoneMapper>().worldProp = true;
             var handler = worldProp.AddComponent<WorldPropSpawnHandler>();
