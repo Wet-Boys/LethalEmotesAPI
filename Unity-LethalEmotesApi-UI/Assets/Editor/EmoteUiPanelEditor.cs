@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Editor.Utils;
+using Editor.Utils.Uxml;
 using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
@@ -15,46 +17,57 @@ namespace Editor
     [CustomEditor(typeof(EmoteUiPanel))]
     public class EmoteUiPanelEditor : LeUiCustomEditorBase<EmoteUiPanel>
     {
+        public VisualTreeAsset uxmlVisualTree;
+
+        [UxmlBindValue("EmoteGenSettings.EmoteModsToGenField")]
+        private int _emoteModsToGen = 10;
         
+        [UxmlBindValue("EmoteGenSettings.EmotesPerEmoteModField")]
+        private int _emotesPerEmoteMod = 100;
+
+        private Label _dataLoadedLabel;
         
         protected override VisualElement CreateGUI()
         {
             var root = new VisualElement();
 
-            var loadDataButton = new Button(LoadData)
-            {
-                text = "Load Fake Data"
-            };
+            if (!uxmlVisualTree)
+                return root;
 
-            var clearDataButton = new Button(ClearData)
-            {
-                text = "Clear Fake Data"
-            };
-
-            var statusText = IsDataLoaded() ? "Loaded" : "Not Loaded";
-
-            var fakeDataStatus = new Label($"Fake Data Status: {statusText}");
-            
-            root.Add(fakeDataStatus);
-            root.Add(loadDataButton);
-            root.Add(clearDataButton);
+            uxmlVisualTree.CloneTree(root);
 
             return root;
         }
 
+        private void UpdateStatusLabel()
+        {
+            _dataLoadedLabel.text = IsDataLoaded() ? "Loaded" : "Not Loaded";
+        }
+
+        [UxmlBindButton("LoadFakeDataButton")]
         private void LoadData()
         {
-            EmoteUiManager.RegisterStateController(new StubbedState());
+            var stubbedState = new StubbedState();
+
+            var emoteDb = (StubbedEmoteDb)stubbedState.EmoteDb;
+            emoteDb.GenerateData(_emoteModsToGen, _emotesPerEmoteMod);
+            
+            EmoteUiManager.RegisterStateController(stubbedState);
+
+            UpdateStatusLabel();
             
             Repaint();
         }
         
+        [UxmlBindButton("ClearFakeDataButton")]
         private void ClearData()
         {
             var type = typeof(EmoteUiManager);
             var field = type.GetField("_stateController", BindingFlags.NonPublic | BindingFlags.Static);
             
             field?.SetValue(null, null);
+            
+            UpdateStatusLabel();
             
             Repaint();
         }
@@ -68,7 +81,12 @@ namespace Editor
 
             return value != null;
         }
-        
+
+        [UxmlOnBindElement("StatusGroup.FakeDataStatusLabel")]
+        private void OnLabelBind(VisualElement label)
+        {
+            _dataLoadedLabel = (Label)label;
+        }
         
         private class StubbedState : IEmoteUiStateController
         {
@@ -168,17 +186,19 @@ namespace Editor
             public bool UseGlobalSettings { get; set; }
         }
         
-        private class StubbedEmoteDb: IEmoteDb
+        private class StubbedEmoteDb : IEmoteDb
         {
-            public string GetEmoteName(string emoteKey) => emoteKey;
+            public string GetEmoteName(string emoteKey) => emoteKey.Split('.').Last();
 
             public void AssociateEmoteKeyWithMod(string emoteKey, string modName) { }
 
-            public string GetModName(string emoteKey) => "N/A";
+            private Dictionary<string, string> _emoteMods = new();
+            
+            public string GetModName(string emoteKey) => _emoteMods[emoteKey];
 
             public bool GetEmoteVisibility(string emoteKey) => true;
 
-            private string[] _emoteKeys;
+            private string[] _emoteKeys = Array.Empty<string>();
             
             public IReadOnlyCollection<string> EmoteKeys
             {
@@ -197,7 +217,28 @@ namespace Editor
                 }
             }
 
-            public IReadOnlyCollection<string> EmoteModNames { get; } = new[] { "N/A" };
+            public IReadOnlyCollection<string> EmoteModNames => _emoteMods.Select(kvp => kvp.Value)
+                .Distinct()
+                .ToArray();
+
+            public void GenerateData(int emoteModsToGen, int emotesPerMod)
+            {
+                var keys = new List<string>();
+                
+                for (int i = 0; i < emoteModsToGen; i++)
+                {
+                    var modName = $"EmoteMod {i + 1}";
+
+                    for (int j = 0; j < emotesPerMod; j++)
+                    {
+                        var key = $"{modName}.Emote {j + 1}";
+                        keys.Add(key);
+                        _emoteMods[key] = modName;
+                    }
+                }
+
+                _emoteKeys = keys.ToArray();
+            }
         }
     }
 }

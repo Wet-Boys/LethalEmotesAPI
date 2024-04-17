@@ -1,4 +1,5 @@
-﻿using UnityEditor.UIElements;
+﻿using Editor.Utils.Uxml;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,8 +15,14 @@ namespace Editor.Utils
             var root = new VisualElement();
             
             root.Add(CreateDefaultGUI());
+
+            var customRoot = CreateGUI();
             
-            root.Add(CreateGUI());
+            customRoot.BindFields(this);
+            customRoot.BindButtonMethods(this);
+            customRoot.BindOnBindListeners(this);
+            
+            root.Add(customRoot);
 
             return root;
         }

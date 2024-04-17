@@ -3,7 +3,6 @@ using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui;
 
@@ -108,7 +107,6 @@ public static class EmoteUiManager
     internal static void RemoveFromEmoteBlacklist(string emoteKey) => _stateController?.RemoveFromEmoteBlacklist(emoteKey);
 
     internal static void RefreshBothLists() => _stateController?.RefreshBothLists();
-
     
     internal static InputActionReference? GetEmoteKeybind(string? emoteKey)
     {
@@ -233,8 +231,15 @@ public static class EmoteUiManager
         EmoteUiInstance.CloseGracefully();
         _stateController?.EnableKeybinds();
     }
+    
     public static float GetUIScale()
     {
+        if (EmoteUiInstance is null)
+        {
+            Debug.LogWarning("EmoteUiInstance is null!");
+            return 0f;
+        }
+        
         return EmoteUiInstance.transform.parent.GetComponent<Canvas>().scaleFactor;
     }
 
@@ -273,6 +278,7 @@ public static class EmoteUiManager
         get => _stateController!.ThirdPerson;
         set => _stateController!.ThirdPerson = value;
     }
+    
     public static bool UseGlobalSettings
     {
         get => _stateController!.UseGlobalSettings;
