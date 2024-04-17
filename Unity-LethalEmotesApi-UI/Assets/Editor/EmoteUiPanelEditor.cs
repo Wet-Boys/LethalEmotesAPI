@@ -175,7 +175,9 @@ namespace Editor
             public void AssociateEmoteKeyWithMod(string emoteKey, string modName) { }
 
             public string GetModName(string emoteKey) => "N/A";
-            
+
+            public bool GetEmoteVisibility(string emoteKey) => true;
+
             private string[] _emoteKeys;
             
             public IReadOnlyCollection<string> EmoteKeys
