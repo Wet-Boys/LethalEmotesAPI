@@ -14,10 +14,9 @@ public class EmoteDb : IEmoteDb
         get
         {
             _emoteKeys ??= BoneMapper.animClips
-                .Where(kvp => kvp.Value is null || kvp.Value.visibility)
+                //.Where(kvp => kvp.Value is null || kvp.Value.visibility)
                 .Select(kvp => kvp.Key)
                 .ToArray();
-
             return _emoteKeys;
         }
     }
@@ -28,7 +27,7 @@ public class EmoteDb : IEmoteDb
             return emoteKey;
 
         var clip = BoneMapper.animClips[emoteKey];
-        
+
         if (clip is not null && clip.usesNewImportSystem)
         {
             return string.IsNullOrEmpty(clip.displayName) ? emoteKey : clip.displayName;
@@ -70,5 +69,14 @@ public class EmoteDb : IEmoteDb
         }
 
         return _emoteKeyModNameLut.GetValueOrDefault(emoteKey, "Unknown");
+    }
+    public bool GetEmoteVisibility(string emoteKey)
+    {
+        if (BoneMapper.animClips.TryGetValue(emoteKey, out var clip))
+        {
+            return clip is null || clip.visibility;
+        }
+
+        return false;
     }
 }

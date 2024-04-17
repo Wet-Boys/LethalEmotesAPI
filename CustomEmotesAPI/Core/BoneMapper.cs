@@ -90,6 +90,7 @@ public class BoneMapper : MonoBehaviour
     public bool canThirdPerson = true;
     internal bool canEmote = false;
     public bool isValidPlayer = false;
+    internal bool canStop = true;
     public static string GetRealAnimationName(string animationName)
     {
         if (customNamePairs.ContainsKey(animationName))
@@ -397,7 +398,7 @@ public class BoneMapper : MonoBehaviour
         if (!animClips.ContainsKey(animation))
             return;
         CustomAnimationClip customClip = animClips[animation];
-        if (customClip is null || !customClip.animates)
+        if (customClip is null || customClip.clip is null || customClip.clip[0] is null)
         {
             return;
         }
@@ -1369,6 +1370,14 @@ public class BoneMapper : MonoBehaviour
                 DebugClass.Log($"couldn't turn on cosmetics: {e}");
             }
         }
+        if (CustomEmotesAPI.BetterEmotesPresent)
+        {
+            Transform t = playerController.transform.Find("ScavengerModel/LEGS");
+            if (t is not null)
+            {
+                t.gameObject.layer = 31;
+            }
+        }
     }
     public void DeThirdPerson()
     {
@@ -1395,6 +1404,14 @@ public class BoneMapper : MonoBehaviour
                 catch (Exception e)
                 {
                     DebugClass.Log($"couldn't clear cosmetics: {e}");
+                }
+            }
+            if (CustomEmotesAPI.BetterEmotesPresent)
+            {
+                Transform t = playerController.transform.Find("ScavengerModel/LEGS");
+                if (t is not null)
+                {
+                    t.gameObject.layer = 0;
                 }
             }
         }
