@@ -71,6 +71,15 @@ namespace LethalEmotesAPI.Patches.ModCompat
         {
             foreach (var item in EmotesManager.allUnlockableEmotesDict)
             {
+                if (item.Value.emoteSyncGroup is not null)
+                {
+                    //Debug.Log($"========================  {item.Value.emoteSyncGroup.IndexOf(item.Value)}   {item.Key}");
+                    if (item.Value.emoteSyncGroup.First() != item.Value)
+                    {
+                        //Debug.Log($"{item.Value.emoteSyncGroup.First() != item.Value}");
+                        continue;
+                    }
+                }
                 //DebugClass.Log($"{BoneMapper.animClips[$"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}"].visibility}   {SessionManager.IsEmoteUnlocked(item.Value)}  {item.Value.emoteName}");
                 BoneMapper.animClips[$"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}"].visibility = SessionManager.IsEmoteUnlocked(item.Value);
             }
