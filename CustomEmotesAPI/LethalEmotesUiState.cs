@@ -83,6 +83,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
     }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist => BlacklistSettings.emotesExcludedFromRandom;
+    
     public IReadOnlyCollection<string> EmotePoolBlacklist => BlacklistSettings.emotesDisabled;
 
     public void AddToRandomPoolBlacklist(string emoteKey)
@@ -200,6 +201,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
         get => (int)Settings.thirdPersonType.Value;
         set => Settings.thirdPersonType.Value = (ThirdPersonType)value;
     }
+    
     public bool UseGlobalSettings
     {
         get => Settings.useGlobalConfig.Value;
