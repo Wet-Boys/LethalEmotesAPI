@@ -73,7 +73,7 @@ public class EmoteList : RecycleListView<EmoteListItem, string>
         if (searchInputField is null)
             return;
         
-        searchInputField.text = "";
+        searchInputField.SetTextWithoutNotify("");
 
         if (_searchableEmoteArray is null)
             return;
