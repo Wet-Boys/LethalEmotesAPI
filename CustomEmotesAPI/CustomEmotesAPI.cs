@@ -499,6 +499,7 @@ namespace EmotesAPI
             hook = new Hook(targetMethod, destMethod, this);
 
         }
+        
         public void Awake()
         {
             instance = this;
@@ -648,6 +649,9 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.GamepadEmoteWheel.performed += GamepadEmoteWheel_performed;
             //EmotesInputSettings.Instance.LigmaBalls.started += LigmaBalls_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+
+            UnityThreadScheduler.Init();
+            ContentCreatorDetector.Init();
         }
 
         bool lockingForMouseInput = false;
