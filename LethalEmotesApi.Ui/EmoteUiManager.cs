@@ -8,7 +8,7 @@ namespace LethalEmotesApi.Ui;
 
 public static class EmoteUiManager
 {
-    internal static IEmoteUiStateController? _stateController;
+    private static IEmoteUiStateController? _stateController;
     internal static EmoteUiPanel? EmoteUiInstance;
 
     private static EmoteWheelSetDisplayData? _emoteDisplayData;
@@ -230,6 +230,12 @@ public static class EmoteUiManager
         
         EmoteUiInstance.CloseGracefully();
         _stateController?.EnableKeybinds();
+    }
+
+    public static void ShowDmcaPrompt()
+    {
+        if (EmoteUiInstance is null)
+            return;
     }
     
     public static float GetUIScale()

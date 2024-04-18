@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using EmotesAPI;
 using JetBrains.Annotations;
 
 namespace LethalEmotesAPI.Utils;
@@ -18,6 +19,10 @@ internal static class ContentCreatorDetector
     
     public static void Init()
     {
+        // Don't waste (the very small amount of) system resources if they've disabled the prompt
+        if (Settings.dontShowDmcaPrompt.Value)
+            return;
+        
         if (OnWineOrProton())
         {
             // Technically someone could be running on macOS or something, but those people aren't real
@@ -33,10 +38,11 @@ internal static class ContentCreatorDetector
 
     private static void ProcessMonitorOnProcessCreated(string processName)
     {
+        // TODO: Verify xsplit process name.
         if (!processName.Contains("obs", StringComparison.InvariantCultureIgnoreCase) && !processName.Contains("xsplit", StringComparison.InvariantCultureIgnoreCase))
             return;
         
-        DebugClass.Log($"Process Detected: {processName}!");
+        
     }
 
     private static bool OnWineOrProton()

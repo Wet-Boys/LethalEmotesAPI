@@ -84,7 +84,7 @@ public class EmoteUiPanel : MonoBehaviour
             return;
         if (CurrentView == UiView.EmoteWheels)
         {
-            EmoteUiManager._stateController?.RefreshTME();
+            EmoteUiManager.GetStateController()?.RefreshTME();
             CloseEmoteWheelsGracefully();
             ShowCustomizePanel();
             CurrentView = UiView.Customize;
