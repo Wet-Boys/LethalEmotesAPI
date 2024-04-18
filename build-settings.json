@@ -10,11 +10,12 @@
     "Unity.TextMeshPro.dll",
     "UnityEngine.dll",
     "UnityEngine.CoreModule.dll",
+    "UnityEngine.TextRenderingModule.dll",
     "Newtonsoft.Json.dll"
   ],
   "ProjectFile": "./CustomEmotesAPI/LethalEmotesApi.csproj",
   "UiProjectFile": "./LethalEmotesApi.Ui/LethalEmotesApi.Ui.csproj",
   "UiUnityDir": "./Unity-LethalEmotesApi-UI/",
-  "ManifestAuthor": "Gemmumoddo",
+  "ManifestAuthor": "Gemumoddo",
   "NetcodePatcherRelease": "2.4.0"
 }

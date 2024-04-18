@@ -41,13 +41,15 @@ namespace EmotesAPI
     [BepInDependency("Ooseykins.LethalVRM", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("io.daxcess.lcvr", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.potatoepet.AdvancedCompany", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("FlipMods.TooManyEmotes", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("BetterEmotes", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.5.2";
+        public const string VERSION = "1.10.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -77,6 +79,8 @@ namespace EmotesAPI
         public static bool MoreCompanyPresent;
         public static bool VRMPresent;
         public static bool AdvancedCompanyPresent;
+        public static bool TMEPresent;
+        public static bool BetterEmotesPresent;
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
@@ -156,7 +160,7 @@ namespace EmotesAPI
         {
             try
             {
-
+                Keybinds.SaveKeybinds();
                 emoteNetworker = Assets.Load<GameObject>($"assets/customstuff/emoteNetworker.prefab");
 
                 emoteNetworker.AddComponent<EmoteNetworker>();
@@ -332,16 +336,22 @@ namespace EmotesAPI
 
         private void GrabbableObjectLateUpdate(Action<GrabbableObject> orig, GrabbableObject self)
         {
-            if (self.playerHeldBy is not null)
+            try
             {
-                BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy.gameObject];
-                if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
+                if (self.playerHeldBy is not null)
                 {
-                    foreach (var item in mapper.itemHolderConstraints)
+                    BoneMapper mapper = BoneMapper.playersToMappers[self.playerHeldBy.gameObject];
+                    if (mapper.emoteSkeletonAnimator is not null && mapper.emoteSkeletonAnimator.enabled)
                     {
-                        item.ActUponConstraints();
+                        foreach (var item in mapper.itemHolderConstraints)
+                        {
+                            item.ActUponConstraints();
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
             }
             orig(self);
         }
@@ -352,11 +362,17 @@ namespace EmotesAPI
             orig(self);
             try
             {
-                DebugClass.Log($"we are playing on {self.gameObject}");
                 BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
                 if (mapper.emoteSkeletonAnimator.enabled)
                 {
-                    PlayAnimation("none", mapper);
+                    if (mapper.currentClip is not null)
+                    {
+                        if (mapper.currentClip.rootIgnoredBones.Contains(HumanBodyBones.Hips) || !mapper.currentClip.animates)
+                        {
+                            return;
+                        }
+                    }
+                    mapper.PlayAnim("none", -1);
                 }
             }
             catch (Exception e)
@@ -365,19 +381,59 @@ namespace EmotesAPI
             }
         }
         private static Hook StartPerformingEmoteClientRpcHook;
+        private void StopPerformingEmoteClientRpc(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            orig(self);
+            try
+            {
+                BoneMapper mapper = BoneMapper.playersToMappers[self.gameObject];
+                if (mapper.emoteSkeletonAnimator.enabled && mapper.canStop && (mapper.currentClipName.Contains("__BetterEmotes") || mapper.currentClipName.Contains("TooManyEmotes__")))
+                {
+                    mapper.PlayAnim("none", -1);
+                }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"couldn't find bonemapper? {e}");
+            }
+        }
+        private static Hook StopPerformingEmoteClientRpcHook;
 
         private void Jump_performed(Action<PlayerControllerB, InputAction.CallbackContext> orig, PlayerControllerB self, InputAction.CallbackContext context)
         {
-            if (localMapper is not null && localMapper.playerController == self)
+            try
             {
-                if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                if (localMapper is not null && localMapper.playerController == self)
                 {
-                    return;
+                    if (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)
+                    {
+                        return;
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                DebugClass.Log($"EmotesAPI: {e}");
+            }
+
             orig(self, context);
         }
         private static Hook Jump_performedHook;
+
+        private void ConnectClientToPlayerObject(Action<PlayerControllerB> orig, PlayerControllerB self)
+        {
+            orig(self);
+            self.StartCoroutine(ReloadTMEAfterFrame(self));
+        }
+        IEnumerator ReloadTMEAfterFrame(PlayerControllerB self)
+        {
+            yield return new WaitForSeconds(1);
+            if (TMEPresent)
+            {
+                TooManyEmotesCompat.ReloadTooManyEmotesVisibility();
+            }
+        }
+        private static Hook ConnectClientToPlayerObjectHook;
 
         private static GameObject emoteNetworker;
 
@@ -426,10 +482,20 @@ namespace EmotesAPI
             }
         }
 
-        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook)
+        public void SetupHook(Type targetClass, Type destClass, string targetMethodName, BindingFlags publicOrNot, string destMethodName, Hook hook, bool isStatic = false, params Type[] paramTypes)
         {
-            MethodInfo targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
-            MethodInfo destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            MethodInfo targetMethod;
+            MethodInfo destMethod;
+            if (isStatic)
+            {
+                targetMethod = targetClass.GetMethods(publicOrNot | System.Reflection.BindingFlags.Static).FirstOrDefault(x => x.Name.Equals(targetMethodName) && x.GetParameters().All(p => paramTypes.Contains(p.ParameterType)));
+                destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            }
+            else
+            {
+                targetMethod = targetClass.GetMethod(targetMethodName, publicOrNot | System.Reflection.BindingFlags.Instance);
+                destMethod = destClass.GetMethod(destMethodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            }
             hook = new Hook(targetMethod, destMethod, this);
 
         }
@@ -451,14 +517,16 @@ namespace EmotesAPI
             MoreCompanyPresent = Chainloader.PluginInfos.ContainsKey("me.swipez.melonloader.morecompany");
             VRMPresent = Chainloader.PluginInfos.ContainsKey("Ooseykins.LethalVRM");
             AdvancedCompanyPresent = Chainloader.PluginInfos.ContainsKey("com.potatoepet.AdvancedCompany");
-
-
+            TMEPresent = Chainloader.PluginInfos.ContainsKey("FlipMods.TooManyEmotes");
+            BetterEmotesPresent = Chainloader.PluginInfos.ContainsKey("BetterEmotes");
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
             //}
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             BlacklistSettings.LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
+            BlacklistSettings.LoadDisabledListFromBepinSex(Settings.DisabledEmotes);
+            Keybinds.LoadKeybinds();
 
             var targetMethod = typeof(PlayerControllerB).GetMethod("Start", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var destMethod = typeof(CustomEmotesAPI).GetMethod(nameof(PlayerControllerStart), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -506,7 +574,8 @@ namespace EmotesAPI
             SetupHook(typeof(GrabbableObject), typeof(CustomEmotesAPI), "LateUpdate", BindingFlags.Public, nameof(GrabbableObjectLateUpdate), GrabbableObjectLateUpdateHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StartPerformingEmoteClientRpc", BindingFlags.Public, nameof(StartPerformingEmoteClientRpc), StartPerformingEmoteClientRpcHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "Jump_performed", BindingFlags.NonPublic, nameof(Jump_performed), Jump_performedHook);
-
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StopPerformingEmoteClientRpc", BindingFlags.Public, nameof(StopPerformingEmoteClientRpc), StopPerformingEmoteClientRpcHook);
+            SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "ConnectClientToPlayerObject", BindingFlags.Public, nameof(ConnectClientToPlayerObject), ConnectClientToPlayerObjectHook);
             CentipedePatches.PatchAll();
             if (VRMPresent)
             {
@@ -516,7 +585,14 @@ namespace EmotesAPI
             {
                 AdvancedCompanyCompat.SetupUpdateVisibilityHook();
             }
-
+            if (TMEPresent && Settings.ImportTME.Value)
+            {
+                TooManyEmotesCompat.RegisterAllTooManyEmotesEmotes();
+            }
+            if (BetterEmotesPresent && Settings.ImportBetterEmotes.Value)
+            {
+                BetterEmotesCompat.RegisterAllTooManyEmotesEmotes();
+            }
 
             EnemySkeletons.SetupEnemyHooks();
 
@@ -569,8 +645,21 @@ namespace EmotesAPI
             ScrollD.started += ctx => EmoteUiManager.OnRightWheel();
             EmotesInputSettings.Instance.StopEmoting.started += StopEmoting_performed;
             EmotesInputSettings.Instance.ThirdPersonToggle.started += ThirdPersonToggle_started;
+            EmotesInputSettings.Instance.GamepadEmoteWheel.performed += GamepadEmoteWheel_performed;
             //EmotesInputSettings.Instance.LigmaBalls.started += LigmaBalls_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+        }
+
+        bool lockingForMouseInput = false;
+        private void GamepadEmoteWheel_performed(InputAction.CallbackContext obj)
+        {
+            if (EmoteUiManager.IsEmoteWheelsOpen())
+            {
+                UnityEngine.Cursor.visible = false;
+                Vector2 middleOfScreen = new Vector2(Screen.width / 2f, Screen.height / 2f);
+                Vector2 pos = obj.ReadValue<Vector2>() * 45 * EmoteUiManager.GetUIScale();
+                Mouse.current.WarpCursorPosition(middleOfScreen + pos);
+            }
         }
 
         bool yote = true;
@@ -621,10 +710,13 @@ namespace EmotesAPI
         private void EmoteWheelInteracted(InputAction.CallbackContext ctx)
         {
             var btn = (ButtonControl)ctx.control;
-
             if (btn.wasPressedThisFrame)
             {
                 EmoteUiManager.OpenEmoteWheels();
+                if (!(ctx.control.ToString().Contains("Keyboard") || ctx.control.ToString().Contains("Mouse")))
+                {
+                    UnityEngine.Cursor.visible = false;
+                }
             }
 
             if (btn.wasReleasedThisFrame)
@@ -654,13 +746,13 @@ namespace EmotesAPI
                             {
                                 if (mapper != localMapper)
                                 {
-                                    if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                                    if (!nearestMapper && mapper.currentClip.allowJoining)
                                     {
                                         nearestMapper = mapper;
                                     }
                                     else if (nearestMapper)
                                     {
-                                        if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                        if (mapper.currentClip.allowJoining && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
                                         {
                                             nearestMapper = mapper;
                                         }
@@ -676,7 +768,7 @@ namespace EmotesAPI
                             string animationName;
                             if (nearestMapper.currentClip.usesNewImportSystem)
                             {
-                                animationName = nearestMapper.currentClip.customInternalName;
+                                animationName = nearestMapper.currentClip.joinEmote;
                             }
                             else
                             {
@@ -719,7 +811,11 @@ namespace EmotesAPI
 
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
-            worldProp.AddComponent<NetworkObject>();
+            if (!worldProp.GetComponent<NetworkObject>())
+            {
+                DebugClass.Log($"Adding a NetworkObject to {worldProp}, but you should really be doing this in Unity!");
+                worldProp.AddComponent<NetworkObject>();
+            }
             networkedObjects.Add(worldProp);
             worldProp.AddComponent<BoneMapper>().worldProp = true;
             var handler = worldProp.AddComponent<WorldPropSpawnHandler>();
@@ -833,6 +929,11 @@ namespace EmotesAPI
             {
                 animationName = BoneMapper.customNamePairs[animationName];
             }
+            string s = BoneMapper.GetRealAnimationName(animationName);
+            if (BlacklistSettings.emotesDisabled.Contains(s))
+            {
+                return;
+            }
             EmoteNetworker.instance.SyncEmote(StartOfRound.Instance.localPlayerController.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
@@ -844,6 +945,11 @@ namespace EmotesAPI
             if (BoneMapper.customNamePairs.ContainsKey(animationName))
             {
                 animationName = BoneMapper.customNamePairs[animationName];
+            }
+            string s = BoneMapper.GetRealAnimationName(animationName);
+            if (BlacklistSettings.emotesDisabled.Contains(s))
+            {
+                return;
             }
             EmoteNetworker.instance.SyncEmote(mapper.mapperBody.GetComponent<NetworkObject>().NetworkObjectId, animationName, pos);
         }
@@ -1039,7 +1145,6 @@ namespace EmotesAPI
             mapper.basePlayerModelAnimator.enabled = true;
             mapper.oneFrameAnimatorLeeWay = true;
             mapper.basePlayerModelAnimator.gameObject.SetActive(true);
-            DebugClass.Log($"reenabling");
 
         }
 

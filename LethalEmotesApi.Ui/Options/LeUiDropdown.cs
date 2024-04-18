@@ -62,4 +62,8 @@ public abstract class LeUiDropdown : MonoBehaviour
         
         dropdown.SetValueWithoutNotify(value);
     }
+    private void UpdateStateBroadcast()
+    {
+        UpdateDropdown();
+    }
 }

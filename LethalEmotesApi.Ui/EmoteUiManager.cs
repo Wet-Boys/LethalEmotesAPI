@@ -1,7 +1,8 @@
-using System;
 using System.Collections.Generic;
 using LethalEmotesApi.Ui.Data;
+using LethalEmotesApi.Ui.Db;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace LethalEmotesApi.Ui;
 
@@ -9,6 +10,8 @@ public static class EmoteUiManager
 {
     internal static IEmoteUiStateController? _stateController;
     internal static EmoteUiPanel? EmoteUiInstance;
+
+    private static EmoteWheelSetDisplayData? _emoteDisplayData;
     
     public static void RegisterStateController(IEmoteUiStateController stateController)
     {
@@ -49,37 +52,99 @@ public static class EmoteUiManager
         _stateController?.UnlockPlayerInput();
     }
 
+    internal static void EnableKeybinds()
+    {
+        _stateController?.EnableKeybinds();
+    }
+
     internal static void PlayAnimationOn(Animator animator, string emoteKey)
     {
         _stateController?.PlayAnimationOn(animator, emoteKey);
     }
 
+    internal static IEmoteDb EmoteDb => _stateController!.EmoteDb;
+
     internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteDb.EmoteKeys;
 
-    internal static string GetEmoteName(string emoteKey) => _stateController!.EmoteDb.GetEmoteName(emoteKey);
+    internal static string GetEmoteName(string emoteKey)
+    {
+        var emoteDb = _stateController!.EmoteDb;
 
-    internal static string GetEmoteModName(string emoteKey) => _stateController!.EmoteDb.GetModName(emoteKey);
-    
+        if (emoteDb.EmoteExists(emoteKey))
+            return emoteDb.GetEmoteName(emoteKey);
+
+        if (_emoteDisplayData is null)
+            return emoteKey;
+
+        return _emoteDisplayData.EmoteKeyEmoteNameLut.GetValueOrDefault(emoteKey, emoteKey);
+    }
+
+    internal static string GetEmoteModName(string emoteKey)
+    {
+        var emoteDb = _stateController!.EmoteDb;
+        
+        if (emoteDb.EmoteExists(emoteKey))
+            return emoteDb.GetModName(emoteKey);
+        
+        if (_emoteDisplayData is null)
+            return "Unknown";
+
+        return _emoteDisplayData.EmoteKeyModNameLut.GetValueOrDefault(emoteKey, "Unknown");
+    }
+
+    internal static bool GetEmoteVisibility(string emoteKey) => _stateController!.EmoteDb.GetEmoteVisibility(emoteKey);
+
     internal static IReadOnlyCollection<string> RandomPoolBlacklist => _stateController!.RandomPoolBlacklist;
     
+    internal static IReadOnlyCollection<string> EmotePoolBlacklist => _stateController!.EmotePoolBlacklist;
+
     internal static void AddToRandomPoolBlacklist(string emoteKey) => _stateController?.AddToRandomPoolBlacklist(emoteKey);
 
     internal static void RemoveFromRandomPoolBlacklist(string emoteKey) => _stateController?.RemoveFromRandomPoolBlacklist(emoteKey);
+    
+    internal static void AddToEmoteBlacklist(string emoteKey) => _stateController?.AddToEmoteBlacklist(emoteKey);
+
+    internal static void RemoveFromEmoteBlacklist(string emoteKey) => _stateController?.RemoveFromEmoteBlacklist(emoteKey);
+
+    internal static void RefreshBothLists() => _stateController?.RefreshBothLists();
+    
+    internal static InputActionReference? GetEmoteKeybind(string? emoteKey)
+    {
+        if (emoteKey is null)
+            return null;
+
+        return _stateController?.GetEmoteKeybind(emoteKey);
+    }
+
+    internal static string[] GetEmoteKeysForBindPath(string bindPath) =>
+        _stateController!.GetEmoteKeysForBindPath(bindPath);
 
     internal static EmoteWheelSetData LoadEmoteWheelSetData()
     {
-        return _stateController!.LoadEmoteWheelSetData();
+        _emoteDisplayData = _stateController!.LoadEmoteWheelSetDisplayData();
+        var wheelSetData = _stateController.LoadEmoteWheelSetData();
+
+        _stateController.SaveEmoteWheelSetDisplayData(_emoteDisplayData.LoadFromWheelSetData(wheelSetData));
+
+        return wheelSetData;
     }
 
     internal static void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
         _stateController!.SaveEmoteWheelSetData(dataToSave);
+        
+        _emoteDisplayData = _emoteDisplayData!.LoadFromWheelSetData(dataToSave);
+        _stateController.SaveEmoteWheelSetDisplayData(_emoteDisplayData);
 
         if (EmoteUiInstance is null)
             return;
         
         EmoteUiInstance.ReloadData();
     }
+    
+    internal static void SaveKeybinds() => _stateController?.SaveKeybinds();
+    
+    internal static void LoadKeybinds() => _stateController?.LoadKeybinds();
 
     public static bool IsEmoteWheelsOpen() => EmoteUiInstance is
         { IsOpen: true, CurrentView: EmoteUiPanel.UiView.EmoteWheels };
@@ -126,6 +191,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.Show();
+        _stateController?.DisableKeybinds();
     }
 
     public static void CloseEmoteWheels()
@@ -137,6 +203,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.Hide();
+        _stateController?.EnableKeybinds();
     }
 
     public static void CloseCustomizationPanel()
@@ -148,6 +215,7 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.Hide();
+        _stateController?.EnableKeybinds();
     }
 
     public static void CloseUiGracefully()
@@ -161,6 +229,18 @@ public static class EmoteUiManager
             return;
         
         EmoteUiInstance.CloseGracefully();
+        _stateController?.EnableKeybinds();
+    }
+    
+    public static float GetUIScale()
+    {
+        if (EmoteUiInstance is null)
+        {
+            Debug.LogWarning("EmoteUiInstance is null!");
+            return 0f;
+        }
+        
+        return EmoteUiInstance.transform.parent.GetComponent<Canvas>().scaleFactor;
     }
 
     public static float EmoteVolume
@@ -197,5 +277,11 @@ public static class EmoteUiManager
     {
         get => _stateController!.ThirdPerson;
         set => _stateController!.ThirdPerson = value;
+    }
+    
+    public static bool UseGlobalSettings
+    {
+        get => _stateController!.UseGlobalSettings;
+        set => _stateController!.UseGlobalSettings = value;
     }
 }

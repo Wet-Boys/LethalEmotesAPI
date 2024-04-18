@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using BepInEx;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using LethalEmotesAPI.Data;
+using LethalEmotesApi.Ui;
 
 public class CustomAnimationClip : MonoBehaviour
 {
@@ -41,8 +44,10 @@ public class CustomAnimationClip : MonoBehaviour
     public bool usesNewImportSystem = false;
     public bool animates = true;
     public bool preventsMovement = false;
+    public bool allowJoining = true;
+    public string joinEmote = "";
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f, bool thirdPerson = false, string displayName = "", BepInPlugin ownerPlugin = null, bool localTransforms = false, bool usesNewImportSystem = false, bool animates = true, bool preventsMovement = false)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop, AudioClip[] primaryAudioClips = null, AudioClip[] secondaryAudioClips = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null, AnimationClipParams.LockType lockType = AnimationClipParams.LockType.none, AudioClip[] primaryDMCAFreeAudioClips = null, AudioClip[] secondaryDMCAFreeAudioClips = null, bool willGetClaimed = false, float audioLevel = .5f, bool thirdPerson = false, string displayName = "", BepInPlugin ownerPlugin = null, bool localTransforms = false, bool usesNewImportSystem = false, bool animates = true, bool preventsMovement = false, bool allowJoining = true, string joinEmote = "")
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -153,5 +158,50 @@ public class CustomAnimationClip : MonoBehaviour
         this.localTransforms = localTransforms;
         this.animates = animates;
         this.preventsMovement = preventsMovement;
+        this.allowJoining = allowJoining;
+
+        if (string.IsNullOrEmpty(customInternalName)) // Can't create an action with an empty name.
+            return;
+        
+        Keybinds.DisableKeybinds();
+
+        if (usesNewImportSystem)
+        {
+            var emoteActionRef = Keybinds.GetOrCreateInputRef(customInternalName);
+            emoteActionRef.action.Enable();
+            emoteActionRef.action.started += EmoteAction_started;
+
+            if (Keybinds.keyBindOverrideStorage.TryGetValue(customInternalName, out var bindingOverride))
+            {
+                emoteActionRef.action.ApplyBindingOverride(bindingOverride);
+            }
+        }
+        else
+        {
+            var emoteActionRef = Keybinds.GetOrCreateInputRef(clip[0].name);
+            emoteActionRef.action.Enable();
+            emoteActionRef.action.started += EmoteAction_started;
+
+            if (Keybinds.keyBindOverrideStorage.TryGetValue(clip[0].name, out var bindingOverride))
+            {
+                emoteActionRef.action.ApplyBindingOverride(bindingOverride);
+            }
+        }
+        Keybinds.EnableKeybinds();
+        if (joinEmote == "")
+        {
+            joinEmote = customInternalName;
+        }
+        this.joinEmote = joinEmote;
+    }
+
+    private static void EmoteAction_started(InputAction.CallbackContext obj)
+    {
+        if (!EmoteUiManager.CanOpenEmoteWheels())
+            return;
+        if (CustomEmotesAPI.localMapper is not null)
+        {
+            CustomEmotesAPI.PlayAnimation(obj.action.name);
+        }
     }
 }

@@ -34,11 +34,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.2" />
+    <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.8" />
+    <PackageReference Include="FlipMods-TooManyEmotes" Version="2.1.4" />
+    <PackageReference Include="KlutzyBubbles-BetterEmotes" Version="1.4.5" publicize="true" />
     <PackageReference Include="notnotnotswipez-MoreCompany" Version="1.7.4" />
     <PackageReference Include="Ooseykins-LethalVRM" Version="1.0.7" publicize="true" />
-    <PackageReference Include="PotatoePet-AdvancedCompany" Version="1.0.112" publicize="true" />
-    <PackageReference Include="rune580.lethalcompany_inpututils" Version="0.6.3" />
+    <PackageReference Include="Rune580.Mods.LethalCompany.InputUtils" Version="0.7.4" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" />
   </ItemGroup>
 
@@ -48,7 +49,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <AssemblyFiles Include="$(AdditionalLibsDir)*.dll" InProject="false" />
+    <AssemblyFiles Include="$(AdditionalLibsDir)*.dll;..\libs\AdvancedCompany.dll" InProject="false" />
     <Reference Include="@(AssemblyFiles)" Private="false" />
   </ItemGroup>
   

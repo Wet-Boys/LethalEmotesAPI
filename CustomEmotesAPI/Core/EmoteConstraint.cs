@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LethalEmotesAPI.Core;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -112,11 +113,27 @@ public class EmoteConstraint : MonoBehaviour
     {
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
+        if (emoteBone.GetComponent<BoneRef>() is not null)
+        {
+            emoteBone.GetComponent<BoneRef>().target = originalBone;
+        }
+        else
+        {
+            emoteBone.gameObject.AddComponent<BoneRef>().target = originalBone;
+        }
     }
     internal void AddSource(Transform originalBone, Transform emoteBone)
     {
         this.originalBone = originalBone;
         this.emoteBone = emoteBone;
+        if (emoteBone.GetComponent<BoneRef>() is not null)
+        {
+            emoteBone.GetComponent<BoneRef>().target = originalBone;
+        }
+        else
+        {
+            emoteBone.gameObject.AddComponent<BoneRef>().target = originalBone;
+        }
     }
     internal static EmoteConstraint AddConstraint(GameObject gameObject, BoneMapper mapper, Transform target, bool needToFix)
     {

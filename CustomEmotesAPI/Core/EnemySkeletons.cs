@@ -31,6 +31,11 @@ namespace LethalEmotesAPI.Core
             yield return new WaitForEndOfFrame();
             AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]);
         }
+        internal IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos)
+        {
+            yield return new WaitForEndOfFrame();
+            AnimationReplacements.Import(g, prefab, pos);
+        }
         private void MaskedPlayerEnemyStart(Action<MaskedPlayerEnemy> orig, MaskedPlayerEnemy self)
         {
             CustomEmotesAPI.localMapper.StartCoroutine(SetupMaskedEmoteSkeletonAfterAFewFrames(self));
@@ -109,8 +114,17 @@ namespace LethalEmotesAPI.Core
                     case "Peeper":
                         AnimationReplacements.Import(self.gameObject, "assets/fineilldoitmyself/Peeper2.prefab", [0]);
                         break;
+                    case "RadMech":
+                        AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/Mech1.prefab", [0]);
+                        break;
+                    case "Butler":
+                        AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/Butler.prefab", [0]);
+                        break;
+                    case "Tulip Snake":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/TulipSnake.prefab", [3]));
+                        break;
                     default:
-                        DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
+                        //DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;
                 }
             }

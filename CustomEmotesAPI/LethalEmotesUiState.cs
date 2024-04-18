@@ -7,6 +7,8 @@ using LethalEmotesApi.Ui.Db;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
 using LethalEmotesApi.Ui;
+using UnityEngine.InputSystem;
+using LethalEmotesAPI.Patches.ModCompat;
 
 namespace LethalEmotesAPI;
 
@@ -56,6 +58,13 @@ public class LethalEmotesUiState : IEmoteUiStateController
 
         return !localPlayer.inTerminalMenu && !localPlayer.isTypingChat && !localPlayer.quickMenuManager.isMenuOpen;
     }
+    public void RefreshTME()
+    {
+        if (CustomEmotesAPI.TMEPresent)
+        {
+            TooManyEmotesCompat.ReloadTooManyEmotesVisibility();
+        }
+    }
 
     public void PlayAnimationOn(Animator animator, string emoteKey)
     {
@@ -75,6 +84,8 @@ public class LethalEmotesUiState : IEmoteUiStateController
 
     public IReadOnlyCollection<string> RandomPoolBlacklist => BlacklistSettings.emotesExcludedFromRandom;
     
+    public IReadOnlyCollection<string> EmotePoolBlacklist => BlacklistSettings.emotesDisabled;
+
     public void AddToRandomPoolBlacklist(string emoteKey)
     {
         BlacklistSettings.AddToExcludeList(emoteKey);
@@ -85,9 +96,32 @@ public class LethalEmotesUiState : IEmoteUiStateController
         BlacklistSettings.RemoveFromExcludeList(emoteKey);
     }
 
+    public void AddToEmoteBlacklist(string emoteKey)
+    {
+        BlacklistSettings.AddToDisabledList(emoteKey);
+    }
+
+    public void RemoveFromEmoteBlacklist(string emoteKey)
+    {
+        BlacklistSettings.RemoveFromDisabledList(emoteKey);
+    }
+    
+    public void RefreshBothLists()
+    {
+        BlacklistSettings.RefreshBothLists();
+    }
+
+    public InputActionReference GetEmoteKeybind(string emoteKey) => Keybinds.GetOrCreateInputRef(emoteKey);
+
+    public void EnableKeybinds() => Keybinds.EnableKeybinds();
+
+    public void DisableKeybinds() => Keybinds.DisableKeybinds();
+    
+    public string[] GetEmoteKeysForBindPath(string bindPath) => Keybinds.GetEmoteKeysForBindPath(bindPath);
+
     internal static void FixLegacyEmotes()
     {
-        EmoteWheelSetData e = EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
+        EmoteWheelSetData e = EmoteWheelSetDataConverter.EmoteWheelSetDataFromJson(Settings.EmoteWheelSetDataEntryString.Value);
         foreach (var wheel in e.EmoteWheels)
         {
             for (int i = 0; i < wheel.Emotes.Length; i++)
@@ -107,15 +141,30 @@ public class LethalEmotesUiState : IEmoteUiStateController
         }
         Settings.EmoteWheelSetDataEntryString.Value = e.ToJson();
     }
+
     public EmoteWheelSetData LoadEmoteWheelSetData()
     {
-
-        return EmoteWheelSetDataConverter.FromJson(Settings.EmoteWheelSetDataEntryString.Value);
+        return EmoteWheelSetDataConverter.EmoteWheelSetDataFromJson(Settings.EmoteWheelSetDataEntryString.Value);
     }
+
+    public EmoteWheelSetDisplayData LoadEmoteWheelSetDisplayData()
+    {
+        return EmoteWheelSetDataConverter.EmoteWheelSetDisplayDataFromJson(Settings.EmoteWheelSetDisplayDataString.Value);
+    }
+
+    public void LoadKeybinds() => Keybinds.LoadKeybinds();
+
     public void SaveEmoteWheelSetData(EmoteWheelSetData dataToSave)
     {
         Settings.EmoteWheelSetDataEntryString.Value = dataToSave.ToJson();
     }
+
+    public void SaveEmoteWheelSetDisplayData(EmoteWheelSetDisplayData dataToSave)
+    {
+        Settings.EmoteWheelSetDisplayDataString.Value = dataToSave.ToJson();
+    }
+
+    public void SaveKeybinds() => Keybinds.SaveKeybinds();
 
     public float EmoteVolume
     {
@@ -151,5 +200,11 @@ public class LethalEmotesUiState : IEmoteUiStateController
     {
         get => (int)Settings.thirdPersonType.Value;
         set => Settings.thirdPersonType.Value = (ThirdPersonType)value;
+    }
+    
+    public bool UseGlobalSettings
+    {
+        get => Settings.useGlobalConfig.Value;
+        set => Settings.useGlobalConfig.Value = value;
     }
 }

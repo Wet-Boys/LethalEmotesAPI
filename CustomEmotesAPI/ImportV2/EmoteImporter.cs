@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
 namespace LethalEmotesAPI.ImportV2
 {
@@ -61,7 +63,7 @@ namespace LethalEmotesAPI.ImportV2
 
             if (animationClipParams.joinSpots == null)
                 animationClipParams.joinSpots = new JoinSpot[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.primaryAnimationClips, animationClipParams.audioLoops, animationClipParams.primaryAudioClips, animationClipParams.secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimationClips, false, animationClipParams.stopWhenMove, false, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, false, animationClipParams.internalName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams.primaryDMCAFreeAudioClips, animationClipParams.secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms, true, !animationClipParams.nonAnimatingEmote, animationClipParams.preventMovement);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.primaryAnimationClips, animationClipParams.audioLoops, animationClipParams.primaryAudioClips, animationClipParams.secondaryAudioClips, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimationClips, false, animationClipParams.stopWhenMove, false, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, false, animationClipParams.internalName, animationClipParams.customPostEventCodeSync, animationClipParams.customPostEventCodeNoSync, animationClipParams.lockType, animationClipParams.primaryDMCAFreeAudioClips, animationClipParams.secondaryDMCAFreeAudioClips, animationClipParams.willGetClaimedByDMCA, animationClipParams.audioLevel, animationClipParams.thirdPerson, animationClipParams.displayName, animationClipParams.OwnerPlugin, animationClipParams.useLocalTransforms, true, !animationClipParams.nonAnimatingEmote, animationClipParams.preventMovement, animationClipParams.allowJoining, animationClipParams.emoteToPlayOnJoin);
             if (animationClipParams.visible)
             {
                 if (!BlacklistSettings.emotesExcludedFromRandom.Contains(animationClipParams.internalName))
@@ -69,6 +71,7 @@ namespace LethalEmotesAPI.ImportV2
                     CustomEmotesAPI.randomClipList.Add(animationClipParams.internalName);
                 }
             }
+
             BoneMapper.animClips.Add(animationClipParams.internalName, clip);
 
         }

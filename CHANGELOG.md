@@ -1,3 +1,35 @@
+- Version 1.10.0: UI performanced significantly improved with large amounts of emotes, this will make the load time go from a few seconds to a few milliseconds when having more than a few emote mods installed. Added gamepad support, all bindings can be changed or removed if need be. Added toggles (default on) which allow BetterEmotes/TooManyEmotes to be populated into LethalEmotesAPI. These emotes are still tied to the configs of their respective mods (such as TooManyEmotes requiring emotes to be unlocked). But can be interacted with more fully, such as supporting the join button (default V). BetterEmotes emotes also supports the third person options in LethalEmotesAPI if used through LethalEmotesAPI methods.
+
+- Version 1.9.1: Fixed issue where emote packs using the legacy import system weren't working nicely with keybinds
+
+- Version 1.9.0: Added emote skeleton for the new snake boi
+
+- Verison 1.8.2: Fixed keybinds being able to be used during areas they shouldn't, like the terminal
+
+- Version 1.8.1: Fixed issue with third person camera clipping into walls with a select few emotes
+
+- Version 1.8.0: Added keybind support. Specifically, in the customize menu you can now assign a keybind to any emote you want. Big thanks to Rune for making the UI work for this
+
+- Version 1.7.5: Changed how we disable the hud to work better with other mods.
+
+- Version 1.7.4: Added v50 enemies. This update is not required to work with v50 though.
+
+- Version 1.7.3: Fixed issue with some enemies emoting in the ground due to new BoneMapper heirarchy changes
+
+- Version 1.7.2: Minor fix around BoneRefs
+
+- Version 1.7.1: Fixed scaling not being accurate (by about .1216 times) Added BoneRefs to all emote bones so that they can easily reference their counterparts
+
+- Version 1.7.0: Quite a few new features! Global config is now a thing. Whenever you launch without a global config present, it will create one based off the current local config file, then after that it will be fully seperate, feel free to use either. The emote wheel will now tell you in more detail when you have emotes on it that are not currently installed. You can now join emotes of all kinds (unless the emote specifically says otherwise: CustomEmoteParams.allowJoining = false) not sure why I didn't have this be the case from the start but oh well. Your head during emotes will now be more alligned with the actual head, it was always kinda short as I've found, this is no longer the case. Fixed a few NREs when highlighting broken emotes in the customize menu. Reparented the BoneMapper so that crouching during an emote no longer moves you slightly backwards.
+
+- Version 1.6.3: Fixed mod compat.
+
+- Version 1.6.2: Fixed a longstanding issue with Start->Loop animations which caused them to not sync properly due to an overlap in the animation controller.
+
+- Version 1.6.1: Fixed a rare issue with GrabbableObjectLateUpdate throwing errors. Move the bonemapper a tad bit in the heirarchy, fixing a future issue I noticed.
+
+- Version 1.6.0: Added a local emote blacklist. By clicking the eye icon in the emote list, you can disable an emote for yourself only. Others will still be able to use and see the emote but you will not. Fixed an oversight with sync timers when an emote only syncs audio and not animations
+
 - Version 1.5.2: Updated netcode patcher to 3.3.4, might help with ping related issues, idk ymmv
 
 - Version 1.5.1: Updated some internal methods to be much more optimized. Should give a bit of a performance boost

@@ -157,9 +157,11 @@ internal static class AnimationReplacements
         try
         {
             var nuts = Assets.Load<GameObject>("assets/customstuff/scavEmoteSkeleton.prefab");
+            nuts.transform.localScale = new Vector3(1.1216f, 1.1216f, 1.1216f);
             float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             test.scale = currScale / banditScale;
+            
             //todo health
             //test.h = bodyPrefab.GetComponentInChildren<PlayerControllerB>().health;
             test.model = modelTransform.gameObject;

@@ -8,7 +8,22 @@ namespace LethalEmotesAPI.Utils
     public class BlacklistSettings
     {
         public static List<string> emotesExcludedFromRandom = [];
+        public static List<string> emotesDisabled = [];
 
+        public static void RefreshBothLists()
+        {
+            emotesExcludedFromRandom.Clear();
+            emotesDisabled.Clear();
+            foreach (var item in emotesExcludedFromRandom)
+            {
+                if (!CustomEmotesAPI.randomClipList.Contains(item))
+                {
+                    CustomEmotesAPI.randomClipList.Add(item);
+                }
+            }
+            LoadExcludeListFromBepinSex(Settings.RandomEmoteBlacklist);
+            LoadDisabledListFromBepinSex(Settings.DisabledEmotes);
+        }
         public static void AddToExcludeList(string emoteName)
         {
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
@@ -22,6 +37,7 @@ namespace LethalEmotesAPI.Utils
 
         public static void RemoveFromExcludeList(string emoteName)
         {
+            RemoveFromDisabledList(emoteName);
             emoteName = BoneMapper.GetRealAnimationName(emoteName);
             emotesExcludedFromRandom.Remove(emoteName);
             if (CustomEmotesAPI.randomClipList.Contains(emoteName))
@@ -44,6 +60,54 @@ namespace LethalEmotesAPI.Utils
         {
             StringBuilder sb = new StringBuilder();
             foreach (var item in emotesExcludedFromRandom)
+            {
+                sb.Append($"{item}ඞ");
+            }
+            if (sb.ToString().EndsWith('ඞ'))
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+            list.Value = sb.ToString();
+        }
+
+
+
+
+
+
+
+
+
+        //Disable List
+        public static void LoadDisabledListFromBepinSex(ConfigEntry<string> list)
+        {
+            string csvList = list.Value;
+            foreach (var item in csvList.Split('ඞ'))
+            {
+                AddToDisabledList(item);
+            }
+        }
+        public static void AddToDisabledList(string emoteName)
+        {
+            emoteName = BoneMapper.GetRealAnimationName(emoteName);
+            AddToExcludeList(emoteName);
+            if (emotesDisabled.Contains(emoteName))
+                return;
+
+            emotesDisabled.Add(emoteName);
+            SaveDisabledListToBepinSex(Settings.DisabledEmotes);
+        }
+
+        public static void RemoveFromDisabledList(string emoteName)
+        {
+            emoteName = BoneMapper.GetRealAnimationName(emoteName);
+            emotesDisabled.Remove(emoteName);
+            SaveDisabledListToBepinSex(Settings.DisabledEmotes);
+        }
+        public static void SaveDisabledListToBepinSex(ConfigEntry<string> list)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in emotesDisabled)
             {
                 sb.Append($"{item}ඞ");
             }

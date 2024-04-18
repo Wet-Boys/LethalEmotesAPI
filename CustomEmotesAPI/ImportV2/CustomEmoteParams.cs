@@ -151,7 +151,15 @@ namespace LethalEmotesAPI.ImportV2
         /// </summary>
         public bool nonAnimatingEmote = false;
 
+        /// <summary>
+        /// Determines if the emote can be joined by pressing the join key. Mainly only want to turn this off for specific emote types.
+        /// </summary>
+        public bool allowJoining = true;
 
+        /// <summary>
+        /// If setup, the specified emote will be played when joining instead of the currently playing emote. I.E: this emote is called Emote1, but your emoteToPlayOnJoin is Emote2. If a player joins this emote they will instead play Emote2
+        /// </summary>
+        public string emoteToPlayOnJoin = "";
 
 
         //keeping this for if we ever port to a game that needs them so I don't forget
