@@ -739,6 +739,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+                    gameObject.AddComponent<NearestEmoterChecker>().self = this;
                     isServer = playerController.IsServer && playerController.IsOwner;
                     HealthbarAnimator.Setup(this);
                     FixLocalArms();
