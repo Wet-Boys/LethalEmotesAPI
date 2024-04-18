@@ -982,11 +982,14 @@ namespace EmotesAPI
             }
 
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
-            
+
             mapper.currentClipName = newAnimation;
-            mapper.UpdateHoverTip();
+            if (BoneMapper.animClips[newAnimation] is not null)
+            {
+                mapper.UpdateHoverTip(BoneMapper.animClips[newAnimation].displayName);
+            }
             mapper.personalTrigger.interactable = false; // remove tooltip
-            
+
             if (mapper == localMapper)
             {
                 if (requestCounter != 0 && CustomEmotesAPI.hudObject is not null)
@@ -1032,10 +1035,10 @@ namespace EmotesAPI
 
             if (newAnimation != "none")
             {
- 
-                    mapper.personalTrigger.interactable = true; // enable tooltip
 
-                
+                mapper.personalTrigger.interactable = true; // enable tooltip
+
+
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.HideAllSpots();
@@ -1057,7 +1060,6 @@ namespace EmotesAPI
 
                 if (mapper.local && hudObject is not null)
                 {
-                    CustomEmotesAPI.currentEmoteText.color = new Color(0, 0, 0, 0); //remove text top left
                     CustomEmotesAPI.currentEmoteText.text = "";
                 }
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)

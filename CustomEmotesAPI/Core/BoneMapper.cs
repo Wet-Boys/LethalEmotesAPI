@@ -536,14 +536,14 @@ public class BoneMapper : MonoBehaviour
         }
     }
 
-    public void UpdateHoverTip()
+    public void UpdateHoverTip(string emoteName)
     {
         currentJoinButton = InputControlPath.ToHumanReadableString(
             EmotesInputSettings.Instance.JoinEmote.bindings[0].effectivePath,
             InputControlPath.HumanReadableStringOptions.OmitDevice);
-        personalTrigger.hoverTip = "Press [" + currentJoinButton + "] to join";
+        personalTrigger.hoverTip = $"Press [{currentJoinButton}] to join {emoteName}";
     }
-    
+
     internal IEnumerator preventEmotesInSpawnAnimation() //this is a hacky fix, but for some reason if you emote while spawning the log will just fucking die, need to come back to this but it's not really a big deal
     {
         yield return new WaitForSeconds(3);
@@ -576,30 +576,24 @@ public class BoneMapper : MonoBehaviour
         if (playerController is null)
         {
             enemyController = mapperBody.GetComponent<EnemyAI>();
-            
+
         }
-        playersToMappers.Add(mapperBody.gameObject, this);
         isValidPlayer = playerController is not null;
         playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
-        
+
         // Tool Tip Handling
         GameObject trigObject = mapperBody.gameObject.transform.Find("PlayerPhysicsBox").gameObject;
         trigObject.tag = "InteractTrigger";
         trigObject.layer = LayerMask.NameToLayer("InteractableObject");
-
-        
-        
         personalTrigger = trigObject.AddComponent<InteractTrigger>();
-        
         personalTrigger.interactable = false;
-        personalTrigger.hoverIcon = null;
-        personalTrigger.disabledHoverIcon = null;
-        //playerController.cursorIcon.color = Color.clear;
+        personalTrigger.hoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
+        personalTrigger.disabledHoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
         personalTrigger.disabledHoverTip = "";
-        UpdateHoverTip();
-        
+        UpdateHoverTip("none");
+
 
         GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
         obj.name = $"{name}_AudioObject";
@@ -990,10 +984,10 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        bool yes = 
-            !CustomEmotesAPI.LCThirdPersonPresent 
-            && currentClip is not null 
-            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on) 
+        bool yes =
+            !CustomEmotesAPI.LCThirdPersonPresent
+            && currentClip is not null
+            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on)
             && canThirdPerson
             && temporarilyThirdPerson != TempThirdPerson.off;
         return yes;
@@ -1179,158 +1173,159 @@ public class BoneMapper : MonoBehaviour
         if (playerController is not null)
         {
             playersToMappers.Remove(playerController.gameObject);
-        if (worldProp)
-        {
-            return;
-        }
-        playersToMappers.Remove(mapperBody);
-        try
-        {
-            currentClip.clip[0].ToString();
-            NewAnimation(null);
-            if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+            if (worldProp)
             {
-                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                return;
+            }
+            playersToMappers.Remove(mapperBody);
+            try
+            {
+                currentClip.clip[0].ToString();
+                NewAnimation(null);
+                if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                 {
-                    CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                    {
+                        CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    }
                 }
-            }
-            if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
-            {
-                audioObject.GetComponent<AudioManager>().Stop();
-                if (currentClip.syncronizeAudio)
+                if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                 {
-                    listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                    audioObject.GetComponent<AudioManager>().Stop();
+                    if (currentClip.syncronizeAudio)
+                    {
+                        listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                    }
                 }
+                if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+                {
+                    CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
+                    uniqueSpot = -1;
+                }
+                BoneMapper.allMappers.Remove(this);
+                prevClip = currentClip;
+                currentClip = null;
             }
-            if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+            catch (Exception e)
             {
-                CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
-                uniqueSpot = -1;
+                //DebugClass.Log($"Had issues when destroying bonemapper: {e}");
+                BoneMapper.allMappers.Remove(this);
             }
-            BoneMapper.allMappers.Remove(this);
-            prevClip = currentClip;
-            currentClip = null;
-        }
-        catch (Exception e)
-        {
-            //DebugClass.Log($"Had issues when destroying bonemapper: {e}");
-            BoneMapper.allMappers.Remove(this);
         }
     }
     public void UnlockBones(bool animatorEnabled = true)
-    {
-        transform.localPosition = Vector3.zero;
-        transform.eulerAngles = bodyPrefab.transform.eulerAngles;
-        //transform.localEulerAngles = new Vector3(90, 0, 0);
-        foreach (var smr in basePlayerModelSMR)
         {
-            for (int i = 0; i < smr.bones.Length; i++)
-            {
-                try
-                {
-                    if (smr.bones[i].gameObject.GetComponent<EmoteConstraint>())
-                    {
-                        smr.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
-                    }
-                }
-                catch (Exception)
-                {
-                    break;
-                }
-            }
-        }
-        foreach (var item in cameraConstraints)
-        {
-            item.DeactivateConstraints();
-        }
-        foreach (var item in itemHolderConstraints)
-        {
-            item.DeactivateConstraints();
-        }
-        foreach (var item in additionalConstraints)
-        {
-            item.DeactivateConstraints();
-        }
-        if (thirdPersonConstraint is not null)
-        {
-            thirdPersonConstraint.DeactivateConstraints();
-        }
-        DeThirdPerson();
-        //basePlayerModelAnimator.enabled = animatorEnabled;
-    }
-    public void LockBones()
-    {
-        UnlockBones();
-        transform.localPosition = Vector3.zero;
-        if (currentClip is not null)
-        {
-            foreach (var item in currentClip.soloIgnoredBones)
-            {
-                if (emoteSkeletonAnimator.GetBoneTransform(item))
-                    dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
-            }
-            foreach (var item in currentClip.rootIgnoredBones)
-            {
-                if (emoteSkeletonAnimator.GetBoneTransform(item))
-                    dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
-                foreach (var bone in emoteSkeletonAnimator.GetBoneTransform(item).GetComponentsInChildren<Transform>())
-                {
-                    dontAnimateUs.Add(bone.name);
-                }
-            }
-        }
-        if (!jank)
-        {
-            emoteSkeletonSMR.enabled = true;
+            transform.localPosition = Vector3.zero;
+            transform.eulerAngles = bodyPrefab.transform.eulerAngles;
+            //transform.localEulerAngles = new Vector3(90, 0, 0);
             foreach (var smr in basePlayerModelSMR)
             {
                 for (int i = 0; i < smr.bones.Length; i++)
                 {
                     try
                     {
-                        if (smr.bones[i].gameObject.GetComponent<EmoteConstraint>() && !dontAnimateUs.Contains(smr.bones[i].name))
+                        if (smr.bones[i].gameObject.GetComponent<EmoteConstraint>())
                         {
-                            //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
-                            EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
-                            ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
-                            if (smr == basePlayerModelSMR.First())
-                            {
-                                if (currentClip is not null)
-                                {
-                                    ec.SetLocalTransforms(currentClip.localTransforms);
-                                }
-                            }
-                        }
-                        else if (dontAnimateUs.Contains(smr.bones[i].name))
-                        {
-                            //DebugClass.Log($"dontanimateme-{i}---------{smr.bones[i].gameObject}");
                             smr.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        DebugClass.Log($"{e}");
+                        break;
                     }
                 }
             }
+            foreach (var item in cameraConstraints)
+            {
+                item.DeactivateConstraints();
+            }
             foreach (var item in itemHolderConstraints)
             {
-                item.ActivateConstraints();
+                item.DeactivateConstraints();
             }
             foreach (var item in additionalConstraints)
             {
-                item.ActivateConstraints();
+                item.DeactivateConstraints();
             }
-            LockCameraStuff(local && ThirdPersonCheck());
+            if (thirdPersonConstraint is not null)
+            {
+                thirdPersonConstraint.DeactivateConstraints();
+            }
+            DeThirdPerson();
+            //basePlayerModelAnimator.enabled = animatorEnabled;
         }
-        else
+        public void LockBones()
         {
-            //a1.enabled = false;
+            UnlockBones();
+            transform.localPosition = Vector3.zero;
+            if (currentClip is not null)
+            {
+                foreach (var item in currentClip.soloIgnoredBones)
+                {
+                    if (emoteSkeletonAnimator.GetBoneTransform(item))
+                        dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
+                }
+                foreach (var item in currentClip.rootIgnoredBones)
+                {
+                    if (emoteSkeletonAnimator.GetBoneTransform(item))
+                        dontAnimateUs.Add(emoteSkeletonAnimator.GetBoneTransform(item).name);
+                    foreach (var bone in emoteSkeletonAnimator.GetBoneTransform(item).GetComponentsInChildren<Transform>())
+                    {
+                        dontAnimateUs.Add(bone.name);
+                    }
+                }
+            }
+            if (!jank)
+            {
+                emoteSkeletonSMR.enabled = true;
+                foreach (var smr in basePlayerModelSMR)
+                {
+                    for (int i = 0; i < smr.bones.Length; i++)
+                    {
+                        try
+                        {
+                            if (smr.bones[i].gameObject.GetComponent<EmoteConstraint>() && !dontAnimateUs.Contains(smr.bones[i].name))
+                            {
+                                //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
+                                EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
+                                ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
+                                if (smr == basePlayerModelSMR.First())
+                                {
+                                    if (currentClip is not null)
+                                    {
+                                        ec.SetLocalTransforms(currentClip.localTransforms);
+                                    }
+                                }
+                            }
+                            else if (dontAnimateUs.Contains(smr.bones[i].name))
+                            {
+                                //DebugClass.Log($"dontanimateme-{i}---------{smr.bones[i].gameObject}");
+                                smr.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            DebugClass.Log($"{e}");
+                        }
+                    }
+                }
+                foreach (var item in itemHolderConstraints)
+                {
+                    item.ActivateConstraints();
+                }
+                foreach (var item in additionalConstraints)
+                {
+                    item.ActivateConstraints();
+                }
+                LockCameraStuff(local && ThirdPersonCheck());
+            }
+            else
+            {
+                //a1.enabled = false;
 
-            StartCoroutine(waitForTwoFramesThenDisableA1());
+                StartCoroutine(waitForTwoFramesThenDisableA1());
+            }
         }
-    }
     public bool isInThirdPerson = false;
     public int originalLayer = -1;
     public void LockCameraStuff(bool thirdPersonLock)
