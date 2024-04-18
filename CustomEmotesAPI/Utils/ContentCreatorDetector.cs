@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using EmotesAPI;
 using JetBrains.Annotations;
+using LethalEmotesApi.Ui;
 
 namespace LethalEmotesAPI.Utils;
 
@@ -41,8 +42,14 @@ internal static class ContentCreatorDetector
         // TODO: Verify xsplit process name.
         if (!processName.Contains("obs", StringComparison.InvariantCultureIgnoreCase) && !processName.Contains("xsplit", StringComparison.InvariantCultureIgnoreCase))
             return;
+
+        if (_processMonitor is null)
+            return;
         
+        _processMonitor.OnProcessCreated -= ProcessMonitorOnProcessCreated;
+        _processMonitor.Dispose();
         
+        EmoteUiManager.ShowDmcaPrompt();
     }
 
     private static bool OnWineOrProton()

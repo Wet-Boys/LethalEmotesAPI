@@ -11,8 +11,11 @@ public class EmoteUiPanel : MonoBehaviour
     public EmoteWheelsController? emoteWheelsController;
     public CustomizePanel? customizePanel;
     public RectTransform? customizeButton;
+    
+    public GameObject? dmcaPromptPrefab;
 
     private TextMeshProUGUI? _customizeButtonLabel;
+    private GameObject? _dmcaPromptInstance;
 
     public bool IsOpen { get; private set; }
     internal UiView CurrentView { get; private set; } = UiView.EmoteWheels;
@@ -61,6 +64,7 @@ public class EmoteUiPanel : MonoBehaviour
         HideCustomizePanel();
         HideCustomizeButton();
         HideEmoteWheels();
+        CloseDmcaPrompt();
         CurrentView = UiView.EmoteWheels;
 
         EmoteUiManager.UnlockMouseInput();
@@ -75,6 +79,7 @@ public class EmoteUiPanel : MonoBehaviour
         HideCustomizePanel();
         HideCustomizeButton();
         CloseEmoteWheelsGracefully();
+        CloseDmcaPrompt();
         CurrentView = UiView.EmoteWheels;
     }
 
@@ -172,6 +177,36 @@ public class EmoteUiPanel : MonoBehaviour
         _customizeButtonLabel.SetText(CurrentView == UiView.EmoteWheels ? "Customize" : "Close");
     }
 
+    public void ShowDmcaPrompt()
+    {
+        if (dmcaPromptPrefab is null)
+            return;
+
+        CloseGracefully();
+
+        if (_dmcaPromptInstance is not null && _dmcaPromptInstance)
+        {
+            DestroyImmediate(_dmcaPromptInstance);
+            _dmcaPromptInstance = null;
+        }
+
+        CurrentView = UiView.DmcaPrompt;
+        _dmcaPromptInstance = Instantiate(dmcaPromptPrefab, transform);
+        
+        EmoteUiManager.LockMouseInput();
+        EmoteUiManager.LockPlayerInput();
+        EmoteUiManager.DisableKeybinds();
+    }
+
+    private void CloseDmcaPrompt()
+    {
+        if (_dmcaPromptInstance is null)
+            return;
+        
+        DestroyImmediate(_dmcaPromptInstance);
+        _dmcaPromptInstance = null;
+    }
+
     private void OnDestroy()
     {
         EmoteUiManager.EmoteUiInstance = null;
@@ -180,6 +215,7 @@ public class EmoteUiPanel : MonoBehaviour
     internal enum UiView
     {
         EmoteWheels,
-        Customize
+        Customize,
+        DmcaPrompt
     }
 }

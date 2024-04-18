@@ -54,6 +54,7 @@ MonoBehaviour:
   emoteWheelsController: {fileID: 468824039466675697}
   customizePanel: {fileID: 5446061295276862818}
   customizeButton: {fileID: 2460874866318377685}
+  dmcaPromptPrefab: {fileID: 1739234260557582369, guid: d6705da0312b4f50594f924f2d96f1a1, type: 3}
 --- !u!1001 &1333587469679525469
 PrefabInstance:
   m_ObjectHideFlags: 0

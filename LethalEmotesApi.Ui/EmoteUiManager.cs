@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
@@ -10,6 +11,8 @@ public static class EmoteUiManager
 {
     private static IEmoteUiStateController? _stateController;
     internal static EmoteUiPanel? EmoteUiInstance;
+
+    private static bool _hasShownDmcaPrompt;
 
     private static EmoteWheelSetDisplayData? _emoteDisplayData;
     
@@ -55,6 +58,11 @@ public static class EmoteUiManager
     internal static void EnableKeybinds()
     {
         _stateController?.EnableKeybinds();
+    }
+    
+    internal static void DisableKeybinds()
+    {
+        _stateController?.DisableKeybinds();
     }
 
     internal static void PlayAnimationOn(Animator animator, string emoteKey)
@@ -234,8 +242,19 @@ public static class EmoteUiManager
 
     public static void ShowDmcaPrompt()
     {
-        if (EmoteUiInstance is null)
+        if (_stateController is null || _hasShownDmcaPrompt)
             return;
+        
+        ThreadPool.QueueUserWorkItem(_ =>
+        {
+            while (EmoteUiInstance is null)
+            {
+                Thread.Sleep(250);
+            }
+            
+            _hasShownDmcaPrompt = true;
+            _stateController.EnqueueWorkOnUnityThread(EmoteUiInstance.ShowDmcaPrompt);
+        });
     }
     
     public static float GetUIScale()
@@ -289,5 +308,11 @@ public static class EmoteUiManager
     {
         get => _stateController!.UseGlobalSettings;
         set => _stateController!.UseGlobalSettings = value;
+    }
+    
+    public static bool DontShowDmcaPrompt
+    {
+        get => _stateController!.DontShowDmcaPrompt;
+        set => _stateController!.DontShowDmcaPrompt = value;
     }
 }
