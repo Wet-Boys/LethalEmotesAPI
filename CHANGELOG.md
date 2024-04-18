@@ -1,3 +1,5 @@
+- Version 1.10.0: UI performanced significantly improved with large amounts of emotes, this will make the load time go from a few seconds to a few milliseconds when having more than a few emote mods installed. Added gamepad support, all bindings can be changed or removed if need be. Added toggles (default on) which allow BetterEmotes/TooManyEmotes to be populated into LethalEmotesAPI. These emotes are still tied to the configs of their respective mods (such as TooManyEmotes requiring emotes to be unlocked). But can be interacted with more fully, such as supporting the join button (default V). BetterEmotes emotes also supports the third person options in LethalEmotesAPI if used through LethalEmotesAPI methods.
+
 - Version 1.9.1: Fixed issue where emote packs using the legacy import system weren't working nicely with keybinds
 
 - Version 1.9.0: Added emote skeleton for the new snake boi

@@ -49,7 +49,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.9.1";
+        public const string VERSION = "1.10.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -427,7 +427,7 @@ namespace EmotesAPI
         }
         IEnumerator ReloadTMEAfterFrame(PlayerControllerB self)
         {
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(1);
             if (TMEPresent)
             {
                 TooManyEmotesCompat.ReloadTooManyEmotesVisibility();

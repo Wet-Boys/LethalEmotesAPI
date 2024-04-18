@@ -42,15 +42,19 @@ namespace LethalEmotesAPI.Patches.ModCompat
             {
                 return;
             }
-            if (CustomEmotesAPI.TMEPresent && !mapper.prevClipName.Contains("BetterEmotes__"))
+            if (mapper.prevClipName.Contains("TooManyEmotes__"))
             {
                 TooManyEmotesCompat.StopEmote(mapper);
+                CustomEmotesAPI.PlayAnimation(newAnimation, mapper);
             }
-            if (mapper.local)
+            else
             {
-                newAnimation = newAnimation.Split($"BetterEmotes__").Last();
-                InputAction.CallbackContext context = default(InputAction.CallbackContext);
-                mapper.StartCoroutine(PlayBetterEmote(context, newAnimation, mapper));
+                if (mapper.local)
+                {
+                    newAnimation = newAnimation.Split($"BetterEmotes__").Last();
+                    InputAction.CallbackContext context = default(InputAction.CallbackContext);
+                    mapper.StartCoroutine(PlayBetterEmote(context, newAnimation, mapper));
+                }
             }
         }
         internal static IEnumerator PlayBetterEmote(InputAction.CallbackContext context, string newAnimation, BoneMapper mapper)

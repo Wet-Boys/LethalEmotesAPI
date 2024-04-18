@@ -48,19 +48,25 @@ namespace LethalEmotesAPI.Patches.ModCompat
             {
                 return;
             }
-            newAnimation = newAnimation.Split($"TooManyEmotes__").Last();
-            //mapper.PlayAnim("none", -1);
-            foreach (var item in EmoteController.allEmoteControllers.Values)
+            if (mapper.prevClipName.Contains("BetterEmotes__"))
             {
-                if (item.IsPerformingCustomEmote() && item.performingEmote == EmotesManager.allUnlockableEmotesDict[newAnimation] && item.gameObject != mapper.mapperBody)
-                {
-                    mapper.mapperBody.GetComponent<EmoteControllerPlayer>().TrySyncingEmoteWithEmoteController(item);
-                    return;
-                }
+                CustomEmotesAPI.PlayAnimation(newAnimation, mapper);
             }
-            if (SessionManager.IsEmoteUnlocked(EmotesManager.allUnlockableEmotesDict[newAnimation]))
+            else
             {
-                mapper.mapperBody.GetComponent<EmoteController>().PerformEmote(EmotesManager.allUnlockableEmotesDict[newAnimation]);
+                newAnimation = newAnimation.Split($"TooManyEmotes__").Last();
+                foreach (var item in EmoteController.allEmoteControllers.Values)
+                {
+                    if (item.IsPerformingCustomEmote() && item.performingEmote == EmotesManager.allUnlockableEmotesDict[newAnimation] && item.gameObject != mapper.mapperBody)
+                    {
+                        mapper.mapperBody.GetComponent<EmoteControllerPlayer>().TrySyncingEmoteWithEmoteController(item);
+                        return;
+                    }
+                }
+                if (SessionManager.IsEmoteUnlocked(EmotesManager.allUnlockableEmotesDict[newAnimation]))
+                {
+                    mapper.mapperBody.GetComponent<EmoteController>().PerformEmote(EmotesManager.allUnlockableEmotesDict[newAnimation]);
+                }
             }
         }
         internal static void StopEmote(BoneMapper mapper)
@@ -73,21 +79,20 @@ namespace LethalEmotesAPI.Patches.ModCompat
             {
                 if (item.Value.emoteSyncGroup is not null)
                 {
-                    //Debug.Log($"========================  {item.Value.emoteSyncGroup.IndexOf(item.Value)}   {item.Key}");
                     if (item.Value.emoteSyncGroup.First() != item.Value)
                     {
-                        //Debug.Log($"{item.Value.emoteSyncGroup.First() != item.Value}");
                         continue;
                     }
                 }
-                //DebugClass.Log($"{BoneMapper.animClips[$"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}"].visibility}   {SessionManager.IsEmoteUnlocked(item.Value)}  {item.Value.emoteName}");
-                BoneMapper.animClips[$"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}"].visibility = SessionManager.IsEmoteUnlocked(item.Value);
+                bool needToUnlock = SessionManager.IsEmoteUnlocked(item.Value);
+                string emoteName = $"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}";
+                CustomEmotesAPI.randomClipList.Remove(emoteName);
+                if (needToUnlock && !BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
+                {
+                    CustomEmotesAPI.randomClipList.Add(emoteName);
+                }
+                BoneMapper.animClips[emoteName].visibility = needToUnlock;
             }
         }
-        //private static void UnlockEmoteLocal(Action<int, string> orig, int emote, string playerUsername)
-        //{
-        //    orig(emote, playerUsername);
-        //}
-        //private static Hook UnlockEmoteLocalHook;
     }
 }

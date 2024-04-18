@@ -61,7 +61,7 @@ public class EmoteNetworker : NetworkBehaviour
         BoneMapper map = bodyObject.GetComponentInChildren<BoneMapper>();
         if (map.playerController is not null && map.playerController.performingEmote)
         {
-            if (!animation.Contains("BetterEmotes__"))
+            if (!animation.Contains("BetterEmotes__") && !animation.Contains("TooManyEmotes__"))
             {
                 map.playerController.performingEmote = false;
                 if (map.playerController.IsOwner)
