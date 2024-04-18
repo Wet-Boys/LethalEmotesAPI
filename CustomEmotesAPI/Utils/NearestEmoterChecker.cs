@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace LethalEmotesAPI.Utils
 {
@@ -17,49 +18,41 @@ namespace LethalEmotesAPI.Utils
         IEnumerator CheckOnInterval(float interval)
         {
             yield return new WaitForSeconds(interval);
-            Debug.Log($"checking ============ {self.currentClipName}");
-            if (self.currentClipName == "none" && CustomEmotesAPI.currentEmoteText is not null)
+            if (CustomEmotesAPI.currentEmoteText is not null)
             {
-                Debug.Log($"checking ============");
-
-                float closestDistance = 30f;
-                BoneMapper nearestMapper = null;
-                foreach (var mapper in BoneMapper.allMappers)
+                if (self.currentClipName == "none")
                 {
-                    try
+                    float closestDistance = 30f;
+                    BoneMapper nearestMapper = null;
+                    foreach (var mapper in BoneMapper.allMappers)
                     {
-                        if (mapper != self)
+                        try
                         {
-                            float dist = Vector3.Distance(self.transform.position, mapper.transform.position);
-                            if (mapper.currentClip.allowJoining && dist < closestDistance)
+                            if (mapper != self)
                             {
-                                nearestMapper = mapper;
-                                closestDistance = dist;
+                                float dist = Vector3.Distance(self.transform.position, mapper.transform.position);
+                                if (mapper.currentClip is not null && mapper.currentClip.allowJoining && dist < closestDistance)
+                                {
+                                    nearestMapper = mapper;
+                                    closestDistance = dist;
+                                }
                             }
                         }
+                        catch (System.Exception)
+                        {
+                        }
                     }
-                    catch (System.Exception)
+                    if (nearestMapper is not null)
                     {
-                    }
-                }
-                if (nearestMapper is not null)
-                {
-                    string animationName;
-                    if (nearestMapper.currentClip.usesNewImportSystem)
-                    {
-                        animationName = nearestMapper.currentClip.joinEmote;
+                        string currentJoinButton = InputControlPath.ToHumanReadableString(
+    EmotesInputSettings.Instance.JoinEmote.bindings[0].effectivePath,
+    InputControlPath.HumanReadableStringOptions.OmitDevice);
+                        CustomEmotesAPI.currentEmoteText.text = $"{currentJoinButton} to join {nearestMapper.currentClip.displayName}";
                     }
                     else
                     {
-                        animationName = nearestMapper.currentClip.clip[0].name;
+                        CustomEmotesAPI.currentEmoteText.text = "";
                     }
-                    //CustomEmotesAPI.currentEmoteText.text = $"{} is playing {nearestMapper.currentClip.displayName} press {} to join";
-                    string name = nearestMapper.isEnemy ? nearestMapper.enemyController.enemyType.enemyName : nearestMapper.playerController.playerUsername;
-                    CustomEmotesAPI.currentEmoteText.text = $"Press V to join {name}";
-                }
-                else
-                {
-                    CustomEmotesAPI.currentEmoteText.text = "";
                 }
             }
             StartCoroutine(CheckOnInterval(1));
