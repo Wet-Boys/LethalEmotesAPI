@@ -973,6 +973,13 @@ namespace EmotesAPI
         public delegate void AnimationChanged(string newAnimation, BoneMapper mapper);
         public static event AnimationChanged animChanged;
         static int requestCounter = 0;
+        public static void ChangeInteractionTriggers(bool active)
+        {
+            foreach (var item in BoneMapper.allMappers)
+            {
+                item.personalTrigger.interactable = active && item.currentClip is not null;
+            }
+        }
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
             if (mapper is null)
@@ -1001,11 +1008,16 @@ namespace EmotesAPI
                 {
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
+                    ChangeInteractionTriggers(true);
                 }
-                else if (CustomEmotesAPI.hudObject is not null)
+                else
                 {
-                    requestCounter++;
-                    HealthbarAnimator.StartHealthbarAnimateRequest();
+                    if (CustomEmotesAPI.hudObject is not null)
+                    {
+                        requestCounter++;
+                        HealthbarAnimator.StartHealthbarAnimateRequest();
+                    }
+                    ChangeInteractionTriggers(false);
                 }
 
             }
@@ -1035,8 +1047,10 @@ namespace EmotesAPI
 
             if (newAnimation != "none")
             {
-
-                mapper.personalTrigger.interactable = true; // enable tooltip
+                if (localMapper.currentClip is null)
+                {
+                    mapper.personalTrigger.interactable = true; // enable tooltip
+                }
 
 
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
