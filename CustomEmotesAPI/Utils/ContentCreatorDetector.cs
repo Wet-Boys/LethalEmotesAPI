@@ -39,8 +39,7 @@ internal static class ContentCreatorDetector
 
     private static void ProcessMonitorOnProcessCreated(string processName)
     {
-        // TODO: Verify xsplit process name.
-        if (!processName.Contains("obs", StringComparison.InvariantCultureIgnoreCase) && !processName.Contains("xsplit", StringComparison.InvariantCultureIgnoreCase))
+        if (!processName.StartsWith("obs", StringComparison.InvariantCultureIgnoreCase) && !processName.Contains("xsplit", StringComparison.InvariantCultureIgnoreCase))
             return;
 
         if (_processMonitor is null)
