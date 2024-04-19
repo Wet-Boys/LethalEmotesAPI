@@ -9,6 +9,7 @@ public class UseGlobalSettings : LeUiToggle
 
     protected override void SetCurrentValue(bool value)
     {
+        EmoteUiManager.UseGlobalSettings = !value;
         EmoteUiManager.UseGlobalSettings = value;
         EmoteUiManager.RefreshBothLists();
         EmoteUiManager.EmoteUiInstance!.ReloadData();

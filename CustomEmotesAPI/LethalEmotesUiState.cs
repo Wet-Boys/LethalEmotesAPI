@@ -204,7 +204,7 @@ public class LethalEmotesUiState : IEmoteUiStateController
     
     public bool UseGlobalSettings
     {
-        get => Settings.useGlobalConfig.Value;
-        set => Settings.useGlobalConfig.Value = value;
+        get => Settings.modPackOverride.Value ? false : Settings.useGlobalConfig.Value;
+        set => Settings.useGlobalConfig.Value = Settings.modPackOverride.Value ? false : value;
     }
 }
