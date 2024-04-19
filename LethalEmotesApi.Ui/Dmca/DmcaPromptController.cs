@@ -6,6 +6,6 @@ public class DmcaPromptController : MonoBehaviour
 {
     public void Close()
     {
-        EmoteUiManager.EmoteUiInstance?.CloseGracefully();
+        EmoteUiManager.emoteUiInstance?.CloseGracefully();
     }
 }

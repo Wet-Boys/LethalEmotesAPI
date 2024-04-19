@@ -13,16 +13,19 @@ public class EmoteUiPanel : MonoBehaviour
     public RectTransform? customizeButton;
     
     public GameObject? dmcaPromptPrefab;
+    public GameObject? dmcaVerificationPromptPrefab;
 
     private TextMeshProUGUI? _customizeButtonLabel;
     private GameObject? _dmcaPromptInstance;
+    private GameObject? _dmcaVerificationPromptInstance;
 
     public bool IsOpen { get; private set; }
     internal UiView CurrentView { get; private set; } = UiView.EmoteWheels;
+    private UiView _prevView;
 
     private void Awake()
     {
-        EmoteUiManager.EmoteUiInstance = this;
+        EmoteUiManager.emoteUiInstance = this;
 
         if (customizeButton is null)
             return;
@@ -51,6 +54,8 @@ public class EmoteUiPanel : MonoBehaviour
     public void Show()
     {
         CurrentView = UiView.EmoteWheels;
+        _prevView = UiView.None;
+        
         UpdateCustomizeButton();
         ShowCustomizeButton();
         ShowEmoteWheels();
@@ -65,7 +70,10 @@ public class EmoteUiPanel : MonoBehaviour
         HideCustomizeButton();
         HideEmoteWheels();
         CloseDmcaPrompt();
+        CloseDmcaVerificationPrompt();
+        
         CurrentView = UiView.EmoteWheels;
+        _prevView = UiView.None;
 
         EmoteUiManager.UnlockMouseInput();
         EmoteUiManager.UnlockPlayerInput();
@@ -79,14 +87,33 @@ public class EmoteUiPanel : MonoBehaviour
         HideCustomizePanel();
         HideCustomizeButton();
         CloseEmoteWheelsGracefully();
+        CloseDmcaVerificationPrompt();
+
+        if (_prevView == UiView.DmcaPrompt)
+        {
+            CurrentView = _prevView;
+            _prevView = UiView.None;
+            
+            EmoteUiManager.LockMouseInput();
+            EmoteUiManager.LockPlayerInput();
+            EmoteUiManager.DisableKeybinds();
+            
+            return;
+        }
+        
         CloseDmcaPrompt();
+        
         CurrentView = UiView.EmoteWheels;
+        _prevView = UiView.None;
+        
+        IsOpen = false;
     }
 
     public void ToggleCustomizePanel()
     {
         if (emoteWheelsController is null)
             return;
+        
         if (CurrentView == UiView.EmoteWheels)
         {
             EmoteUiManager.GetStateController()?.RefreshTME();
@@ -196,6 +223,8 @@ public class EmoteUiPanel : MonoBehaviour
         EmoteUiManager.LockMouseInput();
         EmoteUiManager.LockPlayerInput();
         EmoteUiManager.DisableKeybinds();
+        
+        IsOpen = true;
     }
 
     private void CloseDmcaPrompt()
@@ -207,15 +236,58 @@ public class EmoteUiPanel : MonoBehaviour
         _dmcaPromptInstance = null;
     }
 
+    public void ShowDmcaVerificationPrompt()
+    {
+        if (dmcaVerificationPromptPrefab is null)
+            return;
+
+        if (CurrentView == UiView.DmcaPrompt)
+            _prevView = UiView.DmcaPrompt;
+        else
+            CloseGracefully();
+
+        if (_dmcaVerificationPromptInstance is not null && _dmcaVerificationPromptInstance)
+        {
+            DestroyImmediate(_dmcaVerificationPromptInstance);
+            _dmcaVerificationPromptInstance = null;
+        }
+
+        CurrentView = UiView.DmcaVerificationPrompt;
+        _dmcaVerificationPromptInstance = Instantiate(dmcaVerificationPromptPrefab, transform);
+        
+        EmoteUiManager.LockMouseInput();
+        EmoteUiManager.LockPlayerInput();
+        EmoteUiManager.DisableKeybinds();
+
+        IsOpen = true;
+    }
+
+    public void CloseDmcaVerificationPrompt()
+    {
+        if (_dmcaVerificationPromptInstance is null)
+            return;
+        
+        DestroyImmediate(_dmcaVerificationPromptInstance);
+        _dmcaVerificationPromptInstance = null;
+
+        if (_prevView != UiView.None)
+        {
+            CurrentView = _prevView;
+            _prevView = UiView.None;
+        }
+    }
+
     private void OnDestroy()
     {
-        EmoteUiManager.EmoteUiInstance = null;
+        EmoteUiManager.emoteUiInstance = null;
     }
 
     internal enum UiView
     {
+        None,
         EmoteWheels,
         Customize,
-        DmcaPrompt
+        DmcaPrompt,
+        DmcaVerificationPrompt
     }
 }

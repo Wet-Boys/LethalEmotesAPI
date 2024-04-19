@@ -46,7 +46,7 @@ internal static class PatchUtils
 
     private static bool EmoteWheelsOpen()
     {
-        return EmoteUiManager.IsEmoteWheelsOpen() || EmoteUiManager.IsCustomizePanelOpen();
+        return EmoteUiManager.IsEmoteUiOpen();
     }
 
     /// <summary>

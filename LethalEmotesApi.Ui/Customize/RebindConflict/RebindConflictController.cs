@@ -54,7 +54,7 @@ public class RebindConflictController : MonoBehaviour
         
         EmoteUiManager.SaveKeybinds();
         
-        EmoteUiManager.EmoteUiInstance!.customizePanel!.gameObject.BroadcastMessage("UpdateStateBroadcast");
+        EmoteUiManager.emoteUiInstance!.customizePanel!.gameObject.BroadcastMessage("UpdateStateBroadcast");
         
         Hide();
     }
@@ -69,7 +69,7 @@ public class RebindConflictController : MonoBehaviour
         EmoteUiManager.LoadKeybinds();
         EmoteUiManager.SaveKeybinds();
         
-        EmoteUiManager.EmoteUiInstance!.customizePanel!.gameObject.BroadcastMessage("UpdateStateBroadcast");
+        EmoteUiManager.emoteUiInstance!.customizePanel!.gameObject.BroadcastMessage("UpdateStateBroadcast");
         
         Hide();
     }

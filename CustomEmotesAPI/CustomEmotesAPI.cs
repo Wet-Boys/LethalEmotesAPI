@@ -50,13 +50,16 @@ namespace EmotesAPI
         public const string PluginName = "Custom Emotes API";
 
         public const string VERSION = "1.10.0";
+        
         public struct NameTokenWithSprite
         {
             public string nameToken;
             public Sprite sprite;
 
         }
+        
         public static List<NameTokenWithSprite> nameTokenSpritePairs = new List<NameTokenWithSprite>();
+        
         public static bool CreateNameTokenSpritePair(string nameToken, Sprite sprite)
         {
             NameTokenWithSprite temp = new NameTokenWithSprite();
@@ -69,10 +72,12 @@ namespace EmotesAPI
             nameTokenSpritePairs.Add(temp);
             return true;
         }
+        
         void CreateBaseNameTokenPairs()
         {
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
+        
         public static List<string> randomClipList = new List<string>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;

@@ -203,6 +203,8 @@ namespace Editor
             
             public string GetModName(string emoteKey) => _emoteMods[emoteKey];
 
+            public string GetModNameFromModGuid(string modGuid) => modGuid;
+
             public bool GetEmoteVisibility(string emoteKey) => true;
 
             private string[] _emoteKeys = Array.Empty<string>();
@@ -227,6 +229,8 @@ namespace Editor
             public IReadOnlyCollection<string> EmoteModNames => _emoteMods.Select(kvp => kvp.Value)
                 .Distinct()
                 .ToArray();
+
+            public IReadOnlyCollection<string> EmoteModGuids => EmoteModNames;
 
             public void GenerateData(int emoteModsToGen, int emotesPerMod)
             {

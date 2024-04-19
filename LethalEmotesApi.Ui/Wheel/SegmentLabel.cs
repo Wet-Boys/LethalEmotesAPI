@@ -42,7 +42,7 @@ public class SegmentLabel : UIBehaviour
     {
         base.OnEnable();
 
-        if (targetLabel is null || missingLabel is null)
+        if (targetLabel is null || missingLabel is null || lockedLabel is null)
             return;
 
         tracker.Add(this, targetLabel, DrivenTransformProperties.Rotation);
