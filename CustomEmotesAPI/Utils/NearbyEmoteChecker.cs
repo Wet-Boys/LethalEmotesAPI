@@ -24,7 +24,7 @@ namespace LethalEmotesAPI.Utils
                     float dist = Vector3.Distance(item.transform.position, CustomEmotesAPI.localMapper.transform.position);
                     if (dist <= maxDistance)
                     {
-                        nearbyEmotes.Add(new NearbyEmote(dist, item.playerController.playerUsername, item.currentClip.customInternalName));
+                        nearbyEmotes.Add(new NearbyEmote(dist, item.playerController.playerUsername, item.currentClip.joinEmote));
                     }
                 }
             }
