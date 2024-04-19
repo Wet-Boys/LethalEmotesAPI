@@ -18,7 +18,7 @@ public class DmcaVerificationPromptLabel : MonoBehaviour
 
         var data = verificationStatusDb.GetVerificationData(EmoteUiManager.EmoteDb.EmoteModGuids.ToArray());
 
-        if (data.Any(item => item.Status != DmcaVerificationStatus.Verified))
+        if (data.Any(item => !item.Status.IsVerified()))
         {
             SetNonCompliant(data);
         }
@@ -41,9 +41,9 @@ public class DmcaVerificationPromptLabel : MonoBehaviour
         if (label is null)
             return;
 
-        var failing = data.Count(item => item.Status != DmcaVerificationStatus.Verified);
+        var failing = data.Count(item => !item.Status.IsVerified());
         
-        label.SetText($"{failing} out of {data.Length} installed emote packs are not verified to comply with the DMCA options provided by LethalEmotesAPI");
+        label.SetText($"{failing} installed emote packs have not yet been verified to comply with the DMCA options provided by LethalEmotesAPI");
     }
 
     public void ShowVerificationDetails()

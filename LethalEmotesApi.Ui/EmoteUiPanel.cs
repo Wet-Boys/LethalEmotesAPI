@@ -262,19 +262,13 @@ public class EmoteUiPanel : MonoBehaviour
         IsOpen = true;
     }
 
-    public void CloseDmcaVerificationPrompt()
+    private void CloseDmcaVerificationPrompt()
     {
         if (_dmcaVerificationPromptInstance is null)
             return;
         
         DestroyImmediate(_dmcaVerificationPromptInstance);
         _dmcaVerificationPromptInstance = null;
-
-        if (_prevView != UiView.None)
-        {
-            CurrentView = _prevView;
-            _prevView = UiView.None;
-        }
     }
 
     private void OnDestroy()

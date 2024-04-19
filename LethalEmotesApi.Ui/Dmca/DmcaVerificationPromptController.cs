@@ -6,6 +6,6 @@ public class DmcaVerificationPromptController : MonoBehaviour
 {
     public void Close()
     {
-        EmoteUiManager.emoteUiInstance?.CloseDmcaVerificationPrompt();
+        EmoteUiManager.emoteUiInstance?.CloseGracefully();
     }
 }
