@@ -19,7 +19,7 @@ namespace LethalEmotesAPI.Utils
             List<NearbyEmote> nearbyEmotes = new List<NearbyEmote>();
             foreach (var item in BoneMapper.allMappers)
             {
-                if (!item.local && item.currentClip is not null)
+                if (!item.local && item.currentClip is not null && item.currentClip.allowJoining)
                 {
                     float dist = Vector3.Distance(item.transform.position, CustomEmotesAPI.localMapper.transform.position);
                     if (dist <= maxDistance)
