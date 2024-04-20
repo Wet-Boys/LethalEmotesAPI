@@ -15,8 +15,6 @@ public class EmoteList : RecycleListView<EmoteListItem, string>
     private CustomizePanel? _customizePanel;
     private SearchableEmoteArray? _searchableEmoteArray;
 
-    private bool _firstUpdate;
-
     protected override IList<string> ListData => _searchableEmoteArray!.ToArray();
 
     protected override void Awake()
@@ -39,13 +37,9 @@ public class EmoteList : RecycleListView<EmoteListItem, string>
         base.Start();
     }
 
-    private void Update()
+    protected override void Update()
     {
-        if (!_firstUpdate)
-        {
-            UpdateState();
-            _firstUpdate = true;
-        }
+        base.Update();
         
         if (searchInputField is not null && searchInputField.isFocused)
             EmoteKeybindButton.CancelExistingRebind();
