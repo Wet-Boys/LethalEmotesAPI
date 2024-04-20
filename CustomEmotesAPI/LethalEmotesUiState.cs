@@ -1,14 +1,14 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using EmotesAPI;
 using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
-using LethalEmotesApi.Ui;
 using UnityEngine.InputSystem;
 using LethalEmotesAPI.Patches.ModCompat;
+using Object = UnityEngine.Object;
 
 namespace LethalEmotesAPI;
 
@@ -118,6 +118,10 @@ public class LethalEmotesUiState : IEmoteUiStateController
     public void DisableKeybinds() => Keybinds.DisableKeybinds();
     
     public string[] GetEmoteKeysForBindPath(string bindPath) => Keybinds.GetEmoteKeysForBindPath(bindPath);
+    
+    public T LoadAsset<T>(string assetName) where T : Object => Assets.Load<T>(assetName);
+
+    public void EnqueueWorkOnUnityThread(Action action) => UnityThreadScheduler.EnqueueWorkOnUnityThread(action);
 
     internal static void FixLegacyEmotes()
     {
@@ -204,7 +208,13 @@ public class LethalEmotesUiState : IEmoteUiStateController
     
     public bool UseGlobalSettings
     {
-        get => Settings.useGlobalConfig.Value;
-        set => Settings.useGlobalConfig.Value = value;
+        get => Settings.modPackOverride.Value ? false : Settings.useGlobalConfig.Value;
+        set => Settings.useGlobalConfig.Value = Settings.modPackOverride.Value ? false : value;
+    }
+
+    public bool DontShowDmcaPrompt
+    {
+        get => Settings.dontShowDmcaPrompt.Value;
+        set => Settings.dontShowDmcaPrompt.Value = value;
     }
 }

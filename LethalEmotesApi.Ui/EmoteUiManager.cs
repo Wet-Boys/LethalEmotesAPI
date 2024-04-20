@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
@@ -8,8 +9,10 @@ namespace LethalEmotesApi.Ui;
 
 public static class EmoteUiManager
 {
-    internal static IEmoteUiStateController? _stateController;
-    internal static EmoteUiPanel? EmoteUiInstance;
+    private static IEmoteUiStateController? _stateController;
+    internal static EmoteUiPanel? emoteUiInstance;
+
+    private static bool _hasShownDmcaPrompt;
 
     private static EmoteWheelSetDisplayData? _emoteDisplayData;
     
@@ -55,6 +58,11 @@ public static class EmoteUiManager
     internal static void EnableKeybinds()
     {
         _stateController?.EnableKeybinds();
+    }
+    
+    internal static void DisableKeybinds()
+    {
+        _stateController?.DisableKeybinds();
     }
 
     internal static void PlayAnimationOn(Animator animator, string emoteKey)
@@ -136,21 +144,23 @@ public static class EmoteUiManager
         _emoteDisplayData = _emoteDisplayData!.LoadFromWheelSetData(dataToSave);
         _stateController.SaveEmoteWheelSetDisplayData(_emoteDisplayData);
 
-        if (EmoteUiInstance is null)
+        if (emoteUiInstance is null)
             return;
         
-        EmoteUiInstance.ReloadData();
+        emoteUiInstance.ReloadData();
     }
     
     internal static void SaveKeybinds() => _stateController?.SaveKeybinds();
     
     internal static void LoadKeybinds() => _stateController?.LoadKeybinds();
 
-    public static bool IsEmoteWheelsOpen() => EmoteUiInstance is
+    public static bool IsEmoteWheelsOpen() => emoteUiInstance is
         { IsOpen: true, CurrentView: EmoteUiPanel.UiView.EmoteWheels };
 
-    public static bool IsCustomizePanelOpen() => EmoteUiInstance is
+    public static bool IsCustomizePanelOpen() => emoteUiInstance is
         { IsOpen: true, CurrentView: EmoteUiPanel.UiView.Customize };
+
+    public static bool IsEmoteUiOpen() => emoteUiInstance is { IsOpen: true };
 
     public static bool CanOpenEmoteWheels()
     {
@@ -162,85 +172,102 @@ public static class EmoteUiManager
 
     public static void OnLeftWheel()
     {
-        if (EmoteUiInstance is null || EmoteUiInstance.emoteWheelsController is null)
+        if (emoteUiInstance is null || emoteUiInstance.emoteWheelsController is null)
             return;
 
         if (!IsEmoteWheelsOpen())
             return;
         
-        EmoteUiInstance.emoteWheelsController.PrevWheel();
+        emoteUiInstance.emoteWheelsController.PrevWheel();
     }
 
     public static void OnRightWheel()
     {
-        if (EmoteUiInstance is null || EmoteUiInstance.emoteWheelsController is null)
+        if (emoteUiInstance is null || emoteUiInstance.emoteWheelsController is null)
             return;
         
         if (!IsEmoteWheelsOpen())
             return;
         
-        EmoteUiInstance.emoteWheelsController.NextWheel();
+        emoteUiInstance.emoteWheelsController.NextWheel();
     }
 
     public static void OpenEmoteWheels()
     {
-        if (EmoteUiInstance is null)
+        if (emoteUiInstance is null)
             return;
 
         if (!CanOpenEmoteWheels())
             return;
         
-        EmoteUiInstance.Show();
+        emoteUiInstance.Show();
         _stateController?.DisableKeybinds();
     }
 
     public static void CloseEmoteWheels()
     {
-        if (EmoteUiInstance is null)
+        if (emoteUiInstance is null)
             return;
 
         if (!IsEmoteWheelsOpen())
             return;
         
-        EmoteUiInstance.Hide();
+        emoteUiInstance.Hide();
         _stateController?.EnableKeybinds();
     }
 
     public static void CloseCustomizationPanel()
     {
-        if (EmoteUiInstance is null)
+        if (emoteUiInstance is null)
             return;
 
         if (!IsCustomizePanelOpen())
             return;
         
-        EmoteUiInstance.Hide();
+        emoteUiInstance.Hide();
         _stateController?.EnableKeybinds();
     }
 
     public static void CloseUiGracefully()
     {
-        CloseCustomizationPanel();
+        // CloseCustomizationPanel();
 
-        if (EmoteUiInstance is null)
+        if (emoteUiInstance is null)
             return;
 
-        if (!IsEmoteWheelsOpen())
+        // if (!IsEmoteWheelsOpen())
+        //     return;
+        
+        emoteUiInstance.CloseGracefully();
+        _stateController?.EnableKeybinds();
+    }
+
+    public static void ShowDmcaPrompt()
+    {
+        if (_stateController is null || _hasShownDmcaPrompt)
             return;
         
-        EmoteUiInstance.CloseGracefully();
-        _stateController?.EnableKeybinds();
+        ThreadPool.QueueUserWorkItem(_ =>
+        {
+            while (emoteUiInstance is null)
+            {
+                Thread.Sleep(250);
+            }
+            
+            _hasShownDmcaPrompt = true;
+            _stateController.EnqueueWorkOnUnityThread(emoteUiInstance.ShowDmcaPrompt);
+        });
     }
     
     public static float GetUIScale()
     {
-        if (EmoteUiInstance is null)
+        if (emoteUiInstance is null)
         {
             Debug.LogWarning("EmoteUiInstance is null!");
             return 0f;
         }
         
-        return EmoteUiInstance.transform.parent.GetComponent<Canvas>().scaleFactor;
+        return emoteUiInstance.transform.parent.GetComponent<Canvas>().scaleFactor;
     }
 
     public static float EmoteVolume
@@ -283,5 +310,11 @@ public static class EmoteUiManager
     {
         get => _stateController!.UseGlobalSettings;
         set => _stateController!.UseGlobalSettings = value;
+    }
+    
+    public static bool DontShowDmcaPrompt
+    {
+        get => _stateController!.DontShowDmcaPrompt;
+        set => _stateController!.DontShowDmcaPrompt = value;
     }
 }

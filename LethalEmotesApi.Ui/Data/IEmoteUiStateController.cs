@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LethalEmotesApi.Ui.Db;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 namespace LethalEmotesApi.Ui.Data;
 
@@ -47,6 +49,10 @@ public interface IEmoteUiStateController
 
     public string[] GetEmoteKeysForBindPath(string bindPath);
 
+    public T LoadAsset<T>(string assetName) where T : Object;
+
+    public void EnqueueWorkOnUnityThread(Action action);
+
     #region Loading Config Data
 
     public EmoteWheelSetData LoadEmoteWheelSetData();
@@ -76,6 +82,7 @@ public interface IEmoteUiStateController
     public int DmcaFree { get; set; }
     public int ThirdPerson { get; set; }
     public bool UseGlobalSettings { get; set; }
+    public bool DontShowDmcaPrompt { get; set; }
 
     #endregion
 }

@@ -11,6 +11,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 namespace Editor
 {
@@ -139,7 +140,12 @@ namespace Editor
             public void DisableKeybinds() { }
 
             public string[] GetEmoteKeysForBindPath(string bindPath) => Array.Empty<string>();
-            
+            public T LoadAsset<T>(string assetName) where T : Object => null;
+            public void EnqueueWorkOnUnityThread(Action action)
+            {
+                Debug.Log("No Thread Scheduler in UnityEditor!");
+            }
+
             public void LoadKeybinds() { }
 
             public void RefreshTME() { }
@@ -184,6 +190,7 @@ namespace Editor
             public int DmcaFree { get; set; }
             public int ThirdPerson { get; set; }
             public bool UseGlobalSettings { get; set; }
+            public bool DontShowDmcaPrompt { get; set; }
         }
         
         private class StubbedEmoteDb : IEmoteDb
@@ -195,6 +202,8 @@ namespace Editor
             private Dictionary<string, string> _emoteMods = new();
             
             public string GetModName(string emoteKey) => _emoteMods[emoteKey];
+
+            public string GetModNameFromModGuid(string modGuid) => modGuid;
 
             public bool GetEmoteVisibility(string emoteKey) => true;
 
@@ -220,6 +229,8 @@ namespace Editor
             public IReadOnlyCollection<string> EmoteModNames => _emoteMods.Select(kvp => kvp.Value)
                 .Distinct()
                 .ToArray();
+
+            public IReadOnlyCollection<string> EmoteModGuids => EmoteModNames;
 
             public void GenerateData(int emoteModsToGen, int emotesPerMod)
             {
