@@ -7,6 +7,7 @@ namespace LethalEmotesAPI.Utils;
 
 public class RecentEmote
 {
+    public const float RECENT_EMOTE_DISTANCE = 30;
     private static readonly Dictionary<string, RecentEmote> EmoteKeysToNearbyEmote = new();
     
     public float Distance; //idk if we actually need distance...
@@ -61,13 +62,13 @@ public class RecentEmote
         return EmoteKeysToNearbyEmote[emoteKey];
     }
         
-    public static RecentEmote[] GetCurrentlyPlayingEmotes(float radius)
+    public static RecentEmote[] GetCurrentlyPlayingEmotes()
     {
         List<List<string>> playerList = new List<List<string>>();
         List<string> emoteList = new List<string>();
         foreach (var item in BoneMapper.allMappers)
         {
-            if (!item.local && item.currentClip is not null && Vector3.Distance(item.transform.position, CustomEmotesAPI.localMapper.transform.position) <= radius)
+            if (!item.local && item.currentClip is not null && Vector3.Distance(item.transform.position, CustomEmotesAPI.localMapper.transform.position) <= RECENT_EMOTE_DISTANCE)
             {
                 if (emoteList.Contains(item.currentClip.customInternalName))
                 {
