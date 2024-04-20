@@ -63,7 +63,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
                         return;
                     }
                 }
-                if (SessionManager.IsEmoteUnlocked(EmotesManager.allUnlockableEmotesDict[newAnimation]))
+                if (SessionManager.IsEmoteUnlocked(EmotesManager.allUnlockableEmotesDict[newAnimation].emoteName))
                 {
                     mapper.mapperBody.GetComponent<EmoteController>().PerformEmote(EmotesManager.allUnlockableEmotesDict[newAnimation]);
                 }
@@ -84,7 +84,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
                         continue;
                     }
                 }
-                bool needToUnlock = SessionManager.IsEmoteUnlocked(item.Value);
+                bool needToUnlock = SessionManager.IsEmoteUnlocked(item.Value.emoteName);
                 string emoteName = $"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}";
                 CustomEmotesAPI.randomClipList.Remove(emoteName);
                 if (needToUnlock && !BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
