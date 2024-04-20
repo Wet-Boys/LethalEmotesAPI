@@ -91,6 +91,7 @@ public class BoneMapper : MonoBehaviour
     internal bool canEmote = false;
     public bool isValidPlayer = false;
     internal bool canStop = true;
+    public string userName = string.Empty;
     public static string GetRealAnimationName(string animationName)
     {
         if (customNamePairs.ContainsKey(animationName))
@@ -561,6 +562,11 @@ public class BoneMapper : MonoBehaviour
         if (playerController is null)
         {
             enemyController = mapperBody.GetComponent<EnemyAI>();
+            userName = enemyController.enemyType.enemyName;
+        }
+        else
+        {
+            userName = playerController.playerUsername;
         }
         isValidPlayer = playerController is not null;
         playersToMappers.Add(mapperBody, this);
@@ -1342,12 +1348,12 @@ public class BoneMapper : MonoBehaviour
     public void TurnOnThirdPerson()
     {
         playerController.localVisor.gameObject.SetActive(false);
-        if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
-        {
-            needToTurnOffShadows = false;
-        }
-        playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-        playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        //if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
+        //{
+        //    needToTurnOffShadows = false;
+        //}
+        //playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        //playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
         if (originalLayer == -1)
         {
             originalLayer = playerController.thisPlayerModel.gameObject.layer;
@@ -1384,12 +1390,12 @@ public class BoneMapper : MonoBehaviour
         if (isInThirdPerson)
         {
             playerController.gameplayCamera.cullingMask = originalCullingMask;
-            if (needToTurnOffShadows)
-            {
-                playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            }
+            //if (needToTurnOffShadows)
+            //{
+            //    playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            //}
             needToTurnOffShadows = true;
-            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            //playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             playerController.localVisor.gameObject.SetActive(true);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;

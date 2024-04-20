@@ -1042,6 +1042,11 @@ namespace EmotesAPI
                 mapper.positionBeforeRootMotion = mapper.mapperBody.transform.position;
                 mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
                 mapper.justSwitched = true;
+                float dist = Vector3.Distance(mapper.transform.position, localMapper.transform.position);
+                if (dist < 30)
+                {
+                    RecentEmote.PlayerPerformedEmote(dist, BoneMapper.animClips[newAnimation].joinEmote, mapper.userName);
+                }
             }
             else
             {
