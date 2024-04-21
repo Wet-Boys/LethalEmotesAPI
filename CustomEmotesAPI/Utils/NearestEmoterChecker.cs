@@ -18,7 +18,7 @@ namespace LethalEmotesAPI.Utils
         IEnumerator CheckOnInterval(float interval)
         {
             yield return new WaitForSeconds(interval);
-            if (CustomEmotesAPI.currentEmoteText is not null)
+            if ((Settings.joinEmoteTutorial.Value || Settings.NearestEmoteText.Value) && CustomEmotesAPI.currentEmoteText is not null)
             {
                 if (self.currentClipName == "none")
                 {
@@ -55,7 +55,7 @@ namespace LethalEmotesAPI.Utils
                     }
                 }
             }
-            StartCoroutine(CheckOnInterval(1));
+            StartCoroutine(CheckOnInterval(interval));
         }
     }
 }
