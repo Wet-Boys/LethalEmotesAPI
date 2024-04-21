@@ -577,11 +577,11 @@ PrefabInstance:
     - target: {fileID: 940000968673150989, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: emoteListItem
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5775056037810604251}
     - target: {fileID: 1014916895743875934, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: emoteListItem
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5775056037810604251}
     - target: {fileID: 2399238976494168639, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: m_Padding.m_Top
       value: 2
@@ -645,7 +645,7 @@ PrefabInstance:
     - target: {fileID: 6185842101870194900, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: emoteListItem
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5775056037810604251}
     - target: {fileID: 7175857151734016797, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: m_fontSize
       value: 10.05

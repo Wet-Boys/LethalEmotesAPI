@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 
 namespace LethalEmotesApi.Ui.Customize.List;
@@ -13,12 +14,18 @@ public class EmoteHistoryListItem : EmoteListItem
             return;
 
         if (playerNames.Length <= 0)
+        {
+            mostRecentPlayerLabel.text = "";
             return;
+        }
 
-        mostRecentPlayerLabel.text = playerNames[0];
+        mostRecentPlayerLabel.text = playerNames.Last();
 
         if (playerNames.Length <= 1)
+        {
+            excessPlayersLabel.text = "";
             return;
+        }
 
         excessPlayersLabel.text = $"+{playerNames.Length - 1}";
     }

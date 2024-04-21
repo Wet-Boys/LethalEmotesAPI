@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EmotesAPI;
+using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.EmoteHistory;
 using UnityEngine;
 
@@ -11,8 +13,10 @@ public class EmoteHistoryManager : IEmoteHistoryManager
     public const float RecentEmoteDistance = 30;
     public const int MaxEmoteHistory = 50;
     
-    /// Used for History tracking of emotes, may contain duplicates.
-    private readonly Dictionary<string, RecentEmote> _emoteKeyToHistoryOfRecentEmotes = new();
+    /// LUT of most recent emotes by emote key, no duplicates.
+    private readonly Dictionary<string, RecentEmote> _emoteKeyToRecentEmotes = new();
+
+    private readonly Dictionary<RecentEmote, long> _emoteHistory = new();
     
     // Keep track of last played emote per player, so we may determine if we need to create a new RecentEmote or not.
     private readonly Dictionary<string, string> _playerLastPlayedEmote = new();
@@ -25,8 +29,12 @@ public class EmoteHistoryManager : IEmoteHistoryManager
     
     public void PlayerPerformedEmote(float dist, string emoteKey, string playerName) // gets fired whenever a BoneMapper calls an emote
     {
+        // Make sure the emote key that was passed in is valid.
+        if (!LethalEmotesUiState.Instance.EmoteDb.GetEmoteVisibility(emoteKey))
+            return;
+        
         var shouldKeepGroup = false;
-        if (_emoteKeyToHistoryOfRecentEmotes.TryGetValue(emoteKey, out var recentEmote))
+        if (_emoteKeyToRecentEmotes.TryGetValue(emoteKey, out var recentEmote))
         {
             // Check to make sure all players last played emote still match the emote in this grouping
             shouldKeepGroup = recentEmote.PlayerNames.All(player =>
@@ -38,30 +46,46 @@ public class EmoteHistoryManager : IEmoteHistoryManager
             });
         }
         
+        _emoteKeyToRecentEmotes.Remove(emoteKey);
+        if (recentEmote is not null)
+            _emoteHistory.Remove(recentEmote);
+        
         if (shouldKeepGroup)
         {
             recentEmote.AddPlayer(playerName);
-
-            _emoteKeyToHistoryOfRecentEmotes.Remove(emoteKey);
-            _emoteKeyToHistoryOfRecentEmotes.Add(emoteKey, recentEmote); // increase player count and re-add item to back of list (just read it backwards)
+            
+            _emoteKeyToRecentEmotes.Add(emoteKey, recentEmote); // increase player count and re-add item to back of list (just read it backwards)
+            _emoteHistory[recentEmote] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
         else
         {
-            _emoteKeyToHistoryOfRecentEmotes.Add(emoteKey, new RecentEmote(dist, emoteKey, playerName));
+            var newRecentEmoteEntry = new RecentEmote(emoteKey, playerName);
+            
+            _emoteKeyToRecentEmotes.Add(emoteKey, newRecentEmoteEntry);
+            _emoteHistory[newRecentEmoteEntry] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
         
-        while (_emoteKeyToHistoryOfRecentEmotes.Count > MaxEmoteHistory)
-            _emoteKeyToHistoryOfRecentEmotes.Remove(_emoteKeyToHistoryOfRecentEmotes.First().Key);
+        while (_emoteKeyToRecentEmotes.Count > MaxEmoteHistory)
+            _emoteKeyToRecentEmotes.Remove(_emoteKeyToRecentEmotes.First().Key);
+
+        var emotesToObliterateFromTime = _emoteHistory
+            .OrderByDescending(kvp => kvp.Value)
+            .Skip(50)
+            .Select(kvp => kvp.Key)
+            .ToArray();
+
+        foreach (var emote in emotesToObliterateFromTime)
+            _emoteHistory.Remove(emote);
         
         _playerLastPlayedEmote[playerName] = emoteKey;
         _staleCache = true;
         
-        PlayerEmoted(_emoteKeyToHistoryOfRecentEmotes.Last().Value);
+        PlayerEmoted(_emoteKeyToRecentEmotes.Last().Value);
     }
     
     public RecentEmote GetRecentEmote(string emoteKey)// idk if this is needed tbh
     {
-        return _emoteKeyToHistoryOfRecentEmotes[emoteKey];
+        return _emoteKeyToRecentEmotes[emoteKey];
     }
     
     public RecentEmote[] GetCurrentlyPlayingEmotes()
@@ -87,7 +111,7 @@ public class EmoteHistoryManager : IEmoteHistoryManager
         List<RecentEmote> list = [];
         for (int i = 0; i < emoteList.Count; i++)
         {
-            list.Add(new RecentEmote(0, emoteList[i], playerList[i]));
+            list.Add(new RecentEmote(emoteList[i], playerList[i]));
         }
         
         return list.ToArray();
@@ -97,8 +121,9 @@ public class EmoteHistoryManager : IEmoteHistoryManager
     {
         if (_staleCache)
         {
-            _cachedRecentEmoteHistory = _emoteKeyToHistoryOfRecentEmotes.Values
-                .Reverse()
+            _cachedRecentEmoteHistory = _emoteHistory
+                .OrderByDescending(kvp => kvp.Value)
+                .Select(kvp => kvp.Key)
                 .ToArray();
 
             _staleCache = false;

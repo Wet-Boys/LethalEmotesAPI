@@ -1349,11 +1349,11 @@ public class BoneMapper : MonoBehaviour
     public void TurnOnThirdPerson()
     {
         playerController.localVisor.gameObject.SetActive(false);
-        //if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
-        //{
-        //    needToTurnOffShadows = false;
-        //}
-        //playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
+        {
+            needToTurnOffShadows = false;
+        }
+        playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
         //playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
         if (originalLayer == -1)
         {
@@ -1391,10 +1391,10 @@ public class BoneMapper : MonoBehaviour
         if (isInThirdPerson)
         {
             playerController.gameplayCamera.cullingMask = originalCullingMask;
-            //if (needToTurnOffShadows)
-            //{
-            //    playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            //}
+            if (needToTurnOffShadows)
+            {
+                playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            }
             needToTurnOffShadows = true;
             //playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             playerController.localVisor.gameObject.SetActive(true);

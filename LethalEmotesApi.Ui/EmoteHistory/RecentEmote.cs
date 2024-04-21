@@ -1,23 +1,22 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LethalEmotesApi.Ui.EmoteHistory;
 
-public class RecentEmote
+public class RecentEmote : IEquatable<RecentEmote>
 {
-    public float Distance; // idk if we actually need distance...
     public readonly string EmoteKey;
     public readonly List<string> PlayerNames;
     
-    public RecentEmote(float distance, string emoteKey, string playerName)
+    public RecentEmote(string emoteKey, string playerName)
     {
-        Distance = distance;
         EmoteKey = emoteKey;
         PlayerNames = [playerName];
     }
     
-    public RecentEmote(float distance, string emoteKey, List<string> playerNames)
+    public RecentEmote(string emoteKey, List<string> playerNames)
     {
-        Distance = distance;
         EmoteKey = emoteKey;
         PlayerNames = playerNames;
     }
@@ -29,5 +28,43 @@ public class RecentEmote
             
         PlayerNames.Add(playerName);
         return true;
+    }
+
+    public bool Equals(RecentEmote? other)
+    {
+        if (ReferenceEquals(null, other))
+            return false;
+        if (ReferenceEquals(this, other))
+            return true;
+        return EmoteKey == other.EmoteKey && PlayerNames.Equals(other.PlayerNames);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+        if (obj.GetType() != GetType())
+            return false;
+        return Equals((RecentEmote)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var playerNamesHash =
+            PlayerNames.Aggregate(19, (current, playerName) => current * 31 + playerName.GetHashCode());
+
+        return HashCode.Combine(EmoteKey, playerNamesHash);
+    }
+
+    public static bool operator ==(RecentEmote? left, RecentEmote? right)
+    {
+        return Equals(left, right);
+    }
+
+    public static bool operator !=(RecentEmote? left, RecentEmote? right)
+    {
+        return !Equals(left, right);
     }
 }
