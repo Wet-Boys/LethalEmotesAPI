@@ -1,25 +1,26 @@
-﻿using EmotesAPI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using EmotesAPI;
 using UnityEngine;
 
 namespace LethalEmotesAPI.Utils;
 
 public class RecentEmote
 {
-    public const float RECENT_EMOTE_DISTANCE = 30;
+    public const float RecentEmoteDistance = 30;
     private static readonly Dictionary<string, RecentEmote> EmoteKeysToNearbyEmote = new();
     
     public float Distance; //idk if we actually need distance...
     public List<string> PlayerNames;
     public string EmoteKey;
-        
+    
     private RecentEmote(float distance, string playerName, string emoteKey)
     {
         Distance = distance;
         PlayerNames = [playerName];
         EmoteKey = emoteKey;
     }
+    
     private RecentEmote(float distance, List<string> playerName, string emoteKey)
     {
         Distance = distance;
@@ -36,7 +37,7 @@ public class RecentEmote
         }
         return false;
     }
-        
+    
     internal static void PlayerPerformedEmote(float dist, string emoteKey, string playerName) //gets fired whenever a BoneMapper calls an emote
     {
         if (EmoteKeysToNearbyEmote.ContainsKey(emoteKey))
@@ -56,19 +57,19 @@ public class RecentEmote
         }
         PlayerEmoted(EmoteKeysToNearbyEmote.Last().Value);
     }
-        
+    
     public static RecentEmote GetRecentEmote(string emoteKey)//idk if this is needed tbh
     {
         return EmoteKeysToNearbyEmote[emoteKey];
     }
-        
+    
     public static RecentEmote[] GetCurrentlyPlayingEmotes()
     {
         List<List<string>> playerList = new List<List<string>>();
         List<string> emoteList = new List<string>();
         foreach (var item in BoneMapper.allMappers)
         {
-            if (!item.local && item.currentClip is not null && Vector3.Distance(item.transform.position, CustomEmotesAPI.localMapper.transform.position) <= RECENT_EMOTE_DISTANCE)
+            if (!item.local && item.currentClip is not null && Vector3.Distance(item.transform.position, CustomEmotesAPI.localMapper.transform.position) <= RecentEmoteDistance)
             {
                 if (emoteList.Contains(item.currentClip.customInternalName))
                 {

@@ -1,34 +1,27 @@
-﻿using BepInEx;
-using System.Reflection;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
-using System.Globalization;
-using BepInEx.Configuration;
+﻿using System;
 using System.Collections;
-using static UnityEngine.ParticleSystem.PlaybackState;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using BepInEx;
+using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using GameNetcodeStuff;
-using MonoMod.RuntimeDetour;
-using System;
-using UnityEngine.UIElements;
-using UnityEngine.XR;
-using UnityEngine.InputSystem;
-using Unity.Netcode;
-using UnityEngine.Networking;
-using UnityEngine.Experimental.Audio;
 using HarmonyLib;
 using LethalCompanyInputUtils;
 using LethalEmotesAPI;
-using LethalEmotesAPI.Data;
-using LethalEmotesApi.Ui;
-using UnityEngine.InputSystem.Controls;
-using LethalEmotesAPI.Utils;
-using TMPro;
-using System.Linq;
-using BepInEx.Bootstrap;
-using LethalEmotesAPI.Patches;
 using LethalEmotesAPI.Core;
+using LethalEmotesAPI.Data;
+using LethalEmotesAPI.Patches;
 using LethalEmotesAPI.Patches.ModCompat;
+using LethalEmotesApi.Ui;
+using LethalEmotesAPI.Utils;
+using MonoMod.RuntimeDetour;
+using TMPro;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace EmotesAPI
 {
@@ -1055,7 +1048,7 @@ namespace EmotesAPI
                 mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
                 mapper.justSwitched = true;
                 float dist = Vector3.Distance(mapper.transform.position, localMapper.transform.position);
-                if (dist < RecentEmote.RECENT_EMOTE_DISTANCE)
+                if (dist < RecentEmote.RecentEmoteDistance)
                 {
                     RecentEmote.PlayerPerformedEmote(dist, BoneMapper.animClips[newAnimation].joinEmote, mapper.userName);
                 }
