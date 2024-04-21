@@ -4,22 +4,22 @@ namespace LethalEmotesApi.Ui.EmoteHistory;
 
 public class RecentEmote
 {
-    public float Distance; //idk if we actually need distance...
+    public float Distance; // idk if we actually need distance...
+    public readonly string EmoteKey;
     public readonly List<string> PlayerNames;
-    public string EmoteKey;
     
-    public RecentEmote(float distance, string playerName, string emoteKey)
+    public RecentEmote(float distance, string emoteKey, string playerName)
     {
         Distance = distance;
-        PlayerNames = [playerName];
         EmoteKey = emoteKey;
+        PlayerNames = [playerName];
     }
     
-    public RecentEmote(float distance, List<string> playerName, string emoteKey)
+    public RecentEmote(float distance, string emoteKey, List<string> playerNames)
     {
         Distance = distance;
-        PlayerNames = playerName;
         EmoteKey = emoteKey;
+        PlayerNames = playerNames;
     }
     
     public bool AddPlayer(string playerName)

@@ -7,6 +7,7 @@ using Editor.Utils.Uxml;
 using LethalEmotesApi.Ui;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
+using LethalEmotesApi.Ui.EmoteHistory;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -181,6 +182,8 @@ namespace Editor
 
             public IEmoteDb EmoteDb { get; } = new StubbedEmoteDb();
 
+            public IEmoteHistoryManager EmoteHistoryManager { get; } = new StubbedEmoteHistoryManager();
+
             public IReadOnlyCollection<string> RandomPoolBlacklist => _randomBlacklist.ToArray();
             public IReadOnlyCollection<string> EmotePoolBlacklist => _emoteBlacklist.ToArray();
             public float EmoteVolume { get; set; }
@@ -249,6 +252,36 @@ namespace Editor
                 }
 
                 _emoteKeys = keys.ToArray();
+            }
+        }
+
+        private class StubbedEmoteHistoryManager : IEmoteHistoryManager
+        {
+            
+            
+            public void GenerateData()
+            {
+                
+            }
+            
+            public void PlayerPerformedEmote(float dist, string emoteKey, string playerName)
+            {
+                
+            }
+
+            public RecentEmote GetRecentEmote(string emoteKey)
+            {
+                return new RecentEmote(0f, emoteKey, "Nobody");
+            }
+
+            public RecentEmote[] GetCurrentlyPlayingEmotes()
+            {
+                return Array.Empty<RecentEmote>();
+            }
+
+            public RecentEmote[] GetHistory()
+            {
+                return Array.Empty<RecentEmote>();
             }
         }
     }

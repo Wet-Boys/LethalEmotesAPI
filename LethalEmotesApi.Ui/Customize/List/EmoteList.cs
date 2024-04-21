@@ -8,7 +8,7 @@ using UnityEngine;
 namespace LethalEmotesApi.Ui.Customize.List;
 
 [DisallowMultipleComponent]
-public class EmoteList : RecycleListView<EmoteListItem, string>
+public class EmoteList : RecycleListView<EmoteListRecycleViewItem, string>
 {
     public TMP_InputField? searchInputField;
     
@@ -75,8 +75,12 @@ public class EmoteList : RecycleListView<EmoteListItem, string>
         _searchableEmoteArray.Filter = "";
     }
     
-    protected override void OnInstantiateListItem(EmoteListItem instance)
+    protected override void OnInstantiateListItem(EmoteListRecycleViewItem viewItem)
     {
+        var instance = viewItem.emoteListItem;
+        if (instance is null)
+            return;
+        
         instance.dragDropController = _customizePanel!.dragDropController;
         instance.previewController = _customizePanel!.previewController;
     }

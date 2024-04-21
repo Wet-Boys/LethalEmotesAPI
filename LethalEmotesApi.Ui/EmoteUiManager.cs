@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
+using LethalEmotesApi.Ui.EmoteHistory;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -71,6 +72,8 @@ public static class EmoteUiManager
     }
 
     internal static IEmoteDb EmoteDb => _stateController!.EmoteDb;
+
+    internal static IEmoteHistoryManager EmoteHistoryManager => _stateController!.EmoteHistoryManager;
 
     internal static IReadOnlyCollection<string> EmoteKeys => _stateController!.EmoteDb.EmoteKeys;
 
