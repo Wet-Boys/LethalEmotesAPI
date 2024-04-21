@@ -590,14 +590,6 @@ namespace EmotesAPI
             {
                 AdvancedCompanyCompat.SetupUpdateVisibilityHook();
             }
-            if (TMEPresent && Settings.ImportTME.Value)
-            {
-                TooManyEmotesCompat.RegisterAllTooManyEmotesEmotes();
-            }
-            if (BetterEmotesPresent && Settings.ImportBetterEmotes.Value)
-            {
-                BetterEmotesCompat.RegisterAllTooManyEmotesEmotes();
-            }
 
             EnemySkeletons.SetupEnemyHooks();
 
@@ -625,7 +617,6 @@ namespace EmotesAPI
                 {
                 }
             }
-
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
 
             //DebugCommands.Debugcommands();
@@ -639,6 +630,18 @@ namespace EmotesAPI
             ScrollU.Enable();
             ScrollD.Enable();
             Settings.SetHealthbarRequest();
+
+
+
+            if (TMEPresent && Settings.ImportTME.Value)
+            {
+                TooManyEmotesCompat.RegisterAllTooManyEmotesEmotes();
+            }
+            if (BetterEmotesPresent && Settings.ImportBetterEmotes.Value)
+            {
+                BetterEmotesCompat.RegisterAllTooManyEmotesEmotes();
+            }
+
 
             EmotesInputSettings.Instance.RandomEmote.started += RandomEmote_performed;
             EmotesInputSettings.Instance.JoinEmote.started += JoinEmote_performed;
@@ -783,6 +786,7 @@ namespace EmotesAPI
                                 animationName = nearestMapper.currentClip.clip[0].name;
                             }
                             PlayAnimation(animationName);
+                            Settings.joinEmoteTutorial.Value = false;
                             Joined(animationName, localMapper, nearestMapper); //this is not networked and only sent locally FYI
                         }
                         nearestMapper = null;
