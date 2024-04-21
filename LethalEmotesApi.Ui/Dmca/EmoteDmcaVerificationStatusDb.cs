@@ -12,7 +12,7 @@ public class EmoteDmcaVerificationStatusDb : ScriptableObject
         get
         {
             _instance ??= EmoteUiManager.GetStateController()!
-                .LoadAsset<EmoteDmcaVerificationStatusDb>("assets/LethalEmotesApi-Ui/data/EmoteDmcaVerificationStatusDb.asset");
+                .LoadAsset<EmoteDmcaVerificationStatusDb>("Assets/LethalEmotesApi-Ui/Data/EmoteDmcaVerificationStatusDb.asset");
 
             return _instance;
         }

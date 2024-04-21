@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using LethalEmotesAPI.Data;
 using LethalEmotesApi.Ui;
+using LethalEmotesApi.Ui.Dmca;
 
 public class CustomAnimationClip : MonoBehaviour
 {
@@ -193,6 +194,10 @@ public class CustomAnimationClip : MonoBehaviour
             joinEmote = customInternalName;
         }
         this.joinEmote = joinEmote;
+        if (EmoteDmcaVerificationStatusDb.IsNonDmcaCompliant(ownerPlugin.GUID))
+        {
+            this.willGetClaimed = true;
+        }
     }
 
     private static void EmoteAction_started(InputAction.CallbackContext obj)
