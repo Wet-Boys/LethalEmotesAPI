@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using EmotesAPI;
 using LethalEmotesAPI.Data;
+using LethalEmotesAPI.Patches.ModCompat;
 using LethalEmotesApi.Ui.Data;
 using LethalEmotesApi.Ui.Db;
+using LethalEmotesApi.Ui.EmoteHistory;
 using LethalEmotesAPI.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using LethalEmotesAPI.Patches.ModCompat;
 using Object = UnityEngine.Object;
 
 namespace LethalEmotesAPI;
@@ -79,6 +80,17 @@ public class LethalEmotesUiState : IEmoteUiStateController
         {
             _emoteDb ??= new EmoteDb();
             return _emoteDb;
+        }
+    }
+
+    private EmoteHistoryManager _emoteHistoryManager;
+
+    public IEmoteHistoryManager EmoteHistoryManager
+    {
+        get
+        {
+            _emoteHistoryManager ??= new EmoteHistoryManager();
+            return _emoteHistoryManager;
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LethalEmotesApi.Ui.Db;
+using LethalEmotesApi.Ui.EmoteHistory;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
@@ -24,6 +25,8 @@ public interface IEmoteUiStateController
     public void PlayAnimationOn(Animator animator, string emoteKey);
 
     public IEmoteDb EmoteDb { get; }
+    
+    public IEmoteHistoryManager EmoteHistoryManager { get; }
 
     public IReadOnlyCollection<string> RandomPoolBlacklist { get; }
     

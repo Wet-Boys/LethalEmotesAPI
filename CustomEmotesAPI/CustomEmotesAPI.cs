@@ -1048,9 +1048,10 @@ namespace EmotesAPI
                 mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
                 mapper.justSwitched = true;
                 float dist = Vector3.Distance(mapper.transform.position, localMapper.transform.position);
-                if (dist < RecentEmote.RecentEmoteDistance)
+                if (dist < EmoteHistoryManager.RecentEmoteDistance)
                 {
-                    RecentEmote.PlayerPerformedEmote(dist, BoneMapper.animClips[newAnimation].joinEmote, mapper.userName);
+                    var emoteHistory = LethalEmotesUiState.Instance.EmoteHistoryManager;
+                    emoteHistory.PlayerPerformedEmote(dist, BoneMapper.animClips[newAnimation].joinEmote, mapper.userName);
                 }
             }
             else
