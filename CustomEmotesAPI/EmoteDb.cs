@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx;
+using BepInEx.Bootstrap;
 using LethalEmotesApi.Ui.Db;
 
 namespace LethalEmotesAPI;
@@ -42,14 +42,31 @@ public class EmoteDb : IEmoteDb
     {
         get
         {
+            // Todo: after some investigation, it looks like this is incorrectly implemented, need to verify that first - Rune
             _emoteModNames ??= BoneMapper.animClips
                 .Where(kvp => kvp.Value is not null)
                 .Select(kvp => kvp.Value.ownerPlugin.Name)
                 .GroupBy(modName => modName)
                 .Select(kvp => kvp.First())
-                .ToList();
+                .ToArray();
 
             return _emoteModNames;
+        }
+    }
+    
+    private IReadOnlyCollection<string> _emoteModGuids;
+
+    public IReadOnlyCollection<string> EmoteModGuids
+    {
+        get
+        {
+            _emoteModGuids ??= BoneMapper.animClips
+                .Where(kvp => kvp.Value is not null)
+                .Select(kvp => kvp.Value.ownerPlugin.GUID)
+                .Distinct()
+                .ToArray();
+
+            return _emoteModGuids;
         }
     }
 
@@ -70,6 +87,15 @@ public class EmoteDb : IEmoteDb
 
         return _emoteKeyModNameLut.GetValueOrDefault(emoteKey, "Unknown");
     }
+
+    public string GetModNameFromModGuid(string modGuid)
+    {
+        if (!Chainloader.PluginInfos.TryGetValue(modGuid, out var pluginInfo))
+            return modGuid;
+
+        return pluginInfo.Metadata.Name;
+    }
+
     public bool GetEmoteVisibility(string emoteKey)
     {
         if (BoneMapper.animClips.TryGetValue(emoteKey, out var clip))

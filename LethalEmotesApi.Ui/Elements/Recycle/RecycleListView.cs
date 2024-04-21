@@ -33,6 +33,7 @@ public abstract class RecycleListView<TRecycleItem, TData> : UIBehaviour
     private Bounds _viewBounds;
     private Vector2 _prevAnchoredPos;
     private bool _recycling;
+    private bool _firstUpdate;
 
     private readonly RecyclePool<TRecycleItem, TData> _pool = [];
     private DrivenRectTransformTracker _tracker;
@@ -71,6 +72,15 @@ public abstract class RecycleListView<TRecycleItem, TData> : UIBehaviour
     protected override void OnEnable()
     {
         base.OnEnable();
+    }
+    
+    protected virtual void Update()
+    {
+        if (!_firstUpdate)
+        {
+            UpdateState();
+            _firstUpdate = true;
+        }
     }
 
     private void OnValidate()
@@ -323,6 +333,9 @@ public abstract class RecycleListView<TRecycleItem, TData> : UIBehaviour
             return;
         
         if (_recycleViewTransform is null)
+            return;
+
+        if (ListData.Count <= 0)
             return;
         
         UpdateViewBounds();

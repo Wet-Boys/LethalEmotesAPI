@@ -49,14 +49,16 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.10.0";
+        public const string VERSION = "1.10.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
             public Sprite sprite;
 
         }
+        
         public static List<NameTokenWithSprite> nameTokenSpritePairs = new List<NameTokenWithSprite>();
+        
         public static bool CreateNameTokenSpritePair(string nameToken, Sprite sprite)
         {
             NameTokenWithSprite temp = new NameTokenWithSprite();
@@ -69,10 +71,12 @@ namespace EmotesAPI
             nameTokenSpritePairs.Add(temp);
             return true;
         }
+        
         void CreateBaseNameTokenPairs()
         {
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
+        
         public static List<string> randomClipList = new List<string>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
@@ -499,6 +503,7 @@ namespace EmotesAPI
             hook = new Hook(targetMethod, destMethod, this);
 
         }
+        
         public void Awake()
         {
             instance = this;
@@ -648,6 +653,9 @@ namespace EmotesAPI
             EmotesInputSettings.Instance.GamepadEmoteWheel.performed += GamepadEmoteWheel_performed;
             //EmotesInputSettings.Instance.LigmaBalls.started += LigmaBalls_started;
             EmoteUiManager.RegisterStateController(LethalEmotesUiState.Instance);
+
+            UnityThreadScheduler.Init();
+            ContentCreatorDetector.Init();
         }
 
         bool lockingForMouseInput = false;
