@@ -1,4 +1,3 @@
-using LethalEmotesApi.Ui.Animation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,11 +6,11 @@ namespace LethalEmotesApi.Ui.Customize.Preview;
 public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
 {
     public GameObject? previewPrefab;
+    public float rotSpeed = 25.0f;
 
     private GameObject? _previewObjectInstance;
     private Animator? _previewAnimator;
     private PreviewRig? _previewRig;
-    private float rotSpeed = 25.0f;
     
     protected override void Start()
     {
