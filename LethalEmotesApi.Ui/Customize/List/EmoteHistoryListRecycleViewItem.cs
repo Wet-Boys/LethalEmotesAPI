@@ -25,6 +25,6 @@ public class EmoteHistoryListRecycleViewItem : MonoBehaviour, IRecycleViewItem<R
             return;
         
         emoteListItem.SetEmoteKey(data.EmoteKey);
-        emoteListItem.SetPlayers(data.PlayerNames.ToArray());
+        emoteListItem.SetPlayers(data.PlayerNames);
     }
 }

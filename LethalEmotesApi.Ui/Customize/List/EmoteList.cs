@@ -37,10 +37,8 @@ public class EmoteList : RecycleListView<EmoteListRecycleViewItem, string>
         base.Start();
     }
 
-    protected override void Update()
+    private void Update()
     {
-        base.Update();
-        
         if (searchInputField is not null && searchInputField.isFocused)
             EmoteKeybindButton.CancelExistingRebind();
     }

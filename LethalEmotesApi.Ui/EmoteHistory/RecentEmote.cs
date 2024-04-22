@@ -7,26 +7,28 @@ namespace LethalEmotesApi.Ui.EmoteHistory;
 public class RecentEmote : IEquatable<RecentEmote>
 {
     public readonly string EmoteKey;
-    public readonly List<string> PlayerNames;
+    private readonly List<string> _playerNames;
+    
+    public string[] PlayerNames => _playerNames.AsEnumerable().Reverse().ToArray();
     
     public RecentEmote(string emoteKey, string playerName)
     {
         EmoteKey = emoteKey;
-        PlayerNames = [playerName];
+        _playerNames = [playerName];
     }
     
     public RecentEmote(string emoteKey, List<string> playerNames)
     {
         EmoteKey = emoteKey;
-        PlayerNames = playerNames;
+        _playerNames = playerNames;
     }
     
     public bool AddPlayer(string playerName)
     {
-        if (PlayerNames.Contains(playerName))
+        if (_playerNames.Contains(playerName))
             return false;
             
-        PlayerNames.Add(playerName);
+        _playerNames.Add(playerName);
         return true;
     }
 
@@ -36,7 +38,7 @@ public class RecentEmote : IEquatable<RecentEmote>
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        return EmoteKey == other.EmoteKey && PlayerNames.Equals(other.PlayerNames);
+        return EmoteKey == other.EmoteKey && _playerNames.Equals(other._playerNames);
     }
 
     public override bool Equals(object? obj)
@@ -53,7 +55,7 @@ public class RecentEmote : IEquatable<RecentEmote>
     public override int GetHashCode()
     {
         var playerNamesHash =
-            PlayerNames.Aggregate(19, (current, playerName) => current * 31 + playerName.GetHashCode());
+            _playerNames.Aggregate(19, (current, playerName) => current * 31 + playerName.GetHashCode());
 
         return HashCode.Combine(EmoteKey, playerNamesHash);
     }

@@ -271,7 +271,7 @@ namespace Editor
 
             public RecentEmote GetRecentEmote(string emoteKey)
             {
-                return new RecentEmote(0f, emoteKey, "Nobody");
+                return new RecentEmote(emoteKey, "Nobody");
             }
 
             public RecentEmote[] GetCurrentlyPlayingEmotes()
