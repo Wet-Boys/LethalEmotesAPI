@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using BepInEx.Configuration;
 using LethalEmotesAPI.Data;
-using LethalEmotesApi.Ui;
-using LethalEmotesApi.Ui.Data;
 using UnityEngine;
-using UnityEngine.Events;
-using LethalConfig.ConfigItems.Options;
 using LethalConfig.ConfigItems;
 using LethalConfig;
 using LethalEmotesAPI.Utils;
 using System.IO;
+using System.Linq;
 
 namespace EmotesAPI
 {
@@ -37,9 +32,25 @@ namespace EmotesAPI
     }
     public static class Settings
     {
-        public static ConfigEntry<bool> useGlobalConfig;
         public static EmotesAPIConfigEntries localConfig;
         public static EmotesAPIConfigEntries globalConfig;
+
+        #region Global Entries
+
+        public static ConfigEntry<bool> useGlobalConfig;
+        public static ConfigEntry<bool> dontShowDmcaPrompt;
+        public static ConfigEntry<string> disallowedModPackOverrideLocations;
+        public static ConfigEntry<bool> joinEmoteTutorial;
+
+        #endregion
+
+        #region Local Entries
+
+        public static ConfigEntry<bool> modPackOverride;
+
+        #endregion
+        
+        #region Common Entries
 
         public static ConfigEntry<float> EmotesVolume => GetCurrentConfig().EmotesVolume;
         public static ConfigEntry<bool> HideJoinSpots => GetCurrentConfig().HideJoinSpots;
@@ -56,14 +67,49 @@ namespace EmotesAPI
         public static ConfigEntry<string> EmoteKeyBinds => GetCurrentConfig().EmoteKeyBinds;
         public static ConfigEntry<bool> ImportTME => GetCurrentConfig().ImportTME;
         public static ConfigEntry<bool> ImportBetterEmotes => GetCurrentConfig().ImportBetterEmotes;
+        public static ConfigEntry<bool> NearestEmoteText => GetCurrentConfig().NearestEmoteText;
+
+
+        #endregion
+
         public static void RunAll()
         {
+            SetProfileName();
             GenerateConfigs();
             LethalConfig();
         }
 
         internal static GameObject picker;
-
+        
+        internal static string profileName;
+        
+        internal static void SetProfileName()
+        {
+            profileName = Directory.GetParent(GetBepinexFolder(CustomEmotesAPI.instance.Info.Location))!.Name;
+        }
+        
+        internal static string GetBepinexFolder(string directory)
+        {
+            string original = directory;
+            bool foundIt = false;
+            for (int i = 0; i < 20; i++)
+            {
+                var parent = Directory.GetParent(directory);
+                
+                if (parent is not null)
+                {
+                    if (parent.Name.ToLowerInvariant() == "bepinex")
+                    {
+                        directory = parent.FullName;
+                        foundIt = true;
+                        break;
+                    }
+                    directory = parent.FullName;
+                }
+            }
+            return foundIt ? directory : original;
+        }
+        
         internal static string GetGlobalSettingsDir()
         {
             var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -75,22 +121,55 @@ namespace EmotesAPI
         {
             string globalConfigPath = Path.Combine(GetGlobalSettingsDir(), "global.cfg");
             bool globalIsNew = !File.Exists(globalConfigPath);
+            
             ConfigFile global = new ConfigFile(globalConfigPath, true, CustomEmotesAPI.instance.Info.Metadata);
-            useGlobalConfig = global.Bind<bool>("Global Settings", "Use Global Config", true, "When true, all EmotesAPI settings will be the same across profiles. When false, each profile will have its own settings.");
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(useGlobalConfig, false));
-            useGlobalConfig.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
-            useGlobalConfig.SettingChanged += HideJoinSpots_SettingChanged;
+            BindGlobalEntries(global);
+            
             globalConfig = new EmotesAPIConfigEntries(global, "Global ");
             localConfig = new EmotesAPIConfigEntries(CustomEmotesAPI.instance.Config, "");
+            modPackOverride = CustomEmotesAPI.instance.Config.Bind<bool>("Local Settings", "Modpack Override", false, "When true, will use local config even when \"Use Global Config\" is set to true. If \"Use Global Config\" is touched by the user, this will always be reset to false.");
+            
+            if (disallowedModPackOverrideLocations.Value.Split('ඞ').ToList().Contains(profileName))
+            {
+                modPackOverride.Value = false;
+            }
+            
             if (globalIsNew)
             {
                 globalConfig.CopyFromConfig(localConfig);
             }
         }
 
+        private static void BindGlobalEntries(ConfigFile global)
+        {
+            useGlobalConfig = global.Bind("Global Settings", "Use Global Config", true, "When true, all EmotesAPI settings will be the same across profiles. When false, each profile will have its own settings.");
+            disallowedModPackOverrideLocations = global.Bind("Global No Touch", "Modpack locations disallowing modPackOverride", "", "Locations where users have already opted out of using the modpack specific options");
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(useGlobalConfig, false));
+            
+            useGlobalConfig.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
+            useGlobalConfig.SettingChanged += HideJoinSpots_SettingChanged;
+            useGlobalConfig.SettingChanged += UseGlobalConfig_SettingChanged;
+
+            dontShowDmcaPrompt = global.Bind("Global Flags", "Dont Show DMCA Prompt", false,
+                "Disables the DMCA prompt from showing in-game. DMCA Prompt automatically shows when we detect OBS or XSplit open");
+
+            joinEmoteTutorial = global.Bind("Global Flags", "Join Emote Tutorial", true, 
+                "Guaruntees the join prompt will be in the top left corner");
+        }
+
+        private static void UseGlobalConfig_SettingChanged(object sender, EventArgs e)
+        {
+            Debug.Log($"setting actually changed");
+            modPackOverride.Value = false;
+            if (!disallowedModPackOverrideLocations.Value.Split('ඞ').ToList().Contains(profileName))
+            {
+                disallowedModPackOverrideLocations.Value += $"ඞ{profileName}";
+            }
+        }
+
         public static EmotesAPIConfigEntries GetCurrentConfig()
         {
-            return useGlobalConfig.Value ? globalConfig : localConfig;
+            return modPackOverride.Value ? localConfig : useGlobalConfig.Value ? globalConfig : localConfig;
         }
 
 
@@ -98,6 +177,7 @@ namespace EmotesAPI
         {
             SetHealthbarRequest();
         }
+        
         internal static void SetHealthbarRequest()
         {
             HealthbarAnimator.permaOn = PermanentEmotingHealthbar.Value;
@@ -120,6 +200,7 @@ namespace EmotesAPI
             picker.transform.SetAsLastSibling();
             picker.GetComponent<Canvas>().sortingOrder = 5;
         }
+        
         internal static void DebugBones(GameObject fab, int spot = 0)
         {
             var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();

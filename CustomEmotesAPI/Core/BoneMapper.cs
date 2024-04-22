@@ -767,7 +767,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-                    Destroy(personalTrigger); // removes trigger from localplayer so you can't see it
+                    gameObject.AddComponent<NearestEmoterChecker>().self = this;
                     isServer = playerController.IsServer && playerController.IsOwner;
                     HealthbarAnimator.Setup(this);
                     FixLocalArms();
@@ -997,7 +997,8 @@ public class BoneMapper : MonoBehaviour
         if (local && isInThirdPerson)
         {
             //just copying this from the unity docs/spectator camera KEKW
-            Ray ray = new Ray(mapperBodyTransform.position, desiredCameraPos.transform.position - mapperBodyTransform.position);
+            Vector3 rayPos = mapperBodyTransform.position + new Vector3(0,1.75f * scale,0);
+            Ray ray = new Ray(rayPos, desiredCameraPos.transform.position - rayPos);
             RaycastHit hit;//                       v PlayerControlerB.walkableSurfacesNoPlayersMask... but it's private and I don't feel like publicizing it lmao
             if (Physics.Raycast(ray, out hit, 10f, 268437761, QueryTriggerInteraction.Ignore))
             {
@@ -1007,7 +1008,7 @@ public class BoneMapper : MonoBehaviour
             {
                 realCameraPos.transform.position = ray.GetPoint(10.0f);
             }
-            if (Vector3.Distance(realCameraPos.transform.position, mapperBodyTransform.position) > Vector3.Distance(desiredCameraPos.transform.position, mapperBodyTransform.position))
+            if (Vector3.Distance(realCameraPos.transform.position, rayPos) > Vector3.Distance(desiredCameraPos.transform.position, rayPos))
             {
                 realCameraPos.transform.position = desiredCameraPos.transform.position;
             }
