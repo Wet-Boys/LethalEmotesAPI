@@ -28,6 +28,7 @@ namespace LethalEmotesAPI.Data
         public ConfigEntry<bool> ImportTME;
         public ConfigEntry<bool> ImportBetterEmotes;
         public ConfigEntry<bool> NearestEmoteText;
+        public ConfigEntry<bool> InteractionToolTip;
         private ConfigFile configFile;
         private string sectionPrefix;
         public EmotesAPIConfigEntries(ConfigFile file, string sectionPrefix) {
@@ -47,6 +48,7 @@ namespace LethalEmotesAPI.Data
             ImportTME = file.Bind<bool>(sectionPrefix + "Misc", "Import TooManyEmotes", true, "If turned on, emotes from TooManyEmotes will also be available in LethalEmotesAPI's menus");
             ImportBetterEmotes = file.Bind<bool>(sectionPrefix + "Misc", "Import BetterEmotes", true, "If turned on, emotes from BetterEmotes will also be available in LethalEmotesAPI's menus");
             NearestEmoteText = file.Bind<bool>(sectionPrefix + "Misc", "Nearest Emote Text", false, "If turned on, will display the nearest joinable emote in the top left corner while not emoting");
+            InteractionToolTip = file.Bind<bool>(sectionPrefix + "Misc", "Interaction Tooltip", false, "If turned on, will display an interaction tooltip when looking at joinable players");
 
             HideJoinSpots.SettingChanged += Settings.HideJoinSpots_SettingChanged;
             PermanentEmotingHealthbar.SettingChanged += Settings.PermanentEmotingHealthbar_SettingChanged;

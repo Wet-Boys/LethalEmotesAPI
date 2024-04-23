@@ -985,6 +985,13 @@ namespace EmotesAPI
         public delegate void AnimationChanged(string newAnimation, BoneMapper mapper);
         public static event AnimationChanged animChanged;
         static int requestCounter = 0;
+        public static void ChangeInteractionTriggers(bool active)
+        {
+            foreach (var item in BoneMapper.allMappers)
+            {
+                item.personalTrigger.interactable = active && item.currentClip is not null && item.currentClip.allowJoining && Settings.InteractionToolTip.Value;
+            }
+        }
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
             if (mapper is null)
@@ -994,7 +1001,14 @@ namespace EmotesAPI
             }
 
             //DebugClass.Log($"Changed {mapper}'s animation to {newAnimation}");
+
             mapper.currentClipName = newAnimation;
+            if (BoneMapper.animClips[newAnimation] is not null)
+            {
+                mapper.UpdateHoverTip(BoneMapper.animClips[newAnimation].displayName);
+            }
+            mapper.personalTrigger.interactable = false; // remove tooltip
+
             if (mapper == localMapper)
             {
                 if (requestCounter != 0 && CustomEmotesAPI.hudObject is not null)
@@ -1006,11 +1020,16 @@ namespace EmotesAPI
                 {
                     localMapper.temporarilyThirdPerson = TempThirdPerson.none;
                     localMapper.rotationPoint.transform.eulerAngles = new Vector3(localMapper.rotationPoint.transform.eulerAngles.x, mapper.playerController.thisPlayerBody.eulerAngles.y, 0);
+                    ChangeInteractionTriggers(true);
                 }
-                else if (CustomEmotesAPI.hudObject is not null)
+                else
                 {
-                    requestCounter++;
-                    HealthbarAnimator.StartHealthbarAnimateRequest();
+                    if (CustomEmotesAPI.hudObject is not null)
+                    {
+                        requestCounter++;
+                        HealthbarAnimator.StartHealthbarAnimateRequest();
+                    }
+                    ChangeInteractionTriggers(false);
                 }
 
             }
@@ -1040,6 +1059,12 @@ namespace EmotesAPI
 
             if (newAnimation != "none")
             {
+                if (localMapper.currentClip is null)
+                {
+                    mapper.personalTrigger.interactable = mapper.currentClip is not null && mapper.currentClip.allowJoining && Settings.InteractionToolTip.Value; // enable tooltip
+                }
+
+
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.HideAllSpots();
@@ -1091,7 +1116,9 @@ namespace EmotesAPI
         public static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
         {
             if (animJoined != null)
+            {
                 animJoined(joinedAnimation, joiner, host);
+            }
         }
         public delegate void BoneMapperCreated(BoneMapper mapper);
         public static event BoneMapperCreated boneMapperCreated;
