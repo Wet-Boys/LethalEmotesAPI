@@ -989,7 +989,7 @@ namespace EmotesAPI
         {
             foreach (var item in BoneMapper.allMappers)
             {
-                item.personalTrigger.interactable = active && item.currentClip is not null;
+                item.personalTrigger.interactable = active && item.currentClip is not null && item.currentClip.allowJoining && Settings.InteractionToolTip.Value;
             }
         }
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
@@ -1061,7 +1061,7 @@ namespace EmotesAPI
             {
                 if (localMapper.currentClip is null)
                 {
-                    mapper.personalTrigger.interactable = true; // enable tooltip
+                    mapper.personalTrigger.interactable = mapper.currentClip is not null && mapper.currentClip.allowJoining && Settings.InteractionToolTip.Value; // enable tooltip
                 }
 
 
