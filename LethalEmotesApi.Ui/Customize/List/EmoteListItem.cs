@@ -109,6 +109,10 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
     public void SetEmoteKey(string emoteKey)
     {
         EmoteKey = emoteKey;
+        
         UpdateState();
+
+        previewController!.PreviewEmoteRenderer.Fov = 25f;
+        previewController.PlayEmote(emoteKey);
     }
 }

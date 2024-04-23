@@ -80,7 +80,6 @@ public class EmoteList : RecycleListView<EmoteListRecycleViewItem, string>
             return;
         
         instance.dragDropController = _customizePanel!.dragDropController;
-        instance.previewController = _customizePanel!.previewController;
     }
     
     private void SearchFieldUpdated(string filter)

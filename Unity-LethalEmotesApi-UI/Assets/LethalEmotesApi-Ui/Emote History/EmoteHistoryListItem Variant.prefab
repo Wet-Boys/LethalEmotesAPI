@@ -670,6 +670,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3628599301948065402 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8464679497778825288, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
+  m_PrefabInstance: {fileID: 5126163936281611826}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -998099503, guid: b2c656f14b2d18f468e54fdcaa06a25c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &3741576777366171429 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8416957986466504983, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
@@ -721,7 +732,7 @@ MonoBehaviour:
   selectImage: {fileID: 1293320578916803819}
   modLabel: {fileID: 2645318322366096687}
   dragDropController: {fileID: 0}
-  previewController: {fileID: 0}
+  previewController: {fileID: 3628599301948065402}
   mostRecentPlayerLabel: {fileID: 2636725819262451248}
 --- !u!114 &-8588142316447648429
 MonoBehaviour:

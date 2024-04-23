@@ -40,6 +40,5 @@ public class EmoteHistoryList : RecycleListView<EmoteHistoryListRecycleViewItem,
             return;
         
         instance.dragDropController = _customizePanel!.dragDropController;
-        instance.previewController = _customizePanel!.previewController;
     }
 }
