@@ -206,13 +206,36 @@ internal static class ContentCreatorDetector
         protected override string[] GetRunningProcesses()
         {
             return Process.GetProcesses()
+                .Where(proc =>
+                {
+                    try
+                    {
+                        var hasExited = proc.HasExited;
+                        if (hasExited)
+                            proc.Dispose();
+                        
+                        return !hasExited;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                })
                 .Select(proc =>
                 {
-                    var name = proc.ProcessName;
-                    proc.Dispose();
-                
-                    return name;
+                    try
+                    {
+                        var name = proc.ProcessName;
+                        proc.Dispose();
+
+                        return name;
+                    }
+                    catch
+                    {
+                        return "";
+                    }
                 })
+                .Where(name => !string.IsNullOrEmpty(name))
                 .ToArray();
         }
 

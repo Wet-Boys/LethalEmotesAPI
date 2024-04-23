@@ -123,6 +123,38 @@ namespace LethalEmotesAPI.Core
                     case "Tulip Snake":
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/TulipSnake.prefab", [3]));
                         break;
+
+
+                    case "HarpGhost":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Ghost1.prefab", [0]));
+                        break;
+                    case "EnforcerGhost":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Ghost1.prefab", [0]));
+                        break;
+                    case "BagpipeGhost":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Ghost1.prefab", [0]));
+                        break;
+                    case "SlendermanEnemy":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Slender3.prefab", [0]));
+                        break;
+                    case "RedWoodGiant":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/XuGiant.prefab", [10]));
+                        break;
+                    case "DriftWoodGiant":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Driftwood.prefab", [0]));
+                        break;
+                    case "Foxy":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Foxy4.prefab", [0]));
+                        break;
+                    case "The Fiend":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Fiend1.prefab", [0]));
+                        break;
+                    case "Siren Head":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/SirenHead2.prefab", [0]));
+                        break;
+                    case "Football":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Football.prefab", [0]));
+                        break;
                     default:
                         //DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;

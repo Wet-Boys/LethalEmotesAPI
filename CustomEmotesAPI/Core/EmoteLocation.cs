@@ -1,9 +1,12 @@
 ﻿using EmotesAPI;
+using LethalEmotesAPI;
+using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 
 public struct JoinSpot
@@ -79,6 +82,7 @@ public class EmoteLocation : MonoBehaviour
             }
         }
     }
+    InteractTrigger personalTrigger;
     void Start()
     {
         SetColor();
@@ -96,6 +100,17 @@ public class EmoteLocation : MonoBehaviour
                 item2.enabled = false;
             }
         }
+        personalTrigger = gameObject.AddComponent<InteractTrigger>();
+        gameObject.tag = "InteractTrigger";
+        gameObject.layer = LayerMask.NameToLayer("InteractableObject");
+        personalTrigger.interactable = true;
+        personalTrigger.hoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
+        personalTrigger.disabledHoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
+        personalTrigger.disabledHoverTip = "";
+        string currentJoinButton = InputControlPath.ToHumanReadableString(
+    EmotesInputSettings.Instance.JoinEmote.bindings[0].effectivePath,
+    InputControlPath.HumanReadableStringOptions.OmitDevice);
+        personalTrigger.hoverTip = $"Press [{currentJoinButton}] to join";
     }
     void OnDestroy()
     {
@@ -142,6 +157,10 @@ public class EmoteLocation : MonoBehaviour
             {
                 validPlayers++;
                 SetColor();
+                if (mapper.local)
+                {
+                    personalTrigger.interactable = true;
+                }
                 mapper.currentEmoteSpot = this.gameObject;
                 CustomEmotesAPI.JoinSpotEntered(mapper, owner);
             }
@@ -157,6 +176,10 @@ public class EmoteLocation : MonoBehaviour
                 if (validPlayers != 0)
                 {
                     validPlayers--;
+                }
+                if (mapper.local)
+                {
+                    personalTrigger.interactable = false;
                 }
                 SetColor();
                 if (mapper.currentEmoteSpot == this.gameObject)

@@ -9,12 +9,15 @@ using LethalEmotesAPI.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class BoneMapper : MonoBehaviour
 {
@@ -85,13 +88,18 @@ public class BoneMapper : MonoBehaviour
     public BoneMapper currentlyLockedBoneMapper;
     public static Dictionary<GameObject, BoneMapper> playersToMappers = new Dictionary<GameObject, BoneMapper>();
     public AudioSource personalAudioSource;
+    public InteractTrigger personalTrigger;
+    public string currentJoinButton;
     public bool isServer = false;
     public int networkId;
+    public bool joined = false;
     public bool canThirdPerson = true;
     internal bool canEmote = false;
     public bool isValidPlayer = false;
     internal bool canStop = true;
     public string userName = string.Empty;
+    internal List<EmoteConstraint> cosmeticConstraints = new List<EmoteConstraint>();
+    internal GameObject originalCosmeticPosition;
     public static string GetRealAnimationName(string animationName)
     {
         if (customNamePairs.ContainsKey(animationName))
@@ -530,9 +538,25 @@ public class BoneMapper : MonoBehaviour
             }
         }
     }
+
+    public void UpdateHoverTip(string emoteName)
+    {
+        if (personalTrigger is not null)
+        {
+            currentJoinButton = InputControlPath.ToHumanReadableString(
+                EmotesInputSettings.Instance.JoinEmote.bindings[0].effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice);
+            personalTrigger.hoverTip = $"Press [{currentJoinButton}] to join {emoteName}";
+        }
+    }
+
     internal IEnumerator preventEmotesInSpawnAnimation() //this is a hacky fix, but for some reason if you emote while spawning the log will just fucking die, need to come back to this but it's not really a big deal
     {
         yield return new WaitForSeconds(3);
+        foreach (var item in cosmeticConstraints)
+        {
+            item.ActivateConstraints();
+        }
         canEmote = true;
     }
     void Start()
@@ -572,6 +596,21 @@ public class BoneMapper : MonoBehaviour
         playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
+
+        // Tool Tip Handling
+        if (!isEnemy)
+        {
+            GameObject trigObject = mapperBody.gameObject.transform.Find("PlayerPhysicsBox").gameObject;
+            trigObject.tag = "InteractTrigger";
+            //trigObject.layer = LayerMask.NameToLayer("InteractableObject");
+            personalTrigger = trigObject.AddComponent<InteractTrigger>();
+            personalTrigger.interactable = false;
+            personalTrigger.hoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
+            personalTrigger.disabledHoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
+            personalTrigger.disabledHoverTip = "";
+            UpdateHoverTip("none");
+        }
+
 
         GameObject obj = GameObject.Instantiate(Assets.Load<GameObject>("assets/source1.prefab"));
         obj.name = $"{name}_AudioObject";
@@ -745,6 +784,13 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+                    originalCosmeticPosition = new GameObject();
+                    originalCosmeticPosition.transform.parent = playerController.headCostumeContainerLocal.parent;
+                    originalCosmeticPosition.transform.position = playerController.headCostumeContainerLocal.position;
+                    originalCosmeticPosition.transform.localEulerAngles = playerController.headCostumeContainerLocal.localEulerAngles;
+                    EmoteConstraint e = playerController.headCostumeContainerLocal.gameObject.AddComponent<EmoteConstraint>();
+                    e.AddSource(playerController.headCostumeContainerLocal, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head));
+                    cosmeticConstraints.Add(e);
                     gameObject.AddComponent<NearestEmoterChecker>().self = this;
                     isServer = playerController.IsServer && playerController.IsOwner;
                     HealthbarAnimator.Setup(this);
@@ -962,10 +1008,10 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool ThirdPersonCheck()
     {
-        bool yes = 
-            !CustomEmotesAPI.LCThirdPersonPresent 
-            && currentClip is not null 
-            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on) 
+        bool yes =
+            !CustomEmotesAPI.LCThirdPersonPresent
+            && currentClip is not null
+            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on)
             && canThirdPerson
             && temporarilyThirdPerson != TempThirdPerson.off;
         return yes;
@@ -975,7 +1021,8 @@ public class BoneMapper : MonoBehaviour
         if (local && isInThirdPerson)
         {
             //just copying this from the unity docs/spectator camera KEKW
-            Ray ray = new Ray(mapperBodyTransform.position, desiredCameraPos.transform.position - mapperBodyTransform.position);
+            Vector3 rayPos = mapperBodyTransform.position + new Vector3(0, 1.75f * scale, 0);
+            Ray ray = new Ray(rayPos, desiredCameraPos.transform.position - rayPos);
             RaycastHit hit;//                       v PlayerControlerB.walkableSurfacesNoPlayersMask... but it's private and I don't feel like publicizing it lmao
             if (Physics.Raycast(ray, out hit, 10f, 268437761, QueryTriggerInteraction.Ignore))
             {
@@ -985,7 +1032,7 @@ public class BoneMapper : MonoBehaviour
             {
                 realCameraPos.transform.position = ray.GetPoint(10.0f);
             }
-            if (Vector3.Distance(realCameraPos.transform.position, mapperBodyTransform.position) > Vector3.Distance(desiredCameraPos.transform.position, mapperBodyTransform.position))
+            if (Vector3.Distance(realCameraPos.transform.position, rayPos) > Vector3.Distance(desiredCameraPos.transform.position, rayPos))
             {
                 realCameraPos.transform.position = desiredCameraPos.transform.position;
             }
@@ -1148,43 +1195,47 @@ public class BoneMapper : MonoBehaviour
     }
     void OnDestroy()
     {
-        if (worldProp)
+        if (playerController is not null)
         {
-            return;
-        }
-        playersToMappers.Remove(mapperBody);
-        try
-        {
-            currentClip.clip[0].ToString();
-            NewAnimation(null);
-            if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+            playersToMappers.Remove(playerController.gameObject);
+            if (worldProp)
             {
-                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                return;
+            }
+            playersToMappers.Remove(mapperBody);
+            try
+            {
+                currentClip.clip[0].ToString();
+                NewAnimation(null);
+                if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                 {
-                    CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                    {
+                        CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    }
                 }
-            }
-            if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
-            {
-                audioObject.GetComponent<AudioManager>().Stop();
-                if (currentClip.syncronizeAudio)
+                if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                 {
-                    listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                    audioObject.GetComponent<AudioManager>().Stop();
+                    if (currentClip.syncronizeAudio)
+                    {
+                        listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                    }
                 }
+                if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+                {
+                    CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
+                    uniqueSpot = -1;
+                }
+                BoneMapper.allMappers.Remove(this);
+                prevClip = currentClip;
+                currentClip = null;
             }
-            if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+            catch (Exception e)
             {
-                CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
-                uniqueSpot = -1;
+                //DebugClass.Log($"Had issues when destroying bonemapper: {e}");
+                BoneMapper.allMappers.Remove(this);
             }
-            BoneMapper.allMappers.Remove(this);
-            prevClip = currentClip;
-            currentClip = null;
-        }
-        catch (Exception e)
-        {
-            //DebugClass.Log($"Had issues when destroying bonemapper: {e}");
-            BoneMapper.allMappers.Remove(this);
         }
     }
     public void UnlockBones(bool animatorEnabled = true)
@@ -1365,6 +1416,10 @@ public class BoneMapper : MonoBehaviour
         playerController.gameplayCamera.cullingMask = StartOfRound.Instance.spectateCamera.cullingMask;//if you break the spectator culling mask, don't, stop, get some help
         thirdPersonConstraint.ActivateConstraints();
         isInThirdPerson = true;
+        foreach (var item in cosmeticConstraints)
+        {
+            item.emoteBone = playerController.playerGlobalHead;
+        }
         if (CustomEmotesAPI.MoreCompanyPresent)
         {
             try
@@ -1401,7 +1456,10 @@ public class BoneMapper : MonoBehaviour
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;
             isInThirdPerson = false;
-
+            foreach (var item in cosmeticConstraints)
+            {
+                item.emoteBone = originalCosmeticPosition.transform;
+            }
             if (CustomEmotesAPI.MoreCompanyPresent && needToTurnOffCosmetics)
             {
                 try

@@ -73,8 +73,14 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     {
         if (_previewAnimator is null)
             return;
-        
-        EmoteUiManager.PlayAnimationOn(_previewAnimator, emoteKey);
+        try
+        {
+            EmoteUiManager.PlayAnimationOn(_previewAnimator, emoteKey);
+        }
+        catch
+        {
+            Debug.Log("Preview can not play emote because it doesn't exist");
+        }
     }
 
     public void ResetPreviewControls()
