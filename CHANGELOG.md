@@ -1,3 +1,5 @@
+- Version 1.11.2: Fixed rare one-time bug upon launching with the new version
+
 - Version 1.11.1: Fixed critical issue preventing terminal use. Fixed bunny ears not working in third person. Removed harmless error in the content creator detector
 
 - Version 1.11.0: Made the DMCA options much more obvious if it detects you might be streaming. Added some tutorial text so players know about the join key. Added a few options to the config to make joining more obvious. Added emote skeletons for quite a few more modded enemies. Adjusted third person camera to be more accurate when pushing against walls. 

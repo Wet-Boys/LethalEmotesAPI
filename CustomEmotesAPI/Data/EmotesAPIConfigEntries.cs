@@ -31,7 +31,8 @@ namespace LethalEmotesAPI.Data
         public ConfigEntry<bool> InteractionToolTip;
         private ConfigFile configFile;
         private string sectionPrefix;
-        public EmotesAPIConfigEntries(ConfigFile file, string sectionPrefix) {
+        public EmotesAPIConfigEntries(ConfigFile file, string sectionPrefix)
+        {
             HideJoinSpots = file.Bind<bool>(sectionPrefix + "Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             rootMotionType = file.Bind<RootMotionType>(sectionPrefix + "Controls", "Camera Lock Settings", RootMotionType.Normal, "Switch head locking between all emotes, no emotes, or let each emote decide.");
             EmotesAlertEnemies = file.Bind<bool>(sectionPrefix + "Misc", "Emotes Alert Enemies", true, "If turned on, emotes will alert enemies like other sound sources.");
@@ -68,7 +69,11 @@ namespace LethalEmotesAPI.Data
         {
             foreach (var item in sourceConfig.configFile.Keys)
             {
-                configFile[new ConfigDefinition(sectionPrefix + item.Section, item.Key)].SetSerializedValue(sourceConfig.configFile[item].GetSerializedValue());
+                var definition = new ConfigDefinition(sectionPrefix + item.Section, item.Key);
+                if (configFile.ContainsKey(definition))
+                {
+                    configFile[definition].SetSerializedValue(sourceConfig.configFile[item].GetSerializedValue());
+                }
             }
         }
     }

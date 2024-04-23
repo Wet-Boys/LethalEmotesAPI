@@ -119,6 +119,7 @@ namespace EmotesAPI
         
         private static void GenerateConfigs()
         {
+            modPackOverride = CustomEmotesAPI.instance.Config.Bind<bool>("Local Settings", "Modpack Override", false, "When true, will use local config even when \"Use Global Config\" is set to true. If \"Use Global Config\" is touched by the user, this will always be reset to false.");
             string globalConfigPath = Path.Combine(GetGlobalSettingsDir(), "global.cfg");
             bool globalIsNew = !File.Exists(globalConfigPath);
             
@@ -127,7 +128,6 @@ namespace EmotesAPI
             
             globalConfig = new EmotesAPIConfigEntries(global, "Global ");
             localConfig = new EmotesAPIConfigEntries(CustomEmotesAPI.instance.Config, "");
-            modPackOverride = CustomEmotesAPI.instance.Config.Bind<bool>("Local Settings", "Modpack Override", false, "When true, will use local config even when \"Use Global Config\" is set to true. If \"Use Global Config\" is touched by the user, this will always be reset to false.");
             
             if (disallowedModPackOverrideLocations.Value.Split('ඞ').ToList().Contains(profileName))
             {
