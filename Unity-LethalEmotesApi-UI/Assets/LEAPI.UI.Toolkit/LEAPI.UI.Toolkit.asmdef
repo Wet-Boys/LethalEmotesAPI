@@ -1,13 +1,10 @@
 {
-    "name": "CustomEmotesApi.UI.Editor",
+    "name": "LEAPI.UI.Toolkit",
     "rootNamespace": "",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "GUID:eadfcb05ee72b135e97438044bfb15fa"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

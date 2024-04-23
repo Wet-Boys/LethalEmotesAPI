@@ -73,7 +73,7 @@ public class PreviewEmoteRenderer : MonoBehaviour
     {
         get
         {
-            _projMat ??= Matrix4x4.Perspective(fov, 1, near, far);
+            _projMat ??= Matrix4x4.Perspective(fov, aspectRatio, near, far);
             return _projMat.Value;
         }
     }
@@ -149,6 +149,6 @@ public class PreviewEmoteRenderer : MonoBehaviour
     
     private void UpdateProjMat()
     {
-        _projMat = Matrix4x4.Perspective(fov, 1, near, far);
+        _projMat = Matrix4x4.Perspective(fov, aspectRatio, near, far);
     }
 }

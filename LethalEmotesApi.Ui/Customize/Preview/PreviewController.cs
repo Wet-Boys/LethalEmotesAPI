@@ -77,6 +77,15 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
         EmoteUiManager.PlayAnimationOn(_previewAnimator, emoteKey);
     }
 
+    public void ResetPreviewControls()
+    {
+        if (_previewRig is null || _previewEmoteRenderer is null)
+            return;
+
+        _previewRig.ResetControls();
+        _previewEmoteRenderer.Fov = 25f;
+    }
+
     private void ResetPreviewInstance()
     {
         if (previewPrefab is null || previewGraphic is null || _renderTexture is null)

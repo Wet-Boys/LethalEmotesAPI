@@ -1410,7 +1410,8 @@ MonoBehaviour:
   backgroundRenderer: {fileID: 6035327424170633418}
   emoteSkinnedMeshRenderer: {fileID: 8277726062195365802}
   targetRenderTexture: {fileID: 0}
-  fov: 60
+  fov: 25
+  aspectRatio: 1
   near: 0.3
   far: 70
 --- !u!1183024399 &5672204223832318081
@@ -1859,6 +1860,7 @@ MonoBehaviour:
   m_Script: {fileID: -723761234, guid: b2c656f14b2d18f468e54fdcaa06a25c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialEulerAngles: {x: 0, y: 0, z: 0}
   emoteRenderer: {fileID: 5354672190154027325}
 --- !u!1 &4383492357313397468
 GameObject:

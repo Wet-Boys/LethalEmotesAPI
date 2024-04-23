@@ -1,3 +1,4 @@
+using System;
 using LethalEmotesApi.Ui.Animation;
 using UnityEngine;
 
@@ -6,7 +7,8 @@ namespace LethalEmotesApi.Ui.Customize.Preview;
 public class PreviewRig : MonoBehaviour
 {
     private readonly TweenRunner<FloatTween> _zoomTweenRunner = new();
-    
+
+    public Vector3 initialEulerAngles;
     public PreviewEmoteRenderer? emoteRenderer;
 
     protected PreviewRig()
@@ -14,6 +16,11 @@ public class PreviewRig : MonoBehaviour
         _zoomTweenRunner.Init(this);
     }
     
+    public void ResetControls()
+    {
+        transform.localEulerAngles = initialEulerAngles;
+    }
+
     public void Orbit(float vInput, float hInput)
     {
         transform.Rotate(Vector3.right, vInput);
@@ -23,7 +30,7 @@ public class PreviewRig : MonoBehaviour
     }
 
     // https://forum.unity.com/threads/limiting-rotation-with-mathf-clamp.171294/ - thread where I borrowed the code
-    static float ClampAngle(float angle, float min, float max)
+    private static float ClampAngle(float angle, float min, float max)
     {
         if (min < 0 && max > 0 && (angle > max || angle < min))
         {

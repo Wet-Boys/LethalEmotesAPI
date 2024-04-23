@@ -70,12 +70,15 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
         
         modLabel.SetText(EmoteUiManager.GetEmoteModName(EmoteKey));
 
-        if (blacklistToggle is null || visibilityToggle is null || emoteKeybind is null)
+        if (blacklistToggle is null || visibilityToggle is null || emoteKeybind is null || previewController is null)
             return;
 
         blacklistToggle.SetEmoteKey(EmoteKey);
         visibilityToggle.SetEmoteKey(EmoteKey);
         emoteKeybind.SetEmoteKey(EmoteKey);
+        
+        previewController.ResetPreviewControls();
+        previewController.PlayEmote(EmoteKey);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -111,8 +114,5 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
         EmoteKey = emoteKey;
         
         UpdateState();
-
-        previewController!.PreviewEmoteRenderer.Fov = 25f;
-        previewController.PlayEmote(emoteKey);
     }
 }
