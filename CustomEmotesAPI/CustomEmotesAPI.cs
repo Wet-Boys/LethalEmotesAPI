@@ -49,16 +49,16 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.11.0";
+        public const string VERSION = "1.11.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
             public Sprite sprite;
 
         }
-        
+
         public static List<NameTokenWithSprite> nameTokenSpritePairs = new List<NameTokenWithSprite>();
-        
+
         public static bool CreateNameTokenSpritePair(string nameToken, Sprite sprite)
         {
             NameTokenWithSprite temp = new NameTokenWithSprite();
@@ -71,12 +71,12 @@ namespace EmotesAPI
             nameTokenSpritePairs.Add(temp);
             return true;
         }
-        
+
         void CreateBaseNameTokenPairs()
         {
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
-        
+
         public static List<string> randomClipList = new List<string>();
         public static bool LCThirdPersonPresent;
         public static bool ModelReplacementAPIPresent;
@@ -307,20 +307,26 @@ namespace EmotesAPI
         private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (localMapper is not null && localMapper.isInThirdPerson)
+            try
             {
-                self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
-                float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
-                cameraLookDir -= inputVector.y;
-                if (cameraLookDir > 200)
+                if (localMapper is not null && localMapper.isInThirdPerson)
                 {
-                    cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                    self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
+                    float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
+                    cameraLookDir -= inputVector.y;
+                    if (cameraLookDir > 200)
+                    {
+                        cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                    }
+                    else
+                    {
+                        cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
+                    }
+                    localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
                 }
-                else
-                {
-                    cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
-                }
-                localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
+            }
+            catch (Exception)
+            {
             }
         }
         private static Hook CalculateNormalLookingInputHook;
@@ -503,7 +509,7 @@ namespace EmotesAPI
             hook = new Hook(targetMethod, destMethod, this);
 
         }
-        
+
         public void Awake()
         {
             instance = this;
@@ -688,6 +694,10 @@ namespace EmotesAPI
         }
 
         private void ThirdPersonToggle_started(InputAction.CallbackContext obj)
+        {
+            ThirdPersonToggle();
+        }
+        private static void ThirdPersonToggle()
         {
             if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
             {
@@ -989,7 +999,10 @@ namespace EmotesAPI
         {
             foreach (var item in BoneMapper.allMappers)
             {
-                item.personalTrigger.interactable = active && item.currentClip is not null && item.currentClip.allowJoining && Settings.InteractionToolTip.Value;
+                if (item.personalTrigger is not null)
+                {
+                    item.personalTrigger.interactable = active && item.currentClip is not null && item.currentClip.allowJoining && Settings.InteractionToolTip.Value;
+                }
             }
         }
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
@@ -1007,7 +1020,10 @@ namespace EmotesAPI
             {
                 mapper.UpdateHoverTip(BoneMapper.animClips[newAnimation].displayName);
             }
-            mapper.personalTrigger.interactable = false; // remove tooltip
+            if (mapper.personalTrigger is not null)
+            {
+                mapper.personalTrigger.interactable = false; // remove tooltip
+            }
 
             if (mapper == localMapper)
             {
@@ -1030,6 +1046,13 @@ namespace EmotesAPI
                         HealthbarAnimator.StartHealthbarAnimateRequest();
                     }
                     ChangeInteractionTriggers(false);
+                    if (newAnimation.Contains($"TooManyEmotes__"))
+                    {
+                        if (mapper.isInThirdPerson)
+                        {
+                            ThirdPersonToggle();
+                        }
+                    }
                 }
 
             }
@@ -1059,7 +1082,7 @@ namespace EmotesAPI
 
             if (newAnimation != "none")
             {
-                if (localMapper.currentClip is null)
+                if (localMapper.currentClip is null && mapper.personalTrigger is not null)
                 {
                     mapper.personalTrigger.interactable = mapper.currentClip is not null && mapper.currentClip.allowJoining && Settings.InteractionToolTip.Value; // enable tooltip
                 }
