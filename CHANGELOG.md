@@ -1,3 +1,5 @@
+- Version 1.11.3: Made players less boulder-like
+
 - Version 1.11.2: Fixed rare one-time bug upon launching with the new version
 
 - Version 1.11.1: Fixed critical issue preventing terminal use. Fixed bunny ears not working in third person. Removed harmless error in the content creator detector

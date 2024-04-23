@@ -597,7 +597,7 @@ public class BoneMapper : MonoBehaviour
         {
             GameObject trigObject = mapperBody.gameObject.transform.Find("PlayerPhysicsBox").gameObject;
             trigObject.tag = "InteractTrigger";
-            trigObject.layer = LayerMask.NameToLayer("InteractableObject");
+            //trigObject.layer = LayerMask.NameToLayer("InteractableObject");
             personalTrigger = trigObject.AddComponent<InteractTrigger>();
             personalTrigger.interactable = false;
             personalTrigger.hoverIcon = Sprite.Instantiate(Assets.Load<Sprite>("assets/fineilldoitmyself/nothing.png"));
