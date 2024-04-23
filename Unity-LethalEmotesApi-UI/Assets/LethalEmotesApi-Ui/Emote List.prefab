@@ -2488,7 +2488,7 @@ MonoBehaviour:
     m_Top: 5
     m_Bottom: 5
   spacing: 5
-  preferredItemSize: {x: 170, y: 135}
+  preferredItemSize: {x: 170, y: 100}
   startCorner: 0
   constraint: 0
   maxInConstraint: 2
@@ -4274,7 +4274,7 @@ MonoBehaviour:
     m_Top: 5
     m_Bottom: 5
   spacing: 5
-  preferredItemSize: {x: 170, y: 142.5}
+  preferredItemSize: {x: 170, y: 107.5}
   startCorner: 0
   constraint: 0
   maxInConstraint: 2
@@ -4372,7 +4372,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7196315519390617209, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 135
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7196315519390617209, guid: 9546dcaa69d1e5d47bddcdd6e236b981, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4602,7 +4602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2665489030280593483, guid: 08690823effd0faeaa0193bc3984068f, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 142.5
+      value: 107.5
       objectReference: {fileID: 0}
     - target: {fileID: 2665489030280593483, guid: 08690823effd0faeaa0193bc3984068f, type: 3}
       propertyPath: m_LocalPosition.x

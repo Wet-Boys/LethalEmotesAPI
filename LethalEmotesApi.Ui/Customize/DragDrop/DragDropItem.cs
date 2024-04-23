@@ -1,11 +1,11 @@
-using TMPro;
+using LethalEmotesApi.Ui.Customize.List;
 using UnityEngine.EventSystems;
 
 namespace LethalEmotesApi.Ui.Customize.DragDrop;
 
 public class DragDropItem : UIBehaviour
 {
-    public TextMeshProUGUI? label;
+    public EmoteListItem? listItem;
     
     public string? EmoteKey { get; private set; }
 
@@ -29,19 +29,9 @@ public class DragDropItem : UIBehaviour
 
     private void UpdateState()
     {
-        if (EmoteKey is null)
+        if (EmoteKey is null || listItem is null)
             return;
         
-        if (label is null)
-            return;
-        
-        try
-        {
-            label.SetText(EmoteUiManager.GetEmoteName(EmoteKey));
-        }
-        catch
-        {
-            label.SetText(EmoteKey);
-        }
+        listItem.SetEmoteKey(EmoteKey);
     }
 }

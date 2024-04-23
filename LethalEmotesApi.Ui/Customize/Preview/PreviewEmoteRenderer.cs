@@ -119,11 +119,10 @@ public class PreviewEmoteRenderer : MonoBehaviour
         UpdateProjMat();
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         _cmdBuffer!.Clear();
         _cmdBuffer.SetViewProjectionMatrices(ViewMat, ProjMat);
-        
         DrawWithMaterials(backgroundRenderer!);
         DrawWithMaterials(emoteSkinnedMeshRenderer!);
         
@@ -141,6 +140,59 @@ public class PreviewEmoteRenderer : MonoBehaviour
             _cmdBuffer!.DrawRenderer(renderer, material, i, -1);
         }
     }
+
+    // private void DrawForwardOpaqueUnlit(Renderer renderer)
+    // {
+    //     var props = new MaterialPropertyBlock();
+    //     
+    //     for (var i = 0; i < renderer.sharedMaterials.Length; i++)
+    //     {
+    //         renderer.GetPropertyBlock(props);
+    //
+    //         var mainTex = props.GetTexture("_MainTex");
+    //         
+    //         var material = renderer.sharedMaterials[i];
+    //         
+    //         // Scene Selection Pass
+    //         material.SetOverrideTag("LightMode", "SceneSelectionPass");
+    //         _cmdBuffer!.DrawRenderer(renderer, material, i, 0);
+    //         
+    //         // Depth Forward Only
+    //         material.SetOverrideTag("LightMode", "DepthForwardOnly");
+    //         _cmdBuffer.DrawRenderer(renderer, material, i, 1);
+    //         
+    //         // Motion Vectors
+    //         material.SetOverrideTag("LightMode", "MotionVectors");
+    //         _cmdBuffer.DrawRenderer(renderer, material, i, 2);
+    //         
+    //         _cmdBuffer!.SetGlobalTexture("_ExposureTexture", _exposureTex);
+    //         _cmdBuffer.SetGlobalTexture("_UnlitColorMap", mainTex);
+    //         
+    //         _cmdBuffer.SetGlobalFloat("_EmissiveExposureWeight", 1f);
+    //         
+    //         _cmdBuffer.SetGlobalColor("_EmissiveColor", Color.clear);
+    //         _cmdBuffer.SetGlobalColor("_UnlitColor", Color.red);
+    //         
+    //         _cmdBuffer.SetGlobalVector("_UnlitColorMap_ST", new Vector4(1, 1, 0, 0));
+    //         
+    //         // Forward Opaque
+    //         material.SetOverrideTag("LightMode", "ForwardOnly");
+    //         _cmdBuffer.DrawRenderer(renderer, material, i, 3);
+    //     }
+    // }
+    //
+    // private void DrawSmr(SkinnedMeshRenderer smr)
+    // {
+    //     for (int i = 0; i < smr.sharedMaterials.Length; i++)
+    //     {
+    //         var material = smr.sharedMaterials[i];
+    //         material.SetPass(0);
+    //         smr.BakeMesh(_smrMesh);
+    //
+    //         var rp = new RenderParams(material);
+    //         Graphics.RenderMesh(rp, _smrMesh, i, smr.localToWorldMatrix);
+    //     }
+    // }
 
     private void OnDestroy()
     {

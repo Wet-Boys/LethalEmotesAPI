@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Experimental.Rendering;
@@ -23,6 +24,8 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     private PreviewRig? _previewRig;
     private PreviewEmoteRenderer? _previewEmoteRenderer;
     private RenderTexture? _renderTexture;
+
+    private string? _nextEmote;
 
     public PreviewEmoteRenderer PreviewEmoteRenderer => _previewEmoteRenderer!;
 
@@ -71,16 +74,26 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
 
     public void PlayEmote(string emoteKey)
     {
+        _nextEmote = emoteKey;
+        
         if (_previewAnimator is null)
             return;
+        
         try
         {
-            EmoteUiManager.PlayAnimationOn(_previewAnimator, emoteKey);
+            EmoteUiManager.PlayAnimationOn(_previewAnimator, _nextEmote);
+            _nextEmote = null;
         }
         catch
         {
             Debug.Log("Preview can not play emote because it doesn't exist");
         }
+    }
+
+    private void Update()
+    {
+        if (_nextEmote is not null)
+            PlayEmote(_nextEmote);
     }
 
     public void ResetPreviewControls()

@@ -90,11 +90,14 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
         
         if (EmoteKey is null)
             return;
-        
-        dragDropController!.OnCanGrab();
 
-        if (dragDropController.DragState != EmoteDragDropController.DragDropState.Ready)
-            return;
+        if (dragDropController is not null)
+        {
+            dragDropController!.OnCanGrab();
+
+            if (dragDropController.DragState != EmoteDragDropController.DragDropState.Ready)
+                return;
+        }
         
         previewController!.PlayEmote(EmoteKey);
     }
@@ -105,6 +108,9 @@ public class EmoteListItem : UIBehaviour, IBeginDragHandler, IDragHandler, IPoin
             return;
 
         selectImage.enabled = false;
+
+        if (dragDropController is null)
+            return;
         
         dragDropController!.OnNotGrab();
     }
