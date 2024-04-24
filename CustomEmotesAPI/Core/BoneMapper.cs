@@ -939,6 +939,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (playerController.isPlayerDead && local && currentClip is not null)
             {
+                UnlockBones();
                 CustomEmotesAPI.PlayAnimation("none");
                 foreach (var item in props)
                 {
