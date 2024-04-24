@@ -49,7 +49,6 @@ public class SegmentLabel : UIBehaviour
         tracker.Add(this, missingLabel, DrivenTransformProperties.Rotation);
         tracker.Add(this, lockedLabel, DrivenTransformProperties.Rotation);
 
-
         var worldRot = RectTransform.eulerAngles;
         targetLabel.localEulerAngles = -worldRot;
         missingLabel.localEulerAngles = -worldRot;
@@ -73,7 +72,7 @@ public class SegmentLabel : UIBehaviour
 
     private void UpdateText()
     {
-        if (targetText is null || missingLabel is null || missingText is null || _emoteKey is null)
+        if (targetText is null || missingLabel is null || missingText is null || lockedLabel is null || _emoteKey is null)
             return;
 
         var emoteName = EmoteUiManager.GetEmoteName(_emoteKey);

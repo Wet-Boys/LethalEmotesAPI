@@ -1,12 +1,11 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace LethalEmotesApi.Ui.Customize.Preview;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(RectTransform))]
 public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
 {
     private static int _instanceCount;
@@ -15,8 +14,6 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     public float rotSpeed = 25.0f;
     public int renderResolution = 360;
     public RectTransform? renderRect;
-    public GraphicsFormat renderColorFormat;
-    public GraphicsFormat renderDepthFormat;
     public RawImage? previewGraphic;
 
     private GameObject? _previewObjectInstance;
@@ -24,16 +21,21 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     private PreviewRig? _previewRig;
     private PreviewEmoteRenderer? _previewEmoteRenderer;
     private RenderTexture? _renderTexture;
+    private RectTransform? _rectTransform;
 
     private string? _nextEmote;
 
     public PreviewEmoteRenderer PreviewEmoteRenderer => _previewEmoteRenderer!;
+
+    public RectTransform RectTransform => _rectTransform ??= GetComponent<RectTransform>();
 
     private float Ratio => renderRect is not null ? renderRect.rect.width / renderRect.rect.height : 1f;
 
     protected override void Awake()
     {
         base.Awake();
+
+        _rectTransform ??= GetComponent<RectTransform>();
         
         _renderTexture = new RenderTexture(renderResolution, (int)Mathf.Floor(renderResolution * Ratio), 1, RenderTextureFormat.DefaultHDR);
     }
@@ -75,13 +77,17 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
     public void PlayEmote(string emoteKey)
     {
         _nextEmote = emoteKey;
-        
-        if (_previewAnimator is null)
+    }
+
+    private void TryPlayEmote()
+    {
+        if (_previewAnimator is null || renderRect is null)
             return;
         
         try
         {
-            EmoteUiManager.PlayAnimationOn(_previewAnimator, _nextEmote);
+            renderRect.gameObject.SetActive(_nextEmote != "none");
+            EmoteUiManager.PlayAnimationOn(_previewAnimator, _nextEmote!);
             _nextEmote = null;
         }
         catch
@@ -90,10 +96,18 @@ public class PreviewController : UIBehaviour, IDragHandler, IScrollHandler
         }
     }
 
+    public void StopEmote()
+    {
+        if (_previewAnimator is null)
+            return;
+        
+        _previewAnimator.StopPlayback();
+    }
+
     private void Update()
     {
         if (_nextEmote is not null)
-            PlayEmote(_nextEmote);
+            TryPlayEmote();
     }
 
     public void ResetPreviewControls()

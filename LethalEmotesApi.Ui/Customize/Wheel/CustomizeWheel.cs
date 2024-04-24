@@ -44,9 +44,6 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
         if (dragDropController is null)
             dragDropController = GetComponentInParent<EmoteDragDropController>();
 
-        // if (previewController is null)
-        //     previewController = GetComponentInParent<CustomizePanel>().previewController;
-
         foreach (var segment in wheelSegments)
         {
             segment.colors = colors;
@@ -109,13 +106,6 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
 
         if (dragDropController.DragState != EmoteDragDropController.DragDropState.Ready)
             return;
-        
-        // if (previewController is null)
-        //     return;
-        // if (prevSegmentIndex == _currentSegmentIndex)
-        //     return;
-        
-        // previewController.PlayEmote(_emoteArray[_currentSegmentIndex]);
     }
 
     private void StartDrag(PointerEventData eventData)
@@ -216,7 +206,7 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
         foreach (var segment in wheelSegments)
             segment.ResetState();
         
-        UpdateLabels();
+        UpdateSegmentStates();
     }
     
     private int GetClosestSegmentIndex(Vector2 mousePos)
@@ -240,13 +230,13 @@ public class CustomizeWheel : UIBehaviour, IBeginDragHandler, IDragHandler, IPoi
         return segmentIndex;
     }
 
-    private void UpdateLabels()
+    private void UpdateSegmentStates()
     {
         if (_emoteArray.Length != wheelSegments.Count)
             return;
         
         for (var i = 0; i < wheelSegments.Count; i++)
-            wheelSegments[i].SetLabel(_emoteArray[i]);
+            wheelSegments[i].SetEmoteKey(_emoteArray[i]);
     }
 
     public class EmoteChangedCallback : UnityEvent<int, string>;

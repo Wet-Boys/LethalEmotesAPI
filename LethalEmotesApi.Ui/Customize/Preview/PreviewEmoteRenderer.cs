@@ -10,6 +10,8 @@ public class PreviewEmoteRenderer : MonoBehaviour
     public MeshRenderer? backgroundRenderer;
     public SkinnedMeshRenderer? emoteSkinnedMeshRenderer;
     public RenderTexture? targetRenderTexture;
+
+    public bool renderBackground = true;
     
     [SerializeField]
     private float fov = 25f;
@@ -123,7 +125,10 @@ public class PreviewEmoteRenderer : MonoBehaviour
     {
         _cmdBuffer!.Clear();
         _cmdBuffer.SetViewProjectionMatrices(ViewMat, ProjMat);
-        DrawWithMaterials(backgroundRenderer!);
+
+        if (renderBackground)
+            DrawWithMaterials(backgroundRenderer!);
+        
         DrawWithMaterials(emoteSkinnedMeshRenderer!);
         
         Graphics.SetRenderTarget(targetRenderTexture);
