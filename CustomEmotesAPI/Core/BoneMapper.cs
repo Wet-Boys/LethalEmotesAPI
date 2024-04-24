@@ -858,7 +858,7 @@ public class BoneMapper : MonoBehaviour
                     if (basePlayerModelSMR[1].bones[i].name == basePlayerModelSMR[0].bones[x].name)
                     {
                         e.AddSource(basePlayerModelSMR[1].bones[i], basePlayerModelSMR[0].bones[x]);
-                        e.forceGlobalTransforms = true;
+                        //e.forceGlobalTransforms = true;
                         break;
                     }
                     if (x == startX - 1)
@@ -1078,7 +1078,7 @@ public class BoneMapper : MonoBehaviour
                         Quaternion tempRot = transform.rotation;
 
                         //move player body
-                        mapperBody.transform.position = new Vector3(emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.x, mapperBody.transform.position.y, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Spine).position.z);
+                        mapperBody.transform.position = new Vector3(emoteSkeletonSMR.rootBone.position.x, mapperBody.transform.position.y, emoteSkeletonSMR.rootBone.position.z);
                         if (isEnemy || !isInThirdPerson)
                         {
                             mapperBody.transform.eulerAngles = new Vector3(mapperBody.transform.eulerAngles.x, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head).eulerAngles.y, mapperBody.transform.eulerAngles.z);
@@ -1087,7 +1087,8 @@ public class BoneMapper : MonoBehaviour
                         //revert self to current BoneMapper position from earlier
                         transform.position = tempPos;
                         transform.rotation = tempRot;
-
+                        basePlayerModelAnimator.transform.parent.position = tempPos;
+                        //basePlayerModelAnimator.transform.parent.rotation = tempRot;
                         if (positionBeforeRootMotion != new Vector3(69, 69, 69))
                         {
                             mapperBody.transform.position = positionBeforeRootMotion;
@@ -1114,6 +1115,7 @@ public class BoneMapper : MonoBehaviour
                     //move bonemapper to last synced position
                     transform.position = prevMapperPos;
                     transform.eulerAngles = prevMapperRot;
+                    basePlayerModelAnimator.transform.parent.position = prevMapperPos;
                 }
             }
         }
@@ -1308,14 +1310,14 @@ public class BoneMapper : MonoBehaviour
                         {
                             //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
                             EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
-                            ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                             if (smr == basePlayerModelSMR.First())
                             {
                                 if (currentClip is not null)
                                 {
-                                    ec.SetLocalTransforms(currentClip.localTransforms);
+                                    ec.SetLocalTransforms(true);
                                 }
                             }
+                            ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                         }
                         else if (dontAnimateUs.Contains(smr.bones[i].name))
                         {

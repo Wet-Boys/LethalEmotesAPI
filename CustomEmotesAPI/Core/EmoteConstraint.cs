@@ -23,6 +23,7 @@ public class EmoteConstraint : MonoBehaviour
     public bool localTransforms { get; private set; } = false;
     public bool forceGlobalTransforms = false;
     internal bool needToFix = true;
+    internal float constraintPower = 0;
     public bool SetLocalTransforms(bool input)
     {
         localTransforms = !forceGlobalTransforms && input;
@@ -38,14 +39,24 @@ public class EmoteConstraint : MonoBehaviour
         {
             if (localTransforms)
             {
+                if (constraintPower < 1)
+                {
+                    constraintPower += Time.deltaTime * 4f;
+                    //Debug.Log(constraintPower);
+                    //Debug.Log($"{Time.frameCount}   {transform.name}");
+                    if (constraintPower > 1)
+                    {
+                        constraintPower = 1;
+                    }
+                }
                 if (onlyY)
                 {
-                    originalBone.localPosition = new Vector3(originalBone.localPosition.x, emoteBone.localPosition.y, originalBone.localPosition.z);
+                    originalBone.localPosition = new Vector3(originalBone.localPosition.x, Mathf.Lerp(originalBone.localPosition.y, emoteBone.localPosition.y, constraintPower), originalBone.localPosition.z);
                 }
                 else
                 {
-                    originalBone.localPosition = emoteBone.localPosition;
-                    originalBone.localRotation = emoteBone.localRotation;
+                    originalBone.localPosition = Vector3.Lerp(originalBone.localPosition, emoteBone.localPosition, constraintPower);
+                    originalBone.localRotation = Quaternion.Lerp(originalBone.localRotation, emoteBone.localRotation, constraintPower);
                 }
             }
             else
@@ -66,6 +77,8 @@ public class EmoteConstraint : MonoBehaviour
     {
         if (!constraintActive && emoteBone is not null)
         {
+            //Debug.Log($"{localTransforms}   {transform.name}");
+            constraintPower = 0;
             if (firstTime2)
             {
                 firstTime2 = false;

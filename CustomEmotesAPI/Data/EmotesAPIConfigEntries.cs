@@ -64,6 +64,10 @@ namespace LethalEmotesAPI.Data
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
             LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(PermanentEmotingHealthbar, false));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(ImportTME, true));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(ImportBetterEmotes, true));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(NearestEmoteText, false));
+            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(InteractionToolTip, false));
         }
         public void CopyFromConfig(EmotesAPIConfigEntries sourceConfig)
         {

@@ -11,7 +11,7 @@ namespace LethalEmotesAPI.Patches
             //copied this partially from https://github.com/notnotnotswipez/MoreCompany/blob/master/MoreCompany/MimicPatches.cs#L32
             Transform cosmeticRoot = mapper.basePlayerModelAnimator.transform;
             CosmeticApplication cosmeticApplication = cosmeticRoot.GetComponent<CosmeticApplication>();
-            if (cosmeticApplication && cosmeticApplication.spawnedCosmetics.Count != 0)
+            if (cosmeticApplication is not null && cosmeticApplication.spawnedCosmetics.Count != 0)
             {
                 foreach (var item in cosmeticApplication.spawnedCosmetics)
                 {
