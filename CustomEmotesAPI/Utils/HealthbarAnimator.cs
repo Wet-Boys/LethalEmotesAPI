@@ -19,6 +19,7 @@ namespace LethalEmotesAPI.Utils
         internal static bool permaOn = false;
         internal static bool setupComplete = false;
         internal static GameObject healthBarCameraObject;
+        internal static HudCameraConstraint hudCameraConstraint;
         internal static void Setup(BoneMapper mapper)
         {
             if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
@@ -62,6 +63,9 @@ namespace LethalEmotesAPI.Utils
                         }
                     }
                 }
+                hudCameraConstraint = healthBarCameraObject.GetComponentInChildren<PositionConstraint>().gameObject.AddComponent<HudCameraConstraint>();
+                healthBarCameraObject.GetComponentInChildren<PositionConstraint>().constraintActive = false;
+                hudCameraConstraint.target = healthBarCameraObject.transform.Find("scavEmoteSkeleton/ScavengerModel/metarig/spine");
                 SetHealthbarPosition();
                 setupComplete = true;
             }
@@ -97,6 +101,7 @@ namespace LethalEmotesAPI.Utils
                         CustomEmotesAPI.baseHUDObject.SetActive(false);
                     }
                     CustomEmotesAPI.selfRedHUDObject.SetActive(false);
+                    hudCameraConstraint.constraintActive = true;
                 }
             }
             else
@@ -113,6 +118,7 @@ namespace LethalEmotesAPI.Utils
                         CustomEmotesAPI.baseHUDObject.SetActive(true);
                     }
                     CustomEmotesAPI.selfRedHUDObject.SetActive(true);
+                    hudCameraConstraint.constraintActive = false;
                 }
             }
 
