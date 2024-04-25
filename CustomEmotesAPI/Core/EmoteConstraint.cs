@@ -25,6 +25,8 @@ public class EmoteConstraint : MonoBehaviour
     internal bool needToFix = true;
     internal float constraintPower = 0;
     internal bool interpolates = false;
+    Vector3 posBeforeStopping;
+    Quaternion rotBeforeStopping;
     public bool SetLocalTransforms(bool input)
     {
         localTransforms = !forceGlobalTransforms && input;
@@ -34,51 +36,74 @@ public class EmoteConstraint : MonoBehaviour
     {
         ActUponConstraints();
     }
+    const float multiplier = .5f;
     public void ActUponConstraints()
     {
         if (constraintActive)
         {
             if (constraintPower < 1)
             {
-                constraintPower += Time.deltaTime * 4f;
+                constraintPower += Time.deltaTime * multiplier;
                 if (constraintPower > 1)
                 {
                     constraintPower = 1;
                 }
             }
-            if (localTransforms)
+            AnimateBone();
+        }
+        else
+        {
+            if (constraintPower > 0)
             {
-                if (onlyY)
+                constraintPower -= Time.deltaTime * multiplier;
+                if (constraintPower < 0)
                 {
-                    originalBone.localPosition = new Vector3(originalBone.localPosition.x, Mathf.Lerp(originalBone.localPosition.y, emoteBone.localPosition.y, constraintPower), originalBone.localPosition.z);
+                    constraintPower = 0;
                 }
-                else
-                {
-                    originalBone.localPosition = Vector3.Lerp(originalBone.localPosition, emoteBone.localPosition, constraintPower);
-                    originalBone.localRotation = Quaternion.Lerp(originalBone.localRotation, emoteBone.localRotation, constraintPower);
-                }
+                RevertBone();
+            }
+        }
+
+    }
+    public void AnimateBone()//yes it's kinda duplicate code, but it's in favor of doing less checks per frame since a lot of items do these steps
+    {
+        if (localTransforms)
+        {
+            if (onlyY)
+            {
+                originalBone.localPosition = new Vector3(originalBone.localPosition.x, Mathf.Lerp(originalBone.localPosition.y, emoteBone.localPosition.y, constraintPower), originalBone.localPosition.z);
             }
             else
             {
-                if (onlyY)
-                {
-                    originalBone.position = new Vector3(originalBone.position.x, Mathf.Lerp(originalBone.position.y, emoteBone.position.y, constraintPower), originalBone.position.z);
-                }
-                else
-                {
-                    originalBone.position = Vector3.Lerp(originalBone.position, emoteBone.position, constraintPower);
-                    originalBone.rotation = Quaternion.Lerp(originalBone.rotation, emoteBone.rotation, constraintPower);
-                }
-                //if (onlyY)
-                //{
-                //    originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
-                //}
-                //else
-                //{
-                //    originalBone.position = emoteBone.position;
-                //    originalBone.rotation = emoteBone.rotation;
-                //}
+                originalBone.localPosition = Vector3.Lerp(originalBone.localPosition, emoteBone.localPosition, constraintPower);
+                originalBone.localRotation = Quaternion.Lerp(originalBone.localRotation, emoteBone.localRotation, constraintPower);
             }
+        }
+        else
+        {
+            if (onlyY)
+            {
+                originalBone.position = new Vector3(originalBone.position.x, Mathf.Lerp(originalBone.position.y, emoteBone.position.y, constraintPower), originalBone.position.z);
+            }
+            else
+            {
+                originalBone.position = Vector3.Lerp(originalBone.position, emoteBone.position, constraintPower);
+                originalBone.rotation = Quaternion.Lerp(originalBone.rotation, emoteBone.rotation, constraintPower);
+            }
+        }
+        posBeforeStopping = emoteBone.localPosition;
+        rotBeforeStopping = emoteBone.localRotation;
+    }
+    public void RevertBone() //yes it's kinda duplicate code, but it's in favor of doing less checks per frame since a lot of items do these steps
+    {
+        if (onlyY)
+        {
+            originalBone.localPosition = new Vector3(originalPosition.x, Mathf.Lerp(originalPosition.y, posBeforeStopping.y, constraintPower), originalPosition.z);
+        }
+        else
+        {
+            originalBone.localPosition = Vector3.Lerp(originalPosition, posBeforeStopping, constraintPower);
+            originalBone.localRotation = Quaternion.Lerp(originalRotation, rotBeforeStopping, constraintPower);
         }
     }
     public void ActivateConstraints()
