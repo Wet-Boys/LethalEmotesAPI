@@ -1040,7 +1040,7 @@ namespace EmotesAPI
                 }
                 else
                 {
-                    if (CustomEmotesAPI.hudObject is not null)
+                    if (CustomEmotesAPI.hudObject is not null && localMapper.currentClip is not null && localMapper.currentClip.animates)
                     {
                         requestCounter++;
                         HealthbarAnimator.StartHealthbarAnimateRequest();

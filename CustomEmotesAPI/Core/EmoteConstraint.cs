@@ -24,6 +24,7 @@ public class EmoteConstraint : MonoBehaviour
     public bool forceGlobalTransforms = false;
     internal bool needToFix = true;
     internal float constraintPower = 0;
+    internal bool interpolates = false;
     public bool SetLocalTransforms(bool input)
     {
         localTransforms = !forceGlobalTransforms && input;
@@ -37,18 +38,16 @@ public class EmoteConstraint : MonoBehaviour
     {
         if (constraintActive)
         {
+            if (constraintPower < 1)
+            {
+                constraintPower += Time.deltaTime * 4f;
+                if (constraintPower > 1)
+                {
+                    constraintPower = 1;
+                }
+            }
             if (localTransforms)
             {
-                if (constraintPower < 1)
-                {
-                    constraintPower += Time.deltaTime * 4f;
-                    //Debug.Log(constraintPower);
-                    //Debug.Log($"{Time.frameCount}   {transform.name}");
-                    if (constraintPower > 1)
-                    {
-                        constraintPower = 1;
-                    }
-                }
                 if (onlyY)
                 {
                     originalBone.localPosition = new Vector3(originalBone.localPosition.x, Mathf.Lerp(originalBone.localPosition.y, emoteBone.localPosition.y, constraintPower), originalBone.localPosition.z);
@@ -63,13 +62,22 @@ public class EmoteConstraint : MonoBehaviour
             {
                 if (onlyY)
                 {
-                    originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+                    originalBone.position = new Vector3(originalBone.position.x, Mathf.Lerp(originalBone.position.y, emoteBone.position.y, constraintPower), originalBone.position.z);
                 }
                 else
                 {
-                    originalBone.position = emoteBone.position;
-                    originalBone.rotation = emoteBone.rotation;
+                    originalBone.position = Vector3.Lerp(originalBone.position, emoteBone.position, constraintPower);
+                    originalBone.rotation = Quaternion.Lerp(originalBone.rotation, emoteBone.rotation, constraintPower);
                 }
+                //if (onlyY)
+                //{
+                //    originalBone.position = new Vector3(originalBone.position.x, emoteBone.position.y, originalBone.position.z);
+                //}
+                //else
+                //{
+                //    originalBone.position = emoteBone.position;
+                //    originalBone.rotation = emoteBone.rotation;
+                //}
             }
         }
     }
@@ -78,7 +86,7 @@ public class EmoteConstraint : MonoBehaviour
         if (!constraintActive && emoteBone is not null)
         {
             //Debug.Log($"{localTransforms}   {transform.name}");
-            constraintPower = 0;
+            constraintPower = interpolates ? 0 : 1;
             if (firstTime2)
             {
                 firstTime2 = false;

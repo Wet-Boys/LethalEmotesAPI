@@ -640,6 +640,7 @@ public class BoneMapper : MonoBehaviour
                             EmoteConstraint e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
                             e.AddSource(ref smr.bones[x], ref emoteSkeletonSMR.bones[i]);
                             e.revertTransform = revertTransform;
+                            e.interpolates = true;
                             break;
                         }
                         if (x == startingXPoint - 1)
@@ -1300,29 +1301,34 @@ public class BoneMapper : MonoBehaviour
         if (!jank)
         {
             emoteSkeletonSMR.enabled = true;
+            var first = basePlayerModelSMR.First();
             foreach (var smr in basePlayerModelSMR)
             {
                 for (int i = 0; i < smr.bones.Length; i++)
                 {
                     try
                     {
-                        if (smr.bones[i].gameObject.GetComponent<EmoteConstraint>() && !dontAnimateUs.Contains(smr.bones[i].name))
+                        EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
+                        if (ec is not null)
                         {
-                            //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
-                            EmoteConstraint ec = smr.bones[i].gameObject.GetComponent<EmoteConstraint>();
-                            if (smr == basePlayerModelSMR.First())
+                            if (!dontAnimateUs.Contains(smr.bones[i].name))
                             {
-                                if (currentClip is not null)
+                                //DebugClass.Log($"-{i}---------{smr.bones[i].gameObject}");
+                                if (smr == first)
                                 {
-                                    ec.SetLocalTransforms(true);
+                                    if (currentClip is not null)
+                                    {
+                                        ec.interpolates = currentClip.interpolation;
+                                        ec.SetLocalTransforms(smr.bones[i] == smr.rootBone ? false : true);
+                                    }
                                 }
+                                ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                             }
-                            ec.ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
-                        }
-                        else if (dontAnimateUs.Contains(smr.bones[i].name))
-                        {
-                            //DebugClass.Log($"dontanimateme-{i}---------{smr.bones[i].gameObject}");
-                            smr.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
+                            else if (dontAnimateUs.Contains(smr.bones[i].name))
+                            {
+                                //DebugClass.Log($"dontanimateme-{i}---------{smr.bones[i].gameObject}");
+                                smr.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
+                            }
                         }
                     }
                     catch (Exception e)
