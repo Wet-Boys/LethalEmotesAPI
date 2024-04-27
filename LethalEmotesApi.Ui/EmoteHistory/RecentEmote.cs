@@ -17,10 +17,10 @@ public class RecentEmote : IEquatable<RecentEmote>
         _playerNames = [playerName];
     }
     
-    public RecentEmote(string emoteKey, List<string> playerNames)
+    public RecentEmote(string emoteKey, IEnumerable<string> playerNames)
     {
         EmoteKey = emoteKey;
-        _playerNames = playerNames;
+        _playerNames = new List<string>(playerNames);
     }
     
     public bool AddPlayer(string playerName)

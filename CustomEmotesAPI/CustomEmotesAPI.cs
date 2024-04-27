@@ -1068,10 +1068,9 @@ namespace EmotesAPI
                 }
             }
 
-            if (animChanged != null)
-            {
-                animChanged(newAnimation, mapper);
-            }
+            animChanged?.Invoke(newAnimation, mapper);
+
+            var emoteHistory = (EmoteHistoryManager)LethalEmotesUiState.Instance.EmoteHistoryManager;
 
             if (newAnimation != "none")
             {
@@ -1095,12 +1094,8 @@ namespace EmotesAPI
                 mapper.positionBeforeRootMotion = mapper.mapperBody.transform.position;
                 mapper.rotationBeforeRootMotion = mapper.mapperBody.transform.rotation;
                 mapper.justSwitched = true;
-                float dist = Vector3.Distance(mapper.transform.position, localMapper.transform.position);
-                if (dist < EmoteHistoryManager.RecentEmoteDistance)
-                {
-                    var emoteHistory = LethalEmotesUiState.Instance.EmoteHistoryManager;
-                    emoteHistory.PlayerPerformedEmote(dist, BoneMapper.animClips[newAnimation].joinEmote, mapper.userName);
-                }
+                
+                emoteHistory.PlayerPerformedEmote(BoneMapper.animClips[newAnimation].joinEmote, mapper);
             }
             else
             {
@@ -1117,6 +1112,8 @@ namespace EmotesAPI
 
                 mapper.transform.localPosition = Vector3.zero;
                 mapper.transform.localEulerAngles = new Vector3(90, 0, 0);
+                
+                emoteHistory.PlayerStoppedEmote(mapper.userName);
             }
         }
         public delegate void JoinedEmoteSpotBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
