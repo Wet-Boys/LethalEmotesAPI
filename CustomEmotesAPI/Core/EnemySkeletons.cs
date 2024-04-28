@@ -34,7 +34,14 @@ namespace LethalEmotesAPI.Core
         internal IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos)
         {
             yield return new WaitForEndOfFrame();
-            AnimationReplacements.Import(g, prefab, pos);
+            try
+            {
+                AnimationReplacements.Import(g, prefab, pos);
+            }
+            catch (Exception)
+            {
+                DebugClass.Log($"had issue importing {g}");
+            }
         }
         private void MaskedPlayerEnemyStart(Action<MaskedPlayerEnemy> orig, MaskedPlayerEnemy self)
         {
