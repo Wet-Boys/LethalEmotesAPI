@@ -49,7 +49,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.11.3";
+        public const string VERSION = "1.11.5";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -260,12 +260,18 @@ namespace EmotesAPI
 
         private void TeleportPlayer(Action<PlayerControllerB, Vector3, bool, float, bool, bool> orig, PlayerControllerB self, Vector3 pos, bool withRotation = false, float rot = 0f, bool allowInteractTrigger = false, bool enableController = true)
         {
-            BoneMapper ownerMapper = self.GetComponentInChildren<BoneMapper>();
-            if (ownerMapper && ownerMapper.parentGameObject && ownerMapper.positionLock)
+            try
             {
-                //ownerMapper.parentGameObject.transform.position += pos - self.transform.position;
-                ownerMapper.preserveParent = false;
-                PlayAnimation("none", ownerMapper);
+                BoneMapper ownerMapper = self.GetComponentInChildren<BoneMapper>();
+                if (ownerMapper && ownerMapper.parentGameObject && ownerMapper.positionLock)
+                {
+                    //ownerMapper.parentGameObject.transform.position += pos - self.transform.position;
+                    ownerMapper.preserveParent = false;
+                    PlayAnimation("none", ownerMapper);
+                }
+            }
+            catch (Exception)
+            {
             }
             orig(self, pos, withRotation, rot, allowInteractTrigger, enableController);
         }
@@ -273,12 +279,25 @@ namespace EmotesAPI
 
         private void PlayerLookInput(Action<PlayerControllerB> orig, PlayerControllerB self)
         {
-            float prevY = self.thisPlayerBody.eulerAngles.y;
-            orig(self);
-            if (localMapper is not null && (localMapper.isInThirdPerson || (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)))
+            float prevY = 0;
+            try
             {
-                localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
-                self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
+                prevY = self.thisPlayerBody.eulerAngles.y;
+            }
+            catch (Exception)
+            {
+            }
+            orig(self);
+            try
+            {
+                if (localMapper is not null && (localMapper.isInThirdPerson || (localMapper.currentClip is not null && localMapper.currentClip.preventsMovement)))
+                {
+                    localMapper.rotationPoint.transform.eulerAngles += new Vector3(0, self.thisPlayerBody.eulerAngles.y - prevY, 0);
+                    self.thisPlayerBody.eulerAngles = new Vector3(self.thisPlayerBody.eulerAngles.x, prevY, self.thisPlayerBody.eulerAngles.z);
+                }
+            }
+            catch (Exception)
+            {
             }
         }
         private static Hook PlayerLookInputHook;
@@ -286,21 +305,28 @@ namespace EmotesAPI
         private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
             orig(self, inputVector);
-            if (localMapper is not null && localMapper.isInThirdPerson)
+            try
             {
-                self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
-                float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
-                cameraLookDir -= inputVector.y;
-                if (cameraLookDir > 200)
+                if (localMapper is not null && localMapper.isInThirdPerson)
                 {
-                    cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                    self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
+                    float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
+                    cameraLookDir -= inputVector.y;
+                    if (cameraLookDir > 200)
+                    {
+                        cameraLookDir = Mathf.Clamp(cameraLookDir, 275, cameraLookDir);
+                    }
+                    else
+                    {
+                        cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
+                    }
+                    localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
                 }
-                else
-                {
-                    cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
-                }
-                localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
             }
+            catch (Exception)
+            {
+            }
+
         }
         private static Hook CalculateSmoothLookingInputHook;
 

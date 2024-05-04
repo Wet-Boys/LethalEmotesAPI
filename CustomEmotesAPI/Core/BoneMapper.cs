@@ -483,6 +483,10 @@ public class BoneMapper : MonoBehaviour
                     if (ogScale != new Vector3(-69, -69, -69))
                     {
                         mapperBody.transform.localScale = ogScale;
+                        if (local)
+                        {
+                            playerController.localVisor.localScale = ogVisorScale;
+                        }
                         ogScale = new Vector3(-69, -69, -69);
                     }
                     foreach (var item in mapperBody.GetComponentsInChildren<Collider>())
@@ -593,7 +597,7 @@ public class BoneMapper : MonoBehaviour
         allMappers.Add(this);
 
         // Tool Tip Handling
-        if (!isEnemy)
+        if (playerController is not null)
         {
             GameObject trigObject = mapperBody.gameObject.transform.Find("PlayerPhysicsBox").gameObject;
             trigObject.tag = "InteractTrigger";
@@ -677,10 +681,6 @@ public class BoneMapper : MonoBehaviour
             }
             //a1.enabled = false;
         }
-        //foreach (var item in emoteSkeletonSMR.bones)
-        //{
-        //    item.name += "_EmoteBone";
-        //}
         transform.localPosition = Vector3.zero;
         CustomEmotesAPI.MapperCreated(this);
         if (playerController is not null)
@@ -720,6 +720,10 @@ public class BoneMapper : MonoBehaviour
             NewAnimation(null);
         }
         ogScale = mapperBody.transform.localScale;
+        if (local)
+        {
+            ogVisorScale = playerController.localVisor.localScale;
+        }
         if (scaleAsScavenger)
             scaleDiff = ogScale / scale;
         else
@@ -749,6 +753,7 @@ public class BoneMapper : MonoBehaviour
         }
     }
     Vector3 ogScale = new Vector3(-69, -69, -69);
+    Vector3 ogVisorScale = Vector3.zeroVector;
     Vector3 scaleDiff = Vector3.one;
     void LocalFunctions()
     {
@@ -780,6 +785,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
+                    playerController.gameplayCamera.nearClipPlane = 0.0005f;
                     originalCosmeticPosition = new GameObject();
                     originalCosmeticPosition.transform.parent = playerController.headCostumeContainerLocal.parent;
                     originalCosmeticPosition.transform.position = playerController.headCostumeContainerLocal.position;
@@ -940,6 +946,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (playerController.isPlayerDead && local && currentClip is not null)
             {
+                UnlockBones();
                 CustomEmotesAPI.PlayAnimation("none");
                 foreach (var item in props)
                 {
@@ -982,6 +989,10 @@ public class BoneMapper : MonoBehaviour
             if (scaleLock)
             {
                 mapperBody.transform.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
+                if (local)
+                {
+                    playerController.localVisor.localScale = ogVisorScale * (mapperBody.transform.localScale.x / ogScale.x);
+                }
             }
         }
     }

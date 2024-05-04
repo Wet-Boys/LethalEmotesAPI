@@ -1,3 +1,7 @@
+- Version 1.11.5:: Slight optimization to the healthbar animator. Fixed issue with enemies spawning on clients
+
+- Version 1.11.4: Now unlocks bones sooner upon player death to avoid conflicts with other mods
+
 - Version 1.11.3: Made players less boulder-like
 
 - Version 1.11.2: Fixed rare one-time bug upon launching with the new version
