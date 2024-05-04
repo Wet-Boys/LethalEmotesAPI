@@ -27,7 +27,10 @@ namespace LethalEmotesAPI.Patches
 
             List<string> cosmetics = CosmeticRegistry.locallySelectedCosmetics;
 
-            cosmeticApplication = cosmeticRoot.gameObject.AddComponent<CosmeticApplication>();
+            if (cosmeticApplication is null)
+            {
+                cosmeticApplication = cosmeticRoot.gameObject.AddComponent<CosmeticApplication>();
+            }
             foreach (var cosmetic in cosmetics)
             {
                 cosmeticApplication.ApplyCosmetic(cosmetic, true);
