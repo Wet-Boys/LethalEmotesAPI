@@ -1,4 +1,6 @@
-- Version 1.11.5:: Slight optimization to the healthbar animator. Fixed issue with enemies spawning on clients
+- Version 1.11.6: Fixed constant duplication of MoreCompany cosmetics
+
+- Version 1.11.5: Slight optimization to the healthbar animator. Fixed issue with enemies spawning on clients
 
 - Version 1.11.4: Now unlocks bones sooner upon player death to avoid conflicts with other mods
 
