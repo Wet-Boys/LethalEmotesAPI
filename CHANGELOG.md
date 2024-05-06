@@ -1,3 +1,5 @@
+- Version 1.12.0: Added Sentinel support
+
 - Version 1.11.6: Fixed constant duplication of MoreCompany cosmetics
 
 - Version 1.11.5: Slight optimization to the healthbar animator. Fixed issue with enemies spawning on clients
