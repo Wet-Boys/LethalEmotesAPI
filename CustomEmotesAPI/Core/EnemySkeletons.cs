@@ -162,6 +162,9 @@ namespace LethalEmotesAPI.Core
                     case "Football":
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Football.prefab", [0]));
                         break;
+                    case "Sentinel":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Sentinel.prefab", [0]));
+                        break;
                     default:
                         //DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;
