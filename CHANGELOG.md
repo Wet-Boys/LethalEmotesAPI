@@ -1,3 +1,5 @@
+- Version 1.12.1: Included debug symbols. Fixed sound collider causing issues with yeeting
+
 - Version 1.12.0: Added Sentinel support
 
 - Version 1.11.6: Fixed constant duplication of MoreCompany cosmetics

@@ -595,7 +595,6 @@ public class BoneMapper : MonoBehaviour
         playersToMappers.Add(mapperBody, this);
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
-
         // Tool Tip Handling
         if (playerController is not null)
         {
@@ -615,7 +614,9 @@ public class BoneMapper : MonoBehaviour
         obj.name = $"{name}_AudioObject";
         obj.transform.SetParent(mapperBody.transform);
         obj.transform.localPosition = Vector3.zero;
-        obj.AddComponent<SphereCollider>().radius = .01f;
+        SphereCollider sphere = obj.AddComponent<SphereCollider>();
+        sphere.radius = .01f;
+        sphere.isTrigger = true;
         obj.layer = 6;
         personalAudioSource = obj.GetComponent<AudioSource>();
         obj.AddComponent<AudioManager>().Setup(personalAudioSource, this);
@@ -625,6 +626,7 @@ public class BoneMapper : MonoBehaviour
 
         int offset = 0;
         bool nuclear = true;
+
         if (nuclear)
         {
             foreach (var smr in basePlayerModelSMR)
@@ -636,7 +638,7 @@ public class BoneMapper : MonoBehaviour
                     {
                         //DebugClass.Log($"comparing:    {emoteSkeletonSMR.bones[i].name} from {emoteSkeletonSMR}   to  {smr.bones[x].name} from {smr}");
                         //DebugClass.Log($"--------------  {smrbone.gameObject.name}   {smr1bone.gameObject.name}      {smrbone.GetComponent<ParentConstraint>()}");
-                        if (emoteSkeletonSMR.bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
+                        if (emoteSkeletonSMR.bones[i] is not null && emoteSkeletonSMR.bones[i].name == smr.bones[x].name && !smr.bones[x].gameObject.GetComponent<EmoteConstraint>())
                         {
                             startingXPoint = x;
                             //DebugClass.Log($"they are equal!");
@@ -695,6 +697,7 @@ public class BoneMapper : MonoBehaviour
         g.transform.localEulerAngles = transform.localEulerAngles;
         g.transform.position = transform.position;
         transform.SetParent(g.transform);
+
         //transform.localEulerAngles = Vector3.zero;
         //transform.localPosition = Vector3.zero;
         g.transform.localPosition = Vector3.zero;
