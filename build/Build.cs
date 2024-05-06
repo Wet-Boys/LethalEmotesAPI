@@ -9,12 +9,10 @@ using System.Text.RegularExpressions;
 using build.Utils;
 using Cake.Common;
 using Cake.Common.IO;
-using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.MSBuild;
 using Cake.Common.Tools.DotNet.Pack;
-using Cake.Common.Tools.DotNet.Restore;
 using Cake.Core;
 using Cake.Core.Diagnostics;
 using Cake.Frosting;
@@ -502,7 +500,7 @@ public sealed class BuildThunderstorePackage : FrostingTask<BuildContext>
         var modDir = publishDir / project.Name;
         Directory.CreateDirectory(modDir);
             
-        context.BuildDir.GlobFiles("*.dll")
+        context.BuildDir.GlobFiles("*.dll", "*.pdb")
             .CopyFilesTo(modDir);
             
         File.Copy("../" / manifestFile, publishDir / manifestFile, true);
