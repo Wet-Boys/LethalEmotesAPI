@@ -1179,7 +1179,7 @@ public class BoneMapper : MonoBehaviour
             }
         }
 
-        if (currentEmoteSpot.GetComponent<EmoteLocation>().joinSpot.requireRaycastToJoin)
+        if (!currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp && currentEmoteSpot.GetComponent<EmoteLocation>().joinSpot.requireRaycastToJoin)
         {
             Vector3 rayPos = mapperBodyTransform.position + new Vector3(0, 1.75f * scale, 0);
             BoneMapper owner = currentEmoteSpot.GetComponent<EmoteLocation>().owner;
