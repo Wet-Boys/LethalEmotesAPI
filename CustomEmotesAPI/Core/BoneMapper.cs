@@ -1179,6 +1179,27 @@ public class BoneMapper : MonoBehaviour
             }
         }
 
+        if (currentEmoteSpot.GetComponent<EmoteLocation>().joinSpot.requireRaycastToJoin)
+        {
+            Vector3 rayPos = mapperBodyTransform.position + new Vector3(0, 1.75f * scale, 0);
+            BoneMapper owner = currentEmoteSpot.GetComponent<EmoteLocation>().owner;
+            Ray ray = new Ray(rayPos, owner.mapperBodyTransform.position - rayPos);
+            float dist = Vector3.Distance(owner.mapperBodyTransform.position, mapperBodyTransform.position) + 2;
+            RaycastHit hit;
+            RaycastHit[] hit2 = Physics.RaycastAll(ray, dist, 8);
+            foreach (var item in hit2)
+            {
+                if (item.collider.gameObject.GetComponent<PlayerControllerB>() && playersToMappers[item.collider.gameObject] == owner)
+                {
+                    bool test = Physics.Raycast(ray, out hit, dist, StartOfRound.Instance.allPlayersCollideWithMask, QueryTriggerInteraction.Ignore);
+                    if (test && hit.distance < item.distance)
+                    {
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
         EmoteNetworker.instance.SyncJoinSpot(mapperBody.GetComponent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponentInParent<NetworkObject>().NetworkObjectId, currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp, spot);
     }
     public void RemoveProp(int propPos)

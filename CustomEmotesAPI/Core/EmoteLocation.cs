@@ -15,12 +15,22 @@ public struct JoinSpot
     public Vector3 position;
     public Vector3 rotation;
     public Vector3 scale;
+    public bool requireRaycastToJoin;
+    public JoinSpot(string _name, Vector3 _position, Vector3 _rotation, Vector3 _scale, bool _requireRaycastToJoin)
+    {
+        name = _name;
+        position = _position;
+        rotation = _rotation;
+        scale = _scale;
+        requireRaycastToJoin = _requireRaycastToJoin;
+    }
     public JoinSpot(string _name, Vector3 _position, Vector3 _rotation, Vector3 _scale)
     {
         name = _name;
         position = _position;
         rotation = _rotation;
         scale = _scale;
+        requireRaycastToJoin = false;
     }
     public JoinSpot(string _name, Vector3 _position)
     {
@@ -28,6 +38,7 @@ public struct JoinSpot
         position = _position;
         rotation = Vector3.zero;
         scale = Vector3.one;
+        requireRaycastToJoin = false;
     }
 }
 public class EmoteLocation : MonoBehaviour
