@@ -1,3 +1,5 @@
+- Version 1.12.3: Fixed issue where I was unintentionally relying on ModelReplacementAPI to fix first person arms for me
+
 - Version 1.12.2: Added requireRaycastToJoin as an option for joinSpots. Basically just means you need line of sight to actually join the player. Doesn't work with world props, but I can look at it in the future if this ever becomes a problem.
 
 - Version 1.12.1: Included debug symbols. Fixed sound collider causing issues with yeeting
