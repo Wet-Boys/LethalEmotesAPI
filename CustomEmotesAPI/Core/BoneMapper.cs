@@ -1452,6 +1452,8 @@ public class BoneMapper : MonoBehaviour
         }
         playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
         playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        playerController.thisPlayerModelLOD1.gameObject.SetActive(false);
+        playerController.thisPlayerModelLOD2.gameObject.SetActive(false);
         if (originalLayer == -1)
         {
             originalLayer = playerController.thisPlayerModel.gameObject.layer;
@@ -1498,6 +1500,8 @@ public class BoneMapper : MonoBehaviour
             }
             needToTurnOffShadows = true;
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            playerController.thisPlayerModelLOD1.gameObject.SetActive(true);
+            playerController.thisPlayerModelLOD2.gameObject.SetActive(true);
             playerController.localVisor.gameObject.SetActive(true);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;

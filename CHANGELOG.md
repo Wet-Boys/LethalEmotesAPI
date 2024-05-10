@@ -1,3 +1,5 @@
+- Version 1.12.4: Fixed potentially showing LODs when multiple mods installed
+
 - Version 1.12.3: Fixed issue where I was unintentionally relying on ModelReplacementAPI to fix first person arms for me
 
 - Version 1.12.2: Added requireRaycastToJoin as an option for joinSpots. Basically just means you need line of sight to actually join the player. Doesn't work with world props, but I can look at it in the future if this ever becomes a problem.
