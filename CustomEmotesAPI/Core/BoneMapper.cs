@@ -1398,20 +1398,36 @@ public class BoneMapper : MonoBehaviour
             if (Settings.rootMotionType.Value != RootMotionType.None &&
 (currentClip.lockType == AnimationClipParams.LockType.rootMotion || Settings.rootMotionType.Value == RootMotionType.All || currentClip.lockType == AnimationClipParams.LockType.lockHead))
             {
-                foreach (var item in cameraConstraints)
-                {
-                    item.ActivateConstraints();
-                }
+                StartCoroutine(ActivateCameraConstraintsAfterFrame(false));
             }
             else if (currentClip.lockType == AnimationClipParams.LockType.headBobbing && Settings.rootMotionType.Value != RootMotionType.None)
             {
-                foreach (var item in cameraConstraints)
+                StartCoroutine(ActivateCameraConstraintsAfterFrame(true));
+            }
+        }
+    }
+    IEnumerator ActivateCameraConstraintsAfterFrame(bool onlyY)
+    {
+        yield return new WaitForEndOfFrame();
+        foreach (var item in cameraConstraints)
+        {
+            item.enabled = true;
+            item.ActivateConstraints();
+            if (onlyY && item != cameraConstraints[cameraConstraints.Count - 1])
+            {
+                item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
+            }
+        }
+        yield return new WaitForEndOfFrame();
+        foreach (var item in cameraConstraints)
+        {
+            if (!item.enabled)
+            {
+                item.enabled = true;
+                item.ActivateConstraints();
+                if (onlyY && item != cameraConstraints[cameraConstraints.Count - 1])
                 {
-                    item.ActivateConstraints();
-                    if (item != cameraConstraints[cameraConstraints.Count - 1])
-                    {
-                        item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
-                    }
+                    item.onlyY = true; //activateconstraints turns this off automatically so make sure to do this after we turn them on
                 }
             }
         }
@@ -1435,7 +1451,7 @@ public class BoneMapper : MonoBehaviour
             needToTurnOffShadows = false;
         }
         playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-        //playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
         if (originalLayer == -1)
         {
             originalLayer = playerController.thisPlayerModel.gameObject.layer;
@@ -1481,7 +1497,7 @@ public class BoneMapper : MonoBehaviour
                 playerController.thisPlayerModel.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             }
             needToTurnOffShadows = true;
-            //playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             playerController.localVisor.gameObject.SetActive(true);
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;
