@@ -1313,6 +1313,7 @@ public class BoneMapper : MonoBehaviour
     {
         UnlockBones();
         transform.localPosition = Vector3.zero;
+        bool allowedToThirdPerson = true;
         if (currentClip is not null)
         {
             foreach (var item in currentClip.soloIgnoredBones)
@@ -1329,6 +1330,7 @@ public class BoneMapper : MonoBehaviour
                     dontAnimateUs.Add(bone.name);
                 }
             }
+            allowedToThirdPerson = !currentClip.forceCameraMode || (currentClip.forceCameraMode && currentClip.thirdPerson);
         }
         if (!jank)
         {
@@ -1372,7 +1374,7 @@ public class BoneMapper : MonoBehaviour
             {
                 item.ActivateConstraints();
             }
-            LockCameraStuff(local && ThirdPersonCheck());
+            LockCameraStuff(local && ThirdPersonCheck() && allowedToThirdPerson);
         }
         else
         {
@@ -1385,7 +1387,12 @@ public class BoneMapper : MonoBehaviour
     public int originalLayer = -1;
     public void LockCameraStuff(bool thirdPersonLock)
     {
-        if (thirdPersonLock)
+        bool allowThirdPerson = false;
+        if (currentClip is not null)
+        {
+            allowThirdPerson = currentClip.allowThirdPerson;
+        }
+        if (thirdPersonLock && allowThirdPerson)
         {
             TurnOnThirdPerson();
         }

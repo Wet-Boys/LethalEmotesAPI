@@ -161,6 +161,15 @@ namespace LethalEmotesAPI.ImportV2
         /// </summary>
         public string emoteToPlayOnJoin = "";
 
+        /// <summary>
+        /// If true, will automatically switch the camera to third or first person based off of the thirdPerson bool.
+        /// </summary>
+        public bool forceCameraMode = false;
+
+        /// <summary>
+        /// If set to false, prevents third person from ever enabling during this emote
+        /// </summary>
+        public bool allowThirdPerson = true;
 
         //keeping this for if we ever port to a game that needs them so I don't forget
         //public bool useSafePositionReset = false; // Unused in Lethal Company
