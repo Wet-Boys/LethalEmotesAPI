@@ -1,3 +1,5 @@
+- Version 1.12.5: Added forceCameraMode and allowThirdPerson to the list of import parameters
+
 - Version 1.12.4: Fixed potentially showing LODs when multiple mods installed
 
 - Version 1.12.3: Fixed issue where I was unintentionally relying on ModelReplacementAPI to fix first person arms for me
