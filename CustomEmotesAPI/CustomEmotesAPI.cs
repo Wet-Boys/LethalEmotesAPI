@@ -1079,6 +1079,14 @@ namespace EmotesAPI
                             ThirdPersonToggle();
                         }
                     }
+                    if (mapper.currentClip is not null && mapper.currentClip.forceCameraMode)
+                    {
+                        if ((mapper.isInThirdPerson && !mapper.currentClip.thirdPerson) ||
+                            (!mapper.isInThirdPerson && mapper.currentClip.thirdPerson))
+                        {
+                            ThirdPersonToggle();
+                        }
+                    }
                 }
 
             }
