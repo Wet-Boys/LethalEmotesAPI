@@ -1,3 +1,5 @@
+- Version 1.12.7: literally nothing but the build broke and this is easier
+
 - Version 1.12.6: Removed unneeded line of code that was causing problems with some mods
 
 - Version 1.12.5: Added forceCameraMode and allowThirdPerson to the list of import parameters
