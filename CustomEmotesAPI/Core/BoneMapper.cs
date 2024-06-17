@@ -906,7 +906,7 @@ public class BoneMapper : MonoBehaviour
                     //DebugClass.Log($"----------{a1}");
                     if (!ragdolling)
                     {
-                        basePlayerModelAnimator.enabled = true;
+                        //basePlayerModelAnimator.enabled = true;
                         oneFrameAnimatorLeeWay = true;
                     }
                     emoteSkeletonAnimator.enabled = false;

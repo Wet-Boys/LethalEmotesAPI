@@ -1,6 +1,6 @@
 {
     "name": "LethalEmotesAPI",
-    "version_number": "1.12.5",
+    "version_number": "1.12.6",
     "website_url": "https://github.com/Wet-Boys/LethalEmotesAPI/",
     "description": "API for adding emotes to Lethal Company",
     "dependencies": [
