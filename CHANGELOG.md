@@ -1,4 +1,4 @@
-- Version 1.12.7: literally nothing but the build broke and this is easier
+- Version 1.12.8: literally nothing but the build broke and this is easier
 
 - Version 1.12.6: Removed unneeded line of code that was causing problems with some mods
 
