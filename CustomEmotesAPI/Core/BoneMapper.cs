@@ -795,6 +795,10 @@ public class BoneMapper : MonoBehaviour
                     EmoteConstraint e = playerController.headCostumeContainerLocal.gameObject.AddComponent<EmoteConstraint>();
                     e.AddSource(playerController.headCostumeContainerLocal, emoteSkeletonAnimator.GetBoneTransform(HumanBodyBones.Head));
                     cosmeticConstraints.Add(e);
+                    foreach (var item in cosmeticConstraints)
+                    {
+                        item.emoteBone = originalCosmeticPosition.transform;
+                    }
                     gameObject.AddComponent<NearestEmoterChecker>().self = this;
                     isServer = playerController.IsServer && playerController.IsOwner;
                     HealthbarAnimator.Setup(this);
