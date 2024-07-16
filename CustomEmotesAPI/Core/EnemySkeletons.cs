@@ -165,6 +165,12 @@ namespace LethalEmotesAPI.Core
                     case "Sentinel":
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Sentinel.prefab", [0]));
                         break;
+                    case "Bush Wolf":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/bushfox.prefab", [0]));
+                        break;
+                    case "Clay Surgeon":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/claysurgeon.prefab", [0]));
+                        break;
                     default:
                         //DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;

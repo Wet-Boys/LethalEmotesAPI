@@ -1,3 +1,5 @@
+- Version 1.13.0: Added emote skeletons for the new enemies.
+
 - Version 1.12.9: Fixed built in hat things being in your stomache before entering third person.
 
 - Version 1.12.8: literally nothing but the build broke and this is easier
