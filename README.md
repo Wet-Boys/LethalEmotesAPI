@@ -10,6 +10,10 @@
 
 - ALL KEYBINDS CAN BE CHANGED IN THE REGULAR KEYBINDS MENU
 
+- For a general list of emote mods designed for EmotesAPI you can check out this list https://thunderstore.io/c/lethal-company/p/Nunchuk/All_Emotes_API_Emote_Packs/
+
+- Compatible with other emote mods like BetterEmotes and TooManyEmotes (Also compatible with MoreEmotes, but the following functionality is only for BetterEmotes and TME). You can even equip their emotes to the EmotesAPI wheel and/or assign hotkeys to their emotes in the EmotesAPI system. Using this method also unlocks EmotesAPI compatibilities like the join button or third person options (mainly for BetterEmotes since it doesn't support third person normally)
+
 ## WIKI
 
 - [Wiki Link](https://github.com/Wet-Boys/LethalEmotesAPI/wiki)

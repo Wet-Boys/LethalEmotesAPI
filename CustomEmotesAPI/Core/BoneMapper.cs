@@ -1394,7 +1394,7 @@ public class BoneMapper : MonoBehaviour
         bool allowThirdPerson = false;
         if (currentClip is not null)
         {
-            allowThirdPerson = currentClip.allowThirdPerson;
+            allowThirdPerson = currentClip.allowThirdPerson && !currentClip.customInternalName.Contains("TooManyEmotes__");
         }
         if (thirdPersonLock && allowThirdPerson)
         {

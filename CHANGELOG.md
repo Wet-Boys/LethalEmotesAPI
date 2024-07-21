@@ -1,3 +1,5 @@
+- Version 1.13.1: Fixed EmotesAPI attempting to do third person stuff when TooManyEmotes is playing, causing issues with model rendering.
+
 - Version 1.13.0: Added emote skeletons for the new enemies.
 
 - Version 1.12.9: Fixed built in hat things being in your stomache before entering third person.
