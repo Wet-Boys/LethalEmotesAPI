@@ -171,6 +171,11 @@ namespace LethalEmotesAPI.ImportV2
         /// </summary>
         public bool allowThirdPerson = true;
 
+        /// <summary>
+        /// Whether or not the healthbar should animate when using this emote
+        /// </summary>
+        public bool animateHealthbar = true;
+
         //keeping this for if we ever port to a game that needs them so I don't forget
         //public bool useSafePositionReset = false; // Unused in Lethal Company
         //public bool stopWhenAttack = false; // Unused in Lethal Company
