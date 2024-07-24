@@ -143,12 +143,13 @@ Material:
     - _EmissionEnabled: 0
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
+    - _FillWeight: 0
     - _FlipbookMode: 0
     - _Fuzziness: 0.1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HealthPercentage: 1
+    - _HealthPercentage: 0
     - _LightingEnabled: 0
     - _Metallic: 0
     - _Mode: 0

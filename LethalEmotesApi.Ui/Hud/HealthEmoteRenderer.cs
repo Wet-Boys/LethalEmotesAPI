@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -8,7 +9,9 @@ public class HealthEmoteRenderer : MonoBehaviour
 {
     public SkinnedMeshRenderer? emoteSkinnedMeshRenderer;
     public Material? material;
-    public RenderTexture? targetRenderTexture;
+    public RenderTexture? hudRenderTexture;
+
+    public float bakeFuzz = 0.005f;
 
     private CommandBuffer? _cmdBuf;
     private readonly Matrix4x4 _projMat = Matrix4x4.Perspective(60f, 1, 0.3f, 15f);
@@ -43,11 +46,14 @@ public class HealthEmoteRenderer : MonoBehaviour
 
     private void LateUpdate()
     {
+        var min = (emoteSkinnedMeshRenderer!.localBounds.extents.y * 2f) - 0.65f;
+        material!.SetFloat("_RemapMin", Mathf.Max(min, 1.7f));
+
         _cmdBuf!.Clear();
         _cmdBuf.SetViewProjectionMatrices(GetViewMatrix(), _projMat);
         _cmdBuf.DrawRenderer(emoteSkinnedMeshRenderer, material);
 
-        Graphics.SetRenderTarget(targetRenderTexture);
+        Graphics.SetRenderTarget(hudRenderTexture);
         GL.Clear(false, true, Color.green);
         Graphics.ExecuteCommandBuffer(_cmdBuf);
     }

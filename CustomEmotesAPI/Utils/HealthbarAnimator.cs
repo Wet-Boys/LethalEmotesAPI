@@ -1,4 +1,5 @@
 ﻿using EmotesAPI;
+using LethalEmotesApi.Ui.Hud;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,12 +20,14 @@ namespace LethalEmotesAPI.Utils
         internal static bool permaOn = false;
         internal static bool setupComplete = false;
         internal static GameObject healthBarCameraObject;
+        internal static Material healthBarCameraScavMat;
         internal static HudCameraConstraint hudCameraConstraint;
         internal static void Setup(BoneMapper mapper)
         {
             if (CustomEmotesAPI.hudObject is not null && CustomEmotesAPI.hudAnimator == null)
             {
                 healthBarCameraObject = GameObject.Instantiate(Assets.Load<GameObject>("assets/lethalemotesapi-ui/hud-healthbarcamera.prefab"));
+                healthBarCameraScavMat = healthBarCameraObject.GetComponentInChildren<HealthEmoteRenderer>().material;
                 healthBarCameraObject.AddComponent<HealthbarAnimator>();
                 healthBarCameraObject.transform.SetParent(mapper.mapperBody.transform.parent);
                 CustomEmotesAPI.hudAnimator = healthBarCameraObject.GetComponentInChildren<Animator>();

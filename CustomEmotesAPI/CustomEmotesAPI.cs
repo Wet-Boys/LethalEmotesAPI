@@ -230,9 +230,20 @@ namespace EmotesAPI
             {
                 try
                 {
-                    hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", health / 100f);
+                    float healthPercentage = health / 100f;
+                    hudObject.GetComponent<CanvasRenderer>().GetMaterial(0).SetFloat("_HealthPercentage", healthPercentage);
+                    if (Settings.FillHealthBar.Value)
+                    {
+                        HealthbarAnimator.healthBarCameraScavMat.SetFloat("_HealthFill", 1 - healthPercentage);
+                    }
+                    else
+                    {
+                        HealthbarAnimator.healthBarCameraScavMat.SetFloat("_HealthFill", 1);
+                    }
+                    //DebugClass.Log($"==============   {Settings.FillHealthBar.Value}     {healthPercentage}    {HealthbarAnimator.healthBarCameraScavMat.GetFloat("_HealthFill")}");
+
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                 }
             }
