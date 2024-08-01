@@ -592,7 +592,14 @@ public class BoneMapper : MonoBehaviour
 
         }
         isValidPlayer = playerController is not null;
-        playersToMappers.Add(mapperBody, this);
+        if (playersToMappers.ContainsKey(mapperBody))
+        {
+            playersToMappers[mapperBody] = this;
+        }
+        else
+        {
+            playersToMappers.Add(mapperBody, this);
+        }
         mapperBodyTransform = mapperBody.transform;
         allMappers.Add(this);
         // Tool Tip Handling

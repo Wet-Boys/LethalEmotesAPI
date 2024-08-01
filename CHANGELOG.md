@@ -1,3 +1,5 @@
+- Version 1.13.3: Fixed potential duplicate entry errors when creating bonemappers.
+
 - Version 1.13.2: Added animateHealthbar to emote parameters, use this if you don't want your emote to call the healthbar to animate (users can still opt to permanently animate it of course)
 
 - Version 1.13.1: Fixed EmotesAPI attempting to do third person stuff when TooManyEmotes is playing, causing issues with model rendering.
