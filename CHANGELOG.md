@@ -1,3 +1,5 @@
+- Version 1.14.0: Added emote skeletons for Interns. Fixed issue where for 1 frame after emoting you would be in the ground (I'm sure this won't cause other issues right chat?)
+
 - Version 1.13.3: Fixed potential duplicate entry errors when creating bonemappers.
 
 - Version 1.13.2: Added animateHealthbar to emote parameters, use this if you don't want your emote to call the healthbar to animate (users can still opt to permanently animate it of course)

@@ -220,6 +220,7 @@ public class BoneMapper : MonoBehaviour
         currentClipName = s;
         if (s == "none")
         {
+            UnlockBones();
             emoteSkeletonAnimator.Play("none", -1, 0f);
             twopart = false;
             prevClip = currentClip;
@@ -568,28 +569,33 @@ public class BoneMapper : MonoBehaviour
         {
             return;
         }
-        if (transform.GetComponentInParent<PlayerControllerB>())
+        PlayerControllerB tempController = transform.GetComponentInParent<PlayerControllerB>();
+        if (transform.GetComponentInParent<EnemyAI>() || (tempController is not null && tempController.GetComponentInChildren<EnemyAI>()))
         {
-            mapperBody = transform.GetComponentInParent<PlayerControllerB>().gameObject;
-            networkId = (int)mapperBody.GetComponent<PlayerControllerB>().NetworkObjectId;
-        }
-        else if (transform.GetComponentInParent<EnemyAI>())
-        {
-            mapperBody = transform.GetComponentInParent<EnemyAI>().gameObject;
+            EnemyAI temp = transform.GetComponentInParent<EnemyAI>();
+            if (temp is null)
+            {
+                temp = tempController.GetComponentInChildren<EnemyAI>();
+            }
+            mapperBody = temp.gameObject;
             //networkId = (int)mapperBody.GetComponent<EnemyAI>().NetworkObjectId;
             networkId = -1; //just leaving this here, if anyone ever makes enemies have cosmetics I don't want it to break, I'll fix it after this hypothetical scenario happens
             isEnemy = CustomEmotesAPI.localMapper.isServer;
+            enemyController = temp;
+        }
+        else if (tempController)
+        {
+            mapperBody = tempController.gameObject;
+            networkId = (int)mapperBody.GetComponent<PlayerControllerB>().NetworkObjectId;
         }
         else
         {
             networkId = -1;
             mapperBody = gameObject;
         }
-        playerController = mapperBody.GetComponent<PlayerControllerB>();
-        if (playerController is null)
+        if (enemyController is null)
         {
-            enemyController = mapperBody.GetComponent<EnemyAI>();
-
+            playerController = mapperBody.GetComponent<PlayerControllerB>();
         }
         isValidPlayer = playerController is not null;
         if (playersToMappers.ContainsKey(mapperBody))

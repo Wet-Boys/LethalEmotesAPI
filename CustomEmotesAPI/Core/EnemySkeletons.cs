@@ -1,4 +1,5 @@
-﻿using EmotesAPI;
+﻿using AdvancedCompany.Game;
+using EmotesAPI;
 using MonoMod.RuntimeDetour;
 using System;
 using System.Collections;
@@ -11,7 +12,7 @@ namespace LethalEmotesAPI.Core
 {
     internal class EnemySkeletons
     {
-        internal IEnumerator AttachCoilHeadSpring(Transform head, BoneMapper b)
+        internal static IEnumerator AttachCoilHeadSpring(Transform head, BoneMapper b)
         {
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
@@ -25,22 +26,22 @@ namespace LethalEmotesAPI.Core
             b.additionalConstraints.Add(EmoteConstraint.AddConstraint(head.gameObject, b, g.transform, true));
 
         }
-        internal IEnumerator SetupMaskedEmoteSkeletonAfterAFewFrames(MaskedPlayerEnemy self)
+        internal static IEnumerator SetupMaskedEmoteSkeletonAfterAFewFrames(MaskedPlayerEnemy self)
         {
             //Advanced company does something with the bones and it doesn't appreciate my bones already existing so we wait
             yield return new WaitForEndOfFrame();
             AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]);
         }
-        internal IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos)
+        internal static IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos)
         {
             yield return new WaitForEndOfFrame();
             try
             {
                 AnimationReplacements.Import(g, prefab, pos);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                DebugClass.Log($"had issue importing {g}");
+                DebugClass.Log($"had issue importing {g}\n\n {e}");
             }
         }
         private void MaskedPlayerEnemyStart(Action<MaskedPlayerEnemy> orig, MaskedPlayerEnemy self)
@@ -49,7 +50,7 @@ namespace LethalEmotesAPI.Core
             orig(self);
         }
         private static Hook MaskedPlayerEnemyStartHook;
-        internal IEnumerator SetupSkeleton(EnemyAI self)
+        internal static IEnumerator SetupSkeleton(EnemyAI self)
         {
             yield return new WaitForEndOfFrame();
             try
@@ -170,6 +171,9 @@ namespace LethalEmotesAPI.Core
                         break;
                     case "Clay Surgeon":
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/claysurgeon.prefab", [0]));
+                        break;
+                    case "InternNPC":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.transform.parent.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]));
                         break;
                     default:
                         //DebugClass.Log($"enemy name: {self.enemyType.enemyName}");

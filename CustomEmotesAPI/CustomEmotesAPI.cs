@@ -43,13 +43,14 @@ namespace EmotesAPI
     [BepInDependency("com.potatoepet.AdvancedCompany", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("FlipMods.TooManyEmotes", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("BetterEmotes", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("Szumi57.LethalInternship", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.13.3";
+        public const string VERSION = "1.14.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -85,6 +86,7 @@ namespace EmotesAPI
         public static bool AdvancedCompanyPresent;
         public static bool TMEPresent;
         public static bool BetterEmotesPresent;
+        public static bool InternsPresent;
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
@@ -556,6 +558,7 @@ namespace EmotesAPI
             AdvancedCompanyPresent = Chainloader.PluginInfos.ContainsKey("com.potatoepet.AdvancedCompany");
             TMEPresent = Chainloader.PluginInfos.ContainsKey("FlipMods.TooManyEmotes");
             BetterEmotesPresent = Chainloader.PluginInfos.ContainsKey("BetterEmotes");
+            InternsPresent = Chainloader.PluginInfos.ContainsKey("Szumi57.LethalInternship");
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
             //}
@@ -617,6 +620,10 @@ namespace EmotesAPI
             if (VRMPresent)
             {
                 VRMCompat.SetupUpdateVisibilityHook();
+            }
+            if (InternsPresent)
+            {
+                InternCompat.SetupInternStartHook();
             }
             if (AdvancedCompanyPresent)
             {
