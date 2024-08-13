@@ -101,19 +101,7 @@ internal static class AnimationReplacements
 
         Transform modelTransform;
         modelTransform = bodyPrefab.GetComponentInChildren<Animator>().transform;
-        try
-        {
-            animcontroller.transform.parent = modelTransform;
-            animcontroller.transform.localPosition = Vector3.zero;
-            animcontroller.transform.eulerAngles = bodyPrefab.transform.eulerAngles;
-            //animcontroller.transform.localEulerAngles = new Vector3(90, 0, 0);
-            animcontroller.transform.localScale = Vector3.one;
-        }
-        catch (Exception e)
-        {
-            DebugClass.Log($"Had trouble setting emote skeletons parent: {e}");
-            throw;
-        }
+
 
         SkinnedMeshRenderer smr1;
         SkinnedMeshRenderer[] smr2 = new SkinnedMeshRenderer[pos.Length];
@@ -169,6 +157,19 @@ internal static class AnimationReplacements
         catch (Exception e)
         {
             DebugClass.Log($"Had issue when setting up BoneMapper settings 2: {e}");
+            throw;
+        }
+        try
+        {
+            animcontroller.transform.parent = modelTransform;
+            animcontroller.transform.localPosition = Vector3.zero;
+            animcontroller.transform.eulerAngles = bodyPrefab.transform.eulerAngles;
+            //animcontroller.transform.localEulerAngles = new Vector3(90, 0, 0);
+            animcontroller.transform.localScale = Vector3.one;
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had trouble setting emote skeletons parent: {e}");
             throw;
         }
         test.revertTransform = revertBonePositions;

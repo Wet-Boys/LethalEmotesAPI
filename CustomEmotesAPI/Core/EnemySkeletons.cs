@@ -32,9 +32,12 @@ namespace LethalEmotesAPI.Core
             yield return new WaitForEndOfFrame();
             AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]);
         }
-        internal static IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos)
+        internal static IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos, int frames = 1)
         {
-            yield return new WaitForEndOfFrame();
+            for (int i = 0; i < frames; i++)
+            {
+                yield return new WaitForEndOfFrame();
+            }
             try
             {
                 AnimationReplacements.Import(g, prefab, pos);
@@ -52,7 +55,6 @@ namespace LethalEmotesAPI.Core
         private static Hook MaskedPlayerEnemyStartHook;
         internal static IEnumerator SetupSkeleton(EnemyAI self)
         {
-            yield return new WaitForEndOfFrame();
             try
             {
                 switch (self.enemyType.enemyName)
@@ -161,7 +163,7 @@ namespace LethalEmotesAPI.Core
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/SirenHead2.prefab", [0]));
                         break;
                     case "Football":
-                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Football.prefab", [0]));
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Football.prefab", [0], 0));
                         break;
                     case "Sentinel":
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/fineilldoitmyself/NewSet/Sentinel.prefab", [0]));
@@ -184,6 +186,7 @@ namespace LethalEmotesAPI.Core
             {
                 DebugClass.Log($"couldn't setup an enemy?");
             }
+            yield return new WaitForEndOfFrame();
         }
 
 
