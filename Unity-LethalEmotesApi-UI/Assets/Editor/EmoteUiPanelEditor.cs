@@ -191,6 +191,11 @@ namespace Editor
             public int ThirdPerson { get; set; }
             public bool UseGlobalSettings { get; set; }
             public bool DontShowDmcaPrompt { get; set; }
+            public bool PermanentEmotingHealthbar { get; set; }
+            public bool ImportTME { get; set; }
+            public bool ImportBetterEmotes { get; set; }
+            public bool NearestEmoteText { get; set; }
+            public bool NearestEmoteTextTutorial { get; set; }
         }
         
         private class StubbedEmoteDb : IEmoteDb

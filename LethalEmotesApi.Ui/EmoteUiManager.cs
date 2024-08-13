@@ -317,4 +317,29 @@ public static class EmoteUiManager
         get => _stateController!.DontShowDmcaPrompt;
         set => _stateController!.DontShowDmcaPrompt = value;
     }
+    public static bool PermanentEmotingHealthbar
+    {
+        get => _stateController!.PermanentEmotingHealthbar;
+        set => _stateController!.PermanentEmotingHealthbar = value;
+    }
+    public static bool ImportTME
+    {
+        get => _stateController!.ImportTME;
+        set => _stateController!.ImportTME = value;
+    }
+    public static bool ImportBetterEmotes
+    {
+        get => _stateController!.ImportBetterEmotes;
+        set => _stateController!.ImportBetterEmotes = value;
+    }
+    public static bool NearestEmoteText
+    {
+        get => _stateController!.NearestEmoteText;
+        set => _stateController!.NearestEmoteText = value;
+    }
+    public static bool NearestEmoteTutorial
+    {
+        get => _stateController!.NearestEmoteTextTutorial;
+        set => _stateController!.NearestEmoteTextTutorial = value;
+    }
 }

@@ -40,7 +40,6 @@ namespace EmotesAPI
         public static ConfigEntry<bool> useGlobalConfig;
         public static ConfigEntry<bool> dontShowDmcaPrompt;
         public static ConfigEntry<string> disallowedModPackOverrideLocations;
-        public static ConfigEntry<bool> joinEmoteTutorial;
 
         #endregion
 
@@ -69,6 +68,8 @@ namespace EmotesAPI
         public static ConfigEntry<bool> ImportBetterEmotes => GetCurrentConfig().ImportBetterEmotes;
         public static ConfigEntry<bool> NearestEmoteText => GetCurrentConfig().NearestEmoteText;
         public static ConfigEntry<bool> InteractionToolTip => GetCurrentConfig().InteractionToolTip;
+        public static ConfigEntry<bool> joinEmoteTutorial => GetCurrentConfig().InteractionToolTip;
+
 
         #endregion
 
@@ -152,9 +153,6 @@ namespace EmotesAPI
 
             dontShowDmcaPrompt = global.Bind("Global Flags", "Dont Show DMCA Prompt", false,
                 "Disables the DMCA prompt from showing in-game. DMCA Prompt automatically shows when we detect OBS or XSplit open");
-
-            joinEmoteTutorial = global.Bind("Global Flags", "Join Emote Tutorial", true, 
-                "Guaruntees the join prompt will be in the top left corner");
         }
 
         private static void UseGlobalConfig_SettingChanged(object sender, EventArgs e)

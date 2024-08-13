@@ -217,4 +217,24 @@ public class LethalEmotesUiState : IEmoteUiStateController
         get => Settings.dontShowDmcaPrompt.Value;
         set => Settings.dontShowDmcaPrompt.Value = value;
     }
+    public bool PermanentEmotingHealthbar { 
+        get => Settings.PermanentEmotingHealthbar.Value; 
+        set => Settings.PermanentEmotingHealthbar.Value = value;
+    }
+    public bool ImportTME { 
+        get => Settings.ImportTME.Value;
+        set => Settings.ImportTME.Value = value;
+    }
+    public bool ImportBetterEmotes { 
+        get => Settings.ImportBetterEmotes.Value;
+        set => Settings.ImportBetterEmotes.Value = value;
+    }
+    public bool NearestEmoteText { 
+        get => Settings.NearestEmoteText.Value;
+        set => Settings.NearestEmoteText.Value = value;
+    }
+    public bool NearestEmoteTextTutorial { 
+        get => Settings.joinEmoteTutorial.Value;
+        set => Settings.joinEmoteTutorial.Value = value;
+    }
 }

@@ -1,3 +1,5 @@
+- Version 1.14.2: Added settings to the Customize menu that have been missing forever
+
 - Version 1.14.1: Fixed Football's emote skeleton not applying properly
 
 - Version 1.14.0: Added emote skeletons for Interns. Fixed issue where for 1 frame after emoting you would be in the ground (I'm sure this won't cause other issues right chat?)
