@@ -158,4 +158,21 @@ public class EmoteConstraint : MonoBehaviour
             DeactivateConstraints();
         }
     }
+    internal void Reset()
+    {
+        originalBone = null;
+        emoteBone = null;
+        originalPosition = Vector3.zero;
+        originalRotation = Quaternion.identity;
+        constraintActive = false;
+        revertTransform = false;
+        firstTime = true;
+        firstTime2 = true;
+        hasEverActivatedConstraints = false;
+        onlyY = false;
+        debug = false;
+        localTransforms = false;
+        forceGlobalTransforms = false;
+        needToFix = true;
+    }
 }

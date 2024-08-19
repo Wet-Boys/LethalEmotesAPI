@@ -177,6 +177,9 @@ namespace LethalEmotesAPI.Core
                     case "InternNPC":
                         CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.transform.parent.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]));
                         break;
+                    case "Maneater":
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/cavedwellerbaby.prefab", [0]));
+                        break;
                     default:
                         //DebugClass.Log($"enemy name: {self.enemyType.enemyName}");
                         break;

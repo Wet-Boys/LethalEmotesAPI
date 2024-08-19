@@ -50,7 +50,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.14.2";
+        public const string VERSION = "1.15.0";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -472,6 +472,22 @@ namespace EmotesAPI
             }
         }
         private static Hook ConnectClientToPlayerObjectHook;
+        private void CaveDwellerStartTransformationAnim(Action<CaveDwellerAI> orig, CaveDwellerAI self)
+        {
+            if (self.GetComponentInChildren<BoneMapper>())
+            {
+                CustomEmotesAPI.localMapper.StartCoroutine(SetupManEaterAdult(self.gameObject, self.GetComponentInChildren<BoneMapper>()));
+            }
+            orig(self);
+        }
+        IEnumerator SetupManEaterAdult(GameObject g, BoneMapper mapper)
+        {
+            yield return new WaitForSeconds(2.5f);
+            DestroyImmediate(mapper.audioObject);
+            DestroyImmediate(mapper.transform.parent.gameObject);
+            CustomEmotesAPI.localMapper.StartCoroutine(EnemySkeletons.SetupSkeletonAfterFrame(g, "assets/enemyskeletons/cavedwellerfather.prefab", [0]));
+        }
+        private static Hook CaveDwellerStartTransformationAnimHook;
 
         private static GameObject emoteNetworker;
 
@@ -616,6 +632,7 @@ namespace EmotesAPI
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "Jump_performed", BindingFlags.NonPublic, nameof(Jump_performed), Jump_performedHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "StopPerformingEmoteClientRpc", BindingFlags.Public, nameof(StopPerformingEmoteClientRpc), StopPerformingEmoteClientRpcHook);
             SetupHook(typeof(PlayerControllerB), typeof(CustomEmotesAPI), "ConnectClientToPlayerObject", BindingFlags.Public, nameof(ConnectClientToPlayerObject), ConnectClientToPlayerObjectHook);
+            SetupHook(typeof(CaveDwellerAI), typeof(CustomEmotesAPI), "StartTransformationAnim", BindingFlags.NonPublic, nameof(CaveDwellerStartTransformationAnim), CaveDwellerStartTransformationAnimHook);
             CentipedePatches.PatchAll();
             if (VRMPresent)
             {

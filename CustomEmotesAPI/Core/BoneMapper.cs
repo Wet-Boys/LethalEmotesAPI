@@ -656,7 +656,15 @@ public class BoneMapper : MonoBehaviour
                             startingXPoint = x;
                             //DebugClass.Log($"they are equal!");
                             //DebugClass.Log($"{smr.name}--- i is equal to {x}  ------ {smr.bones[x].name}");
-                            EmoteConstraint e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
+                            EmoteConstraint e = smr.bones[x].gameObject.GetComponent<EmoteConstraint>();
+                            if (e is null)
+                            {
+                                e = smr.bones[x].gameObject.AddComponent<EmoteConstraint>();
+                            }
+                            else
+                            {
+                                e.Reset();
+                            }
                             e.AddSource(ref smr.bones[x], ref emoteSkeletonSMR.bones[i]);
                             e.revertTransform = revertTransform;
                             break;
@@ -1250,6 +1258,7 @@ public class BoneMapper : MonoBehaviour
                 return;
             }
             playersToMappers.Remove(mapperBody);
+            PlayAnim("none", -1);
             try
             {
                 currentClip.clip[0].ToString();
@@ -1467,9 +1476,14 @@ public class BoneMapper : MonoBehaviour
     }
     internal bool needToTurnOffShadows = true;
     internal bool needToTurnOffCosmetics = true;
+    Renderer helmetRenderer = null;
     public void TurnOnThirdPerson()
     {
-        playerController.localVisor.gameObject.SetActive(false);
+        if (helmetRenderer is null)
+        {
+            helmetRenderer = playerController.localVisor.transform.GetChild(0).GetComponent<Renderer>();
+        }
+        helmetRenderer.enabled = false;
         if (playerController.thisPlayerModel.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.On)
         {
             needToTurnOffShadows = false;
@@ -1526,7 +1540,7 @@ public class BoneMapper : MonoBehaviour
             playerController.thisPlayerModelArms.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             playerController.thisPlayerModelLOD1.gameObject.SetActive(true);
             playerController.thisPlayerModelLOD2.gameObject.SetActive(true);
-            playerController.localVisor.gameObject.SetActive(true);
+            helmetRenderer.enabled = true;
             playerController.thisPlayerModel.gameObject.layer = originalLayer;
             playerController.grabDistance = 3f;
             isInThirdPerson = false;
