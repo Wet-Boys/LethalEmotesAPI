@@ -75,23 +75,26 @@ namespace LethalEmotesAPI.Patches.ModCompat
         }
         public static void ReloadTooManyEmotesVisibility()
         {
-            foreach (var item in EmotesManager.allUnlockableEmotesDict)
+            if (EmotesAPI.Settings.ImportTME.Value)
             {
-                if (item.Value.emoteSyncGroup is not null)
+                foreach (var item in EmotesManager.allUnlockableEmotesDict)
                 {
-                    if (item.Value.emoteSyncGroup.First() != item.Value)
+                    if (item.Value.emoteSyncGroup is not null)
                     {
-                        continue;
+                        if (item.Value.emoteSyncGroup.First() != item.Value)
+                        {
+                            continue;
+                        }
                     }
+                    bool needToUnlock = SessionManager.IsEmoteUnlocked(item.Value.emoteName);
+                    string emoteName = $"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}";
+                    CustomEmotesAPI.randomClipList.Remove(emoteName);
+                    if (needToUnlock && !BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
+                    {
+                        CustomEmotesAPI.randomClipList.Add(emoteName);
+                    }
+                    BoneMapper.animClips[emoteName].visibility = needToUnlock;
                 }
-                bool needToUnlock = SessionManager.IsEmoteUnlocked(item.Value.emoteName);
-                string emoteName = $"{CustomEmotesAPI.PluginGUID}__TooManyEmotes__{item.Key}";
-                CustomEmotesAPI.randomClipList.Remove(emoteName);
-                if (needToUnlock && !BlacklistSettings.emotesExcludedFromRandom.Contains(emoteName))
-                {
-                    CustomEmotesAPI.randomClipList.Add(emoteName);
-                }
-                BoneMapper.animClips[emoteName].visibility = needToUnlock;
             }
         }
     }

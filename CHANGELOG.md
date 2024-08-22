@@ -1,3 +1,5 @@
+- Version 1.15.1: Fixed breaking issue when NOT importing TooManyEmotes
+
 - Version 1.15.0: Added support for new enemy. Changed how I hide the helmet in third person so it doesn't break post-processing
 
 - Version 1.14.2: Added settings to the Customize menu that have been missing forever
