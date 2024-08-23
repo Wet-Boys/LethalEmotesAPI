@@ -1,11 +1,10 @@
 {
     "name": "LethalEmotesAPI",
-    "version_number": "1.15.1",
+    "version_number": "1.15.2",
     "website_url": "https://github.com/Wet-Boys/LethalEmotesAPI/",
     "description": "API for adding emotes to Lethal Company",
     "dependencies": [
 		"BepInEx-BepInExPack-5.4.2100",
-		"Rune580-LethalCompany_InputUtils-0.7.3",
-		"AinaVT-LethalConfig-1.2.0"
+		"Rune580-LethalCompany_InputUtils-0.7.3"
     ]
 }

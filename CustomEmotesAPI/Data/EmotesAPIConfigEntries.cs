@@ -1,8 +1,8 @@
 ﻿using BepInEx.Configuration;
 using EmotesAPI;
-using LethalConfig.ConfigItems.Options;
-using LethalConfig.ConfigItems;
-using LethalConfig;
+//using LethalConfig.ConfigItems.Options;
+//using LethalConfig.ConfigItems;
+//using LethalConfig;
 using LethalEmotesApi.Ui.Data;
 using System;
 using System.Collections.Generic;
@@ -57,14 +57,14 @@ namespace LethalEmotesAPI.Data
             configFile = file;
             this.sectionPrefix = sectionPrefix;
 
-            LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<RootMotionType>(rootMotionType, false));
-            LethalConfigManager.AddConfigItem(new FloatSliderConfigItem(EmotesVolume, new FloatSliderOptions { Min = 0, Max = 100, RequiresRestart = false }));
-            LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<DMCAType>(DMCAFree, false));
-            LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<ThirdPersonType>(thirdPersonType, false));
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(EmotesAlertEnemies, false));
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(PermanentEmotingHealthbar, false));
+            //LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<RootMotionType>(rootMotionType, false));
+            //LethalConfigManager.AddConfigItem(new FloatSliderConfigItem(EmotesVolume, new FloatSliderOptions { Min = 0, Max = 100, RequiresRestart = false }));
+            //LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<DMCAType>(DMCAFree, false));
+            //LethalConfigManager.AddConfigItem(new EnumDropDownConfigItem<ThirdPersonType>(thirdPersonType, false));
+            //LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(EmotesAlertEnemies, false));
+            //LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(HideJoinSpots, false));
+            //LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(StopEmoteWhenLockedToStopsEmote, false));
+            //LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(PermanentEmotingHealthbar, false));
         }
         public void CopyFromConfig(EmotesAPIConfigEntries sourceConfig)
         {

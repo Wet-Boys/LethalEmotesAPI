@@ -1,3 +1,5 @@
+- Version 1.15.2: Removed LethalConfig integration. EmotesAPI uses Local/Global configs based on user settings. LethalConfig doesn't support this as far as I am aware due to caching (please correct me if you know otherwise). This is to prevent confusion when changing settings that might not take effect.
+
 - Version 1.15.1: Fixed breaking issue when NOT importing TooManyEmotes
 
 - Version 1.15.0: Added support for new enemy. Changed how I hide the helmet in third person so it doesn't break post-processing

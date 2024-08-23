@@ -3,8 +3,8 @@ using System.Text;
 using BepInEx.Configuration;
 using LethalEmotesAPI.Data;
 using UnityEngine;
-using LethalConfig.ConfigItems;
-using LethalConfig;
+//using LethalConfig.ConfigItems;
+//using LethalConfig;
 using LethalEmotesAPI.Utils;
 using System.IO;
 using System.Linq;
@@ -77,7 +77,7 @@ namespace EmotesAPI
         {
             SetProfileName();
             GenerateConfigs();
-            LethalConfig();
+            //LethalConfig();
         }
 
         internal static GameObject picker;
@@ -145,7 +145,7 @@ namespace EmotesAPI
         {
             useGlobalConfig = global.Bind("Global Settings", "Use Global Config", true, "When true, all EmotesAPI settings will be the same across profiles. When false, each profile will have its own settings.");
             disallowedModPackOverrideLocations = global.Bind("Global No Touch", "Modpack locations disallowing modPackOverride", "", "Locations where users have already opted out of using the modpack specific options");
-            LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(useGlobalConfig, false));
+            //LethalConfigManager.AddConfigItem(new BoolCheckBoxConfigItem(useGlobalConfig, false));
             
             useGlobalConfig.SettingChanged += PermanentEmotingHealthbar_SettingChanged;
             useGlobalConfig.SettingChanged += HideJoinSpots_SettingChanged;
@@ -225,13 +225,13 @@ namespace EmotesAPI
             sb.Append("\n\n");
             DebugClass.Log(sb.ToString());
         }
-        internal static void LethalConfig()
-        {
-            var aVeryCoolIconAsset = Assets.Load<Sprite>("lethalconfigicon.png");
-            LethalConfigManager.SetModIcon(aVeryCoolIconAsset);
-            LethalConfigManager.SetModDescription("API for importing animations to Lethal Company");
-            LethalConfigManager.SkipAutoGenFor("No Touch");
-        }
+        //internal static void LethalConfig()
+        //{
+        //    var aVeryCoolIconAsset = Assets.Load<Sprite>("lethalconfigicon.png");
+        //    LethalConfigManager.SetModIcon(aVeryCoolIconAsset);
+        //    LethalConfigManager.SetModDescription("API for importing animations to Lethal Company");
+        //    LethalConfigManager.SkipAutoGenFor("No Touch");
+        //}
 
     }
 }
