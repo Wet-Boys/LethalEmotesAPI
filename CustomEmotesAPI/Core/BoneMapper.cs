@@ -139,9 +139,8 @@ public class BoneMapper : MonoBehaviour
         emoteSkeletonAnimator.enabled = true;
 
         dontAnimateUs.Clear();
-        try
+        if (currentClip is not null)
         {
-            currentClip.clip[0].ToString();
             try
             {
                 if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
@@ -208,12 +207,6 @@ public class BoneMapper : MonoBehaviour
             {
                 DebugClass.Log($"had issue turning off audio before new audio played step 4: {e}");
             }
-
-
-        }
-        catch (Exception)
-        {
-
         }
 
         currEvent = 0;
@@ -238,11 +231,7 @@ public class BoneMapper : MonoBehaviour
         {
             prevClip = currentClip;
             currentClip = animClips[s];
-            try
-            {
-                currentClip.clip[0].ToString();
-            }
-            catch (Exception)
+            if (currentClip is null)
             {
                 return;
             }
@@ -1103,6 +1092,10 @@ public class BoneMapper : MonoBehaviour
                 justSwitched = false;
                 return;
             }
+            if (currentClip is null)
+            {
+                return;
+            }
             //only do this if current animation applies root motion
             if (currentClip.lockType == AnimationClipParams.LockType.rootMotion)
             {
@@ -1261,37 +1254,38 @@ public class BoneMapper : MonoBehaviour
             PlayAnim("none", -1);
             try
             {
-                currentClip.clip[0].ToString();
-                NewAnimation(null);
-                if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+                if (currentClip is not null)
                 {
-                    if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                    currentClip.clip[0].ToString();
+                    NewAnimation(null);
+                    if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                     {
-                        CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                        if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                        {
+                            CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                        }
                     }
-                }
-                if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
-                {
-                    audioObject.GetComponent<AudioManager>().Stop();
-                    if (currentClip.syncronizeAudio)
+                    if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
                     {
-                        listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                        audioObject.GetComponent<AudioManager>().Stop();
+                        if (currentClip.syncronizeAudio)
+                        {
+                            listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                        }
                     }
+                    if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+                    {
+                        CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
+                        uniqueSpot = -1;
+                    }
+                    prevClip = currentClip;
+                    currentClip = null;
                 }
-                if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
-                {
-                    CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
-                    uniqueSpot = -1;
-                }
-                BoneMapper.allMappers.Remove(this);
-                prevClip = currentClip;
-                currentClip = null;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                //DebugClass.Log($"Had issues when destroying bonemapper: {e}");
-                BoneMapper.allMappers.Remove(this);
             }
+            BoneMapper.allMappers.Remove(this);
         }
     }
     public void UnlockBones(bool animatorEnabled = true)

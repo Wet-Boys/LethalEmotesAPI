@@ -50,7 +50,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.15.2";
+        public const string VERSION = "1.15.3";
         public struct NameTokenWithSprite
         {
             public string nameToken;

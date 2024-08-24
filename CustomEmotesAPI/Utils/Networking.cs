@@ -41,8 +41,10 @@ public class EmoteNetworker : NetworkBehaviour
         CustomAnimationClip clip = BoneMapper.animClips[animation];
         try
         {
-            clip.clip[0].ToString();
-            eventNum = UnityEngine.Random.Range(0, BoneMapper.primaryAudioClips[clip.syncPos].Length);
+            if (clip is not null)
+            {
+                eventNum = UnityEngine.Random.Range(0, BoneMapper.primaryAudioClips[clip.syncPos].Length);
+            }
         }
         catch (Exception)
         {
