@@ -773,7 +773,7 @@ public class BoneMapper : MonoBehaviour
         {
             try
             {
-                if (moving && currentClip.stopOnMove)
+                if (moving && currentClip is not null && currentClip.stopOnMove)
                 {
                     CustomEmotesAPI.PlayAnimation("none");
                 }
@@ -926,23 +926,25 @@ public class BoneMapper : MonoBehaviour
                     emoteSkeletonAnimator.enabled = false;
                     try
                     {
-                        currentClip.clip.ToString();
-                        CustomEmotesAPI.Changed("none", this);
-                        NewAnimation(null);
-                        if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+                        if (currentClip is not null)
                         {
-                            CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
-                        }
-                        if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
-                        {
-                            audioObject.GetComponent<AudioManager>().Stop();
-                            if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
+                            CustomEmotesAPI.Changed("none", this);
+                            NewAnimation(null);
+                            if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                             {
-                                listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                                CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                             }
+                            if (primaryAudioClips[currentClip.syncPos][currEvent] != null)
+                            {
+                                audioObject.GetComponent<AudioManager>().Stop();
+                                if (primaryAudioClips[currentClip.syncPos][currEvent] != null && currentClip.syncronizeAudio)
+                                {
+                                    listOfCurrentEmoteAudio[currentClip.syncPos].Remove(audioObject.GetComponent<AudioSource>());
+                                }
+                            }
+                            prevClip = currentClip;
+                            currentClip = null;
                         }
-                        prevClip = currentClip;
-                        currentClip = null;
                     }
                     catch (Exception)
                     {

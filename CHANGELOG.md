@@ -1,3 +1,5 @@
+- Version 1.15.4: Fixed two spots that I missed last time.
+
 - Version 1.15.3: Fixed some bad practice code that was throwing false positives for people debugging their mod packs
 
 - Version 1.15.2: Removed LethalConfig integration. EmotesAPI uses Local/Global configs based on user settings. LethalConfig doesn't support this as far as I am aware due to caching (please correct me if you know otherwise). This is to prevent confusion when changing settings that might not take effect.
