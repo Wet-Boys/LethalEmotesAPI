@@ -797,7 +797,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     CustomEmotesAPI.localMapper = this;
                     local = true;
-                    playerController.gameplayCamera.nearClipPlane = 0.0005f;
+                    //playerController.gameplayCamera.nearClipPlane = 0.0005f;
                     originalCosmeticPosition = new GameObject();
                     originalCosmeticPosition.transform.parent = playerController.headCostumeContainerLocal.parent;
                     originalCosmeticPosition.transform.position = playerController.headCostumeContainerLocal.position;
