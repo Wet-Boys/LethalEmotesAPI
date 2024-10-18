@@ -131,7 +131,7 @@ namespace LethalEmotesAPI.Core
                         AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/Butler.prefab", [0]);
                         break;
                     case "Tulip Snake":
-                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/TulipSnake.prefab", [3]));
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupSkeletonAfterFrame(self.gameObject, "assets/enemyskeletons/TulipSnake.prefab", [2]));
                         break;
 
 

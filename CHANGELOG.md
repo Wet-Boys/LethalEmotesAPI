@@ -1,3 +1,5 @@
+- Verison 1.15.6: Fixed tulip snakes not setting up their emote skeleton properly (I forgot how arrays work)
+
 - Version 1.15.5: Removed code to change near-clip plane of the camera. This is to help emote packs that shrink the character from having clipping problems with the helmet. This is a temporary fix to work with Diveristy since no emote packs actually take advantage of the near clip change yet.
 
 - Version 1.15.4: Fixed two spots that I missed last time.
