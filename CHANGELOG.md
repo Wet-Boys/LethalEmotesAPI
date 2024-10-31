@@ -1,3 +1,5 @@
+- Version 1.15.8: Literally nothing but build system broke. don't worry about it
+
 - Version 1.15.7: Recompiled to work with the new version of MoreCompany. Mixing new MoreCompany with old EmotesAPI or vice versa will prevent you from seeing your cosmetics but otherwise it's safe.
 
 - Verison 1.15.6: Fixed tulip snakes not setting up their emote skeleton properly (I forgot how arrays work)
