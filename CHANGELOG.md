@@ -1,3 +1,5 @@
+- Version 1.15.7: Recompiled to work with the new version of MoreCompany. Mixing new MoreCompany with old EmotesAPI or vice versa will prevent you from seeing your cosmetics but otherwise it's safe.
+
 - Verison 1.15.6: Fixed tulip snakes not setting up their emote skeleton properly (I forgot how arrays work)
 
 - Version 1.15.5: Removed code to change near-clip plane of the camera. This is to help emote packs that shrink the character from having clipping problems with the helmet. This is a temporary fix to work with Diveristy since no emote packs actually take advantage of the near clip change yet.

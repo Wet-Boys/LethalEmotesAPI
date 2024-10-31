@@ -37,7 +37,7 @@
     <PackageReference Include="BunyaPineTree-ModelReplacementAPI" Version="2.3.8" />
     <PackageReference Include="FlipMods-TooManyEmotes" Version="2.1.8" />
     <PackageReference Include="KlutzyBubbles-BetterEmotes" Version="1.4.5" publicize="true" />
-    <PackageReference Include="notnotnotswipez-MoreCompany" Version="1.7.4" />
+    <PackageReference Include="notnotnotswipez-MoreCompany" Version="1.11.0" />
     <PackageReference Include="Ooseykins-LethalVRM" Version="1.0.7" publicize="true" />
     <PackageReference Include="Rune580.Mods.LethalCompany.InputUtils" Version="0.7.4" />
     <PackageReference Include="Szumi57-LethalInternship" Version="0.14.8" publicize="true" />
