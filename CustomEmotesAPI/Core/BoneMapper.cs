@@ -478,6 +478,14 @@ public class BoneMapper : MonoBehaviour
                             playerController.localVisor.localScale = ogVisorScale;
                         }
                         ogScale = new Vector3(-69, -69, -69);
+                        if (CustomEmotesAPI.ModelReplacementAPIPresent)
+                        {
+                            ModelReplacementAPICompat.ScaleModelAsMapper(Vector3.one, Vector3.one, playerController);
+                        }
+                        if (CustomEmotesAPI.VRMPresent)
+                        {
+                            VRMCompat.ScaleModelAsMapper(Vector3.one, Vector3.one, playerController);
+                        }
                     }
                     foreach (var item in mapperBody.GetComponentsInChildren<Collider>())
                     {
@@ -1010,6 +1018,14 @@ public class BoneMapper : MonoBehaviour
                 if (local)
                 {
                     playerController.localVisor.localScale = ogVisorScale * (mapperBody.transform.localScale.x / ogScale.x);
+                }
+                if (CustomEmotesAPI.ModelReplacementAPIPresent)
+                {
+                    ModelReplacementAPICompat.ScaleModelAsMapper(mapperBody.transform.localScale, ogScale, playerController);
+                }
+                if (CustomEmotesAPI.VRMPresent)
+                {
+                    VRMCompat.ScaleModelAsMapper(Vector3.one, Vector3.one, playerController);
                 }
             }
         }

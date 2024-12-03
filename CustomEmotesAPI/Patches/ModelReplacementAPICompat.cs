@@ -1,6 +1,8 @@
-﻿using BepInEx.Bootstrap;
+﻿using AdvancedCompany.Game;
+using BepInEx.Bootstrap;
 using EmotesAPI;
 using GameNetcodeStuff;
+using LethalEmotesAPI.Patches.ModCompat;
 using ModelReplacement;
 using ModelReplacement.Modules;
 using MonoMod.RuntimeDetour;
@@ -27,5 +29,19 @@ namespace LethalEmotesAPI.Patches
             return orig(self);
         }
         internal static Hook GetViewStateHook;
+        internal static void ScaleModelAsMapper(Vector3 currentScale, Vector3 ogScale, PlayerControllerB player)
+        {
+            BodyReplacementBase bod;
+            ModelReplacementAPI.GetPlayerModelReplacement(player, out bod);
+            if (bod is not null)
+            {
+                if (!Why2.originalBodyScales.ContainsKey(bod))
+                {
+                    Why2.originalBodyScales.Add(bod, bod.replacementModel.transform.localScale);
+                }
+                Vector3 scaleVector = new Vector3(currentScale.x / ogScale.x, currentScale.y / ogScale.y, currentScale.z / ogScale.z);
+                bod.replacementModel.transform.localScale = new Vector3(Why2.originalBodyScales[bod].x * scaleVector.x, Why2.originalBodyScales[bod].y * scaleVector.y, Why2.originalBodyScales[bod].z * scaleVector.z);
+            }
+        }
     }
 }

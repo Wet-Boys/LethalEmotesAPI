@@ -1,3 +1,5 @@
+- Version 1.15.9: Fixed VRM/ModelReplacementAPI models not scaling up/down correctly when assigning a parent game object. Literally no one uses this feature but I will soonTM
+
 - Version 1.15.8: Literally nothing but build system broke. don't worry about it
 
 - Version 1.15.7: Recompiled to work with the new version of MoreCompany. Mixing new MoreCompany with old EmotesAPI or vice versa will prevent you from seeing your cosmetics but otherwise it's safe.
