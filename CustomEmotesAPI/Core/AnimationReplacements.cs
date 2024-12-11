@@ -5,6 +5,7 @@ using System.Text;
 using GameNetcodeStuff;
 using LethalEmotesAPI.Utils;
 using EmotesAPI;
+using UnityEngine.UIElements;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -149,7 +150,6 @@ internal static class AnimationReplacements
             float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             test.scale = currScale / banditScale;
-            
             //todo health
             //test.h = bodyPrefab.GetComponentInChildren<PlayerControllerB>().health;
             test.model = modelTransform.gameObject;

@@ -87,6 +87,7 @@ namespace EmotesAPI
         public static bool TMEPresent;
         public static bool BetterEmotesPresent;
         public static bool InternsPresent;
+        public static bool NunchukThirdPersonPresent;
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
@@ -147,7 +148,7 @@ namespace EmotesAPI
                     SMR2 = i;
                 }
             }
-            AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 });
+            AnimationReplacements.Import(player.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", new int[] { SMR1, SMR2 }).scale = 1;
 
             //TODO this cleanup is not working?????
             //try
@@ -306,10 +307,18 @@ namespace EmotesAPI
 
         private void CalculateSmoothLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
-            orig(self, inputVector);
+            bool inThirdPerson = localMapper is not null && localMapper.isInThirdPerson;
+            if (inThirdPerson)
+            {
+                orig(self, Vector2.zeroVector);
+            }
+            else
+            {
+                orig(self, inputVector);
+            }
             try
             {
-                if (localMapper is not null && localMapper.isInThirdPerson)
+                if (inThirdPerson)
                 {
                     self.gameplayCamera.transform.localEulerAngles = new Vector3(Mathf.LerpAngle(self.gameplayCamera.transform.localEulerAngles.x, 0, self.smoothLookMultiplier * Time.deltaTime), 0, self.gameplayCamera.transform.localEulerAngles.z);
                     float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
@@ -334,10 +343,18 @@ namespace EmotesAPI
 
         private void CalculateNormalLookingInput(Action<PlayerControllerB, Vector2> orig, PlayerControllerB self, Vector2 inputVector)
         {
-            orig(self, inputVector);
+            bool inThirdPerson = localMapper is not null && localMapper.isInThirdPerson;
+            if (inThirdPerson)
+            {
+                orig(self, Vector2.zeroVector);
+            }
+            else
+            {
+                orig(self, inputVector);
+            }
             try
             {
-                if (localMapper is not null && localMapper.isInThirdPerson)
+                if (inThirdPerson)
                 {
                     self.gameplayCamera.transform.localEulerAngles = new Vector3(0, self.gameplayCamera.transform.localEulerAngles.y, self.gameplayCamera.transform.localEulerAngles.z);
                     float cameraLookDir = localMapper.rotationPoint.transform.localEulerAngles.x;
@@ -350,7 +367,7 @@ namespace EmotesAPI
                     {
                         cameraLookDir = Mathf.Clamp(cameraLookDir, cameraLookDir, 85);
                     }
-                    localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y, localMapper.rotationPoint.transform.localEulerAngles.z);
+                    localMapper.rotationPoint.transform.localEulerAngles = new Vector3(cameraLookDir, localMapper.rotationPoint.transform.localEulerAngles.y + inputVector.x, localMapper.rotationPoint.transform.localEulerAngles.z);
                 }
             }
             catch (Exception)
@@ -575,6 +592,7 @@ namespace EmotesAPI
             TMEPresent = Chainloader.PluginInfos.ContainsKey("FlipMods.TooManyEmotes");
             BetterEmotesPresent = Chainloader.PluginInfos.ContainsKey("BetterEmotes");
             InternsPresent = Chainloader.PluginInfos.ContainsKey("Szumi57.LethalInternship");
+            NunchukThirdPersonPresent = true;//TODO FIX
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
             //}
@@ -749,7 +767,7 @@ namespace EmotesAPI
         }
         private static void ThirdPersonToggle()
         {
-            if (localMapper is not null && localMapper.currentClip is not null && !LCThirdPersonPresent)
+            if (localMapper is not null && (localMapper.currentClip is not null || NunchukThirdPersonPresent) && !LCThirdPersonPresent)
             {
                 switch (localMapper.temporarilyThirdPerson)
                 {

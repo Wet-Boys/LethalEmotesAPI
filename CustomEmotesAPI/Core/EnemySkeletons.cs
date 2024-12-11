@@ -30,7 +30,7 @@ namespace LethalEmotesAPI.Core
         {
             //Advanced company does something with the bones and it doesn't appreciate my bones already existing so we wait
             yield return new WaitForEndOfFrame();
-            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]);
+            AnimationReplacements.Import(self.gameObject, "assets/customstuff/scavEmoteSkeleton.prefab", [0]).scale = 1;
         }
         internal static IEnumerator SetupSkeletonAfterFrame(GameObject g, string prefab, int[] pos, int frames = 1)
         {

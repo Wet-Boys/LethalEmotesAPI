@@ -1051,9 +1051,14 @@ public class BoneMapper : MonoBehaviour
     {
         bool yes =
             !CustomEmotesAPI.LCThirdPersonPresent
-            && currentClip is not null
-            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on)
+
+            && 
+            ((CustomEmotesAPI.NunchukThirdPersonPresent && currentClip is null) || 
+            (currentClip is not null 
+            && (((currentClip.thirdPerson || Settings.thirdPersonType.Value == ThirdPersonType.All) && Settings.thirdPersonType.Value != ThirdPersonType.None) || temporarilyThirdPerson == TempThirdPerson.on)))
+
             && canThirdPerson
+
             && temporarilyThirdPerson != TempThirdPerson.off;
         return yes;
     }
@@ -1425,7 +1430,7 @@ public class BoneMapper : MonoBehaviour
     public int originalLayer = -1;
     public void LockCameraStuff(bool thirdPersonLock)
     {
-        bool allowThirdPerson = false;
+        bool allowThirdPerson = CustomEmotesAPI.NunchukThirdPersonPresent;
         if (currentClip is not null)
         {
             allowThirdPerson = currentClip.allowThirdPerson && !currentClip.customInternalName.Contains("TooManyEmotes__");
