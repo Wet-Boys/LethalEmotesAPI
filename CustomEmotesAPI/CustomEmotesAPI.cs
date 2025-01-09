@@ -44,6 +44,7 @@ namespace EmotesAPI
     [BepInDependency("FlipMods.TooManyEmotes", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("BetterEmotes", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("Szumi57.LethalInternship", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("gemumoddo.thirdperson", BepInDependency.DependencyFlags.SoftDependency)]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
         public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
@@ -592,7 +593,7 @@ namespace EmotesAPI
             TMEPresent = Chainloader.PluginInfos.ContainsKey("FlipMods.TooManyEmotes");
             BetterEmotesPresent = Chainloader.PluginInfos.ContainsKey("BetterEmotes");
             InternsPresent = Chainloader.PluginInfos.ContainsKey("Szumi57.LethalInternship");
-            NunchukThirdPersonPresent = true;//TODO FIX
+            NunchukThirdPersonPresent = Chainloader.PluginInfos.ContainsKey("gemumoddo.thirdperson");
             //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             //{
             //}
