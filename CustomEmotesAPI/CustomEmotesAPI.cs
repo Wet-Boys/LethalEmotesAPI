@@ -51,7 +51,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "1.15.10";
+        public const string VERSION = "1.15.11";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -1074,6 +1074,12 @@ namespace EmotesAPI
                 }
             }
         }
+
+        internal static IEnumerator PlayNoneAfterFrame()
+        {
+            yield return new WaitForEndOfFrame();
+            PlayAnimation("none");
+        }
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
             if (mapper is null)
@@ -1135,7 +1141,8 @@ namespace EmotesAPI
             }
             else if (localMapper.currentlyLockedBoneMapper == mapper && Settings.StopEmoteWhenLockedToStopsEmote.Value)
             {
-                PlayAnimation("none", localMapper);
+                localMapper.StartCoroutine(PlayNoneAfterFrame());
+                // PlayAnimation("none", localMapper);//why does this desync for clients? Idk this is such a niche use case, and I'm kinda done with making stuff at this point so this workaround is good enough for me.
             }
             foreach (var item in EmoteLocation.emoteLocations)
             {

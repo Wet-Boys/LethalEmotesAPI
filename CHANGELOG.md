@@ -1,3 +1,5 @@
+- Version 1.15.11: Fixed issue where getting disconnected from a join spot caused desyncs.
+
 - Version 1.15.10: Fixed a longstanding bug where rotating in third person without moving would slightly rotate you on other people's screens. Fixed another longstanding bug where the first player slot had incorrect bonemapper scaling. Added internal stuff so that the third person mod works since people seem to really like the third person setup I use.
 
 - Version 1.15.9: Fixed VRM/ModelReplacementAPI models not scaling up/down correctly when assigning a parent game object. Literally no one uses this feature but I will soonTM
