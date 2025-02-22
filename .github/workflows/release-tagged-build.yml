@@ -36,7 +36,7 @@ jobs:
       run: git diff --quiet tags/${LATEST_RELEASE_TAG} HEAD -- CHANGELOG.md || exit -1
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
@@ -53,7 +53,7 @@ jobs:
       run: ./build.sh --configuration=Release --target=BuildNuGet
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: lethal-emotes-api
         path: CustomEmotesAPI/bin/Debug/netstandard2.1/upload/
