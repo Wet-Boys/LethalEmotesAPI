@@ -53,6 +53,16 @@ namespace LethalEmotesAPI.Core
             orig(self);
         }
         private static Hook MaskedPlayerEnemyStartHook;
+
+        internal static IEnumerator SetupCoilHead(EnemyAI self)
+        {
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/springman4.prefab", [0]);
+            BoneMapper b = self.GetComponentInChildren<BoneMapper>();
+            Transform head = self.transform.Find("SpringManModel").Find("Head");
+            CustomEmotesAPI.localMapper.StartCoroutine(AttachCoilHeadSpring(head, b));
+        }
         internal static IEnumerator SetupSkeleton(EnemyAI self)
         {
             try
@@ -90,10 +100,7 @@ namespace LethalEmotesAPI.Core
                         AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/pufferenemy.prefab", [0]);
                         break;
                     case "Spring":
-                        AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/springman4.prefab", [0]);
-                        BoneMapper b = self.GetComponentInChildren<BoneMapper>();
-                        Transform head = self.transform.Find("SpringManModel").Find("Head");
-                        CustomEmotesAPI.localMapper.StartCoroutine(AttachCoilHeadSpring(head, b));
+                        CustomEmotesAPI.localMapper.StartCoroutine(SetupCoilHead(self));
                         break;
                     case "Jester":
                         AnimationReplacements.Import(self.gameObject, "assets/enemyskeletons/jester2.prefab", [0, 1, 2]).scale = 1.3f;
