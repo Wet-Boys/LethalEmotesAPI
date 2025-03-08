@@ -46,10 +46,11 @@ namespace LethalEmotesAPI
                 needToContinueOnFinish = false;
                 audioSource.loop = true;
             }
-            if (audioSource.isPlaying && mapper.playerController is not null && mapper.playerController.IsOwner)
+            if (audioSource.isPlaying)
             {
                     audioSource.volume = Settings.EmotesVolume.Value / 100f;
-                    if (Settings.EmotesAlertEnemies.Value)
+                    
+                    if (Settings.EmotesAlertEnemies.Value && mapper.playerController is not null && mapper.playerController.IsOwner)
                     {
                         if (audioTimer <= 0f)
                         {
