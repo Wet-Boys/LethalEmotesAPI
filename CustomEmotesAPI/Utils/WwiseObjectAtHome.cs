@@ -51,7 +51,7 @@ namespace LethalEmotesAPI
                     audioSource.volume = Settings.EmotesVolume.Value / 100f;
                     if (Settings.EmotesAlertEnemies.Value)
                     {
-                        if (mapper.playerController != null && noiseInterval <= 0f)
+                        if (noiseInterval <= 0f)
                         {
                             audioTimer = 1f;
                             roundManager.PlayAudibleNoise(mapper.mapperBody.transform.position, 30f, mapper.currentAudioLevel, 0, mapper.playerController.isInHangarShipRoom && mapper.playerController.playersManager.hangarDoorsClosed, 5);
