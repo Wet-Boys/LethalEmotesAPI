@@ -46,26 +46,23 @@ namespace LethalEmotesAPI
                 needToContinueOnFinish = false;
                 audioSource.loop = true;
             }
-            if (audioSource.isPlaying)
+            if (audioSource.isPlaying && mapper.playerController!= null && mapper.playerController.IsOwner)
             {
-                audioTimer += Time.deltaTime;
-                if (audioTimer > .75f)
-                {
                     audioSource.volume = Settings.EmotesVolume.Value / 100f;
-                    audioTimer -= .75f;
                     if (Settings.EmotesAlertEnemies.Value)
                     {
-                        if (mapper.playerController is not null)
+                        if (mapper.playerController != null && noiseInterval <= 0f)
                         {
-                            RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, mapper.playerController.isInHangarShipRoom && mapper.playerController.playersManager.hangarDoorsClosed, 5);
+                            audioTimer = 1f;
+                            roundManager.PlayAudibleNoise(mapper.mapperBody.transform.position, 30f, mapper.currentAudioLevel, 0, mapper.playerController.isInHangarShipRoom && mapper.playerController.playersManager.hangarDoorsClosed, 5);
                         }
                         else
                         {
-                            //RoundManager.Instance.PlayAudibleNoise(mapper.mapperBody.transform.position, 30, mapper.currentAudioLevel, 0, false, 5);
+                            audioTimer -= Time.deltaTime;
                         }
                     }
-                }
             }
+
         }
         public void Play(int syncPos, int currEvent, bool looping, bool sync, bool willGetClaimed)
         {
