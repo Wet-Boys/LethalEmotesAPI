@@ -1,3 +1,5 @@
+- Version 1.15.13: Tweak to audible noise generation to prevent enemies from breaking. Thanks to huluoboya3 for submitting the PR
+
 - Version 1.15.12: Fix for incompat with coilheadstare. Sorry this took so long, I just kinda forgor.
 
 - Version 1.15.11: Fixed issue where getting disconnected from a join spot caused desyncs.

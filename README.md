@@ -31,3 +31,5 @@
 - Modeling/Animation - github.com
 
 - Code fixes/preview window - tillytanker
+
+- Minor refactor - huluoboya3
