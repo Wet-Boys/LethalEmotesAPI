@@ -20,6 +20,11 @@ public static class PlayerControllerPatches
 
             //new CodeMatch(code => code.Calls(AccessTools.Method(typeof(IngamePlayerSettings), "get_Instance"))),
             //    new CodeMatch(code => code.LoadsField(AccessTools.Field(typeof(IngamePlayerSettings), "playerInput"))),
+            
+            
+            
+            //this.moveInputVector = IngamePlayerSettings.Instance.playerInput.actions.FindAction("Move", false).ReadValue<Vector2>();
+            //and a bit of if (this.moveInputVector.magnitude > 0.2f)
             matcher.MatchForward(true,
                 new CodeMatch(code => code.opcode == OpCodes.Ldarg_0),
                 new CodeMatch(code => code.opcode == OpCodes.Call),
@@ -30,14 +35,18 @@ public static class PlayerControllerPatches
                 new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                 new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                 new CodeMatch(code => code.opcode == OpCodes.Stfld),
-                new CodeMatch(code => code.opcode == OpCodes.Call),
-                new CodeMatch(code => code.opcode == OpCodes.Ldfld),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Ldstr),
-                new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Stloc_0)
+                new CodeMatch(code => code.opcode == OpCodes.Ldarg_0)
+                
+                
+                //unknown what this was
+                // new CodeMatch(code => code.opcode == OpCodes.Call),
+                // new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                // new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                // new CodeMatch(code => code.opcode == OpCodes.Ldstr),
+                // new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
+                // new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                // new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                // new CodeMatch(code => code.opcode == OpCodes.Stloc_0)
             );
 
             matcher

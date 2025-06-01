@@ -1,3 +1,5 @@
+- Version 1.16.0: Update to fix some bugs with v70
+
 - Version 1.15.13: Tweak to audible noise generation to prevent enemies from breaking. Thanks to huluoboya3 for submitting the PR
 
 - Version 1.15.12: Fix for incompat with coilheadstare. Sorry this took so long, I just kinda forgor.
