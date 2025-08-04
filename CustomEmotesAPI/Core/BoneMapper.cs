@@ -358,14 +358,16 @@ public class BoneMapper : MonoBehaviour
                 {
                     animController["Floss"] = currentClip.secondaryClip[pos];
                     animator.runtimeAnimatorController = animController;
-                    animator.Play("Loop", -1, (((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length/* + .25f*/) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length)/* - 0.0815217f*/);
+                    float normalizedTime = currentClip.syncronizeAnimation ? (((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length) : 0;
+                    animator.Play("Loop", -1, normalizedTime);
                 }
                 else
                 {
                     animController["Dab"] = currentClip.clip[pos];
                     animController["nobones"] = currentClip.secondaryClip[pos];
                     animator.runtimeAnimatorController = animController;
-                    animator.Play("PoopToLoop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+                    float normalizedTime = currentClip.syncronizeAnimation ? (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length : 0;
+                    animator.Play("PoopToLoop", -1, normalizedTime);
                 }
             }
         }
@@ -375,7 +377,8 @@ public class BoneMapper : MonoBehaviour
             animator.runtimeAnimatorController = animController;
             if (currentClip.clip[pos].length != 0)
             {
-                animator.Play("Loop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+                float normalizedTime = currentClip.syncronizeAnimation ? (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length : 0;
+                animator.Play("Loop", -1, normalizedTime);
             }
             else
             {
@@ -386,7 +389,8 @@ public class BoneMapper : MonoBehaviour
         {
             animController["Default Dance"] = currentClip.clip[pos];
             animator.runtimeAnimatorController = animController;
-            animator.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+            float normalizedTime = currentClip.syncronizeAnimation ? (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length : 0;
+            animator.Play("Poop", -1, normalizedTime);
         }
     }
     public static void PreviewAnimations(Animator animator, string animation)

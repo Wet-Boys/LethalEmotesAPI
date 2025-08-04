@@ -1,3 +1,5 @@
+- Version 1.16.1: Fixed issue where emotes set to only sync audio would still sync animations
+
 - Version 1.16.0: Update to fix some bugs with v70
 
 - Version 1.15.13: Tweak to audible noise generation to prevent enemies from breaking. Thanks to huluoboya3 for submitting the PR
