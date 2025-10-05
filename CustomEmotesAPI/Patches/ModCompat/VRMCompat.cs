@@ -20,7 +20,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
             {
                 foreach (var item in Resources.FindObjectsOfTypeAll(typeof(LethalVRMManager)) as LethalVRMManager[])
                 {
-                    Why.iWantToSeeYourManager = item;
+                    Why.iWantToSeeYourManager = item.gameObject;
                 }
             }
         }
@@ -30,7 +30,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
             {
                 if (!Why.playersToVRMInstances.ContainsKey(player))
                 {
-                    foreach (var item in Why.iWantToSeeYourManager.instances)
+                    foreach (var item in Why.iWantToSeeYourManager.GetComponent<LethalVRMManager>().instances)//Why.iWantToSeeYourManager.instances
                     {
                         if (item.PlayerControllerB == player)
                         {
@@ -65,7 +65,7 @@ namespace LethalEmotesAPI.Patches.ModCompat
             GetPlayerInDictionary(player);
             if (Why.playersToVRMInstances.ContainsKey(player))
             {
-                return Why.playersToVRMInstances[player];
+                return (LethalVRMInstance)Why.playersToVRMInstances[player];
             }
             return null;
         }

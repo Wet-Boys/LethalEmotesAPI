@@ -35,12 +35,12 @@ namespace LethalEmotesAPI.Patches
             ModelReplacementAPI.GetPlayerModelReplacement(player, out bod);
             if (bod is not null)
             {
-                if (!Why2.originalBodyScales.ContainsKey(bod))
+                if (!Why2.originalBodyScales.ContainsKey(bod.gameObject))
                 {
-                    Why2.originalBodyScales.Add(bod, bod.replacementModel.transform.localScale);
+                    Why2.originalBodyScales.Add(bod.gameObject, bod.replacementModel.transform.localScale);
                 }
                 Vector3 scaleVector = new Vector3(currentScale.x / ogScale.x, currentScale.y / ogScale.y, currentScale.z / ogScale.z);
-                bod.replacementModel.transform.localScale = new Vector3(Why2.originalBodyScales[bod].x * scaleVector.x, Why2.originalBodyScales[bod].y * scaleVector.y, Why2.originalBodyScales[bod].z * scaleVector.z);
+                bod.replacementModel.transform.localScale = new Vector3(Why2.originalBodyScales[bod.gameObject].x * scaleVector.x, Why2.originalBodyScales[bod.gameObject].y * scaleVector.y, Why2.originalBodyScales[bod.gameObject].z * scaleVector.z);
             }
         }
     }

@@ -17,5 +17,5 @@
   "UiProjectFile": "./LethalEmotesApi.Ui/LethalEmotesApi.Ui.csproj",
   "UiUnityDir": "./Unity-LethalEmotesApi-UI/",
   "ManifestAuthor": "Gemumoddo",
-  "NetcodePatcherRelease": "2.4.0"
+  "NetcodePatcherRelease": "4.4.2"
 }
