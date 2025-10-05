@@ -6,13 +6,15 @@
       "version": "4.0.0",
       "commands": [
         "dotnet-cake"
-      ]
+      ],
+      "rollForward": false
     },
     "evaisa.netcodepatcher.cli": {
-      "version": "3.3.4",
+      "version": "4.4.2",
       "commands": [
         "netcode-patch"
-      ]
+      ],
+      "rollForward": false
     }
   }
 }
