@@ -1,11 +1,11 @@
 ﻿using EmotesAPI;
 using LethalEmotesAPI.Core;
-using LethalInternship.AI;
 using MonoMod.RuntimeDetour;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using LethalInternship.Core.Interns.AI;
 
 namespace LethalEmotesAPI.Patches.ModCompat
 {

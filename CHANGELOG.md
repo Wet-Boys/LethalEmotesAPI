@@ -1,3 +1,5 @@
+- Version 1.17.1: Updated package for LethalInternship so the compat fixes don't break the game
+
 - Verison 1.17.0: Fixed incompatibility with a few random mods which basically broke the game, genuinely not sure how the bug occured but it's fixed now. Updated to work with v73, if you use any lower version, you need to downgrade this mod.
 
 - Version 1.16.1: Fixed issue where emotes set to only sync audio would still sync animations
