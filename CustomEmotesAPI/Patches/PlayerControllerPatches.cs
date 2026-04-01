@@ -14,38 +14,42 @@ public static class PlayerControllerPatches
     [HarmonyPatch(typeof(PlayerControllerB), "Update")]
     public static class UpdatePatch
     {
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+                public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var matcher = new CodeMatcher(instructions);
+            var moveInputField = AccessTools.Field(typeof(PlayerControllerB), "moveInputVector");
 
-            //new CodeMatch(code => code.Calls(AccessTools.Method(typeof(IngamePlayerSettings), "get_Instance"))),
-            //    new CodeMatch(code => code.LoadsField(AccessTools.Field(typeof(IngamePlayerSettings), "playerInput"))),
+            if (moveInputField == null)
+            {
+                DebugClass.Log("PlayerControllerB.moveInputVector field not found, possibly due to a game update!");
+                return instructions;
+            }
+
+            //InputSystem.actions.FindAction("Move").ReadValue<Vector2>()，stfld
             matcher.MatchForward(true,
-                new CodeMatch(code => code.opcode == OpCodes.Ldarg_0),
-                new CodeMatch(code => code.opcode == OpCodes.Call),
-                new CodeMatch(code => code.opcode == OpCodes.Ldfld),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Ldstr),
-                new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Stfld),
-                new CodeMatch(code => code.opcode == OpCodes.Call),
-                new CodeMatch(code => code.opcode == OpCodes.Ldfld),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Ldstr),
-                new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
-                new CodeMatch(code => code.opcode == OpCodes.Stloc_0)
+
+                new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(InputSystem), "get_actions")),
+                new CodeMatch(OpCodes.Ldstr, "Move"),
+                new CodeMatch(OpCodes.Ldc_I4_0),
+                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(InputActionAsset), "FindAction", [typeof(string), typeof(bool)])),
+                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(InputAction), "ReadValue", [typeof(Vector2)])),
+                new CodeMatch(OpCodes.Stfld, moveInputField)
+
             );
 
-            matcher
-                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
-                .InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomEmotesAPI), nameof(CustomEmotesAPI.AutoWalking), new[] { typeof(PlayerControllerB) })));
+            if (!matcher.IsValid)
+            {
+                DebugClass.Log("Failed to locate moveInputVector assignment in PlayerControllerB.Update, possibly due to a game update!");
+                return instructions;
+            }
+
+            matcher.Advance(1);
+
+            matcher.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0),new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomEmotesAPI), nameof(CustomEmotesAPI.AutoWalking), [typeof(PlayerControllerB)])));
 
             return matcher.InstructionEnumeration();
         }
+
     }
     
     [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
