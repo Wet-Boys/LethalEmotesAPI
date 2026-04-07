@@ -1,3 +1,13 @@
+- Version 1.17.1: Updated package for LethalInternship so the compat fixes don't break the game
+
+- Verison 1.17.0: Fixed incompatibility with a few random mods which basically broke the game, genuinely not sure how the bug occured but it's fixed now. Updated to work with v73, if you use any lower version, you need to downgrade this mod.
+
+- Version 1.16.1: Fixed issue where emotes set to only sync audio would still sync animations
+
+- Version 1.16.0: Update to fix some bugs with v70
+
+- Version 1.15.13: Tweak to audible noise generation to prevent enemies from breaking. Thanks to huluoboya3 for submitting the PR
+
 - Version 1.15.12: Fix for incompat with coilheadstare. Sorry this took so long, I just kinda forgor.
 
 - Version 1.15.11: Fixed issue where getting disconnected from a join spot caused desyncs.

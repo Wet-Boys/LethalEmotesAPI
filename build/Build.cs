@@ -294,7 +294,7 @@ public sealed class PatchNetcode : FrostingTask<BuildContext>
         
         using var patcher = new Process();
         patcher.StartInfo.FileName = "dotnet";
-        patcher.StartInfo.Arguments = $"tool run netcode-patch ./plugins ./deps";
+        patcher.StartInfo.Arguments = $"tool run netcode-patch -uv 2022.3.62 -nv 1.12.0 -tv 1.0.0 ./plugins ./deps";
         patcher.StartInfo.WorkingDirectory = context.PatcherDir;
         patcher.StartInfo.CreateNoWindow = false;
         patcher.StartInfo.UseShellExecute = true;

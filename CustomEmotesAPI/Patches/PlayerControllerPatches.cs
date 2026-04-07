@@ -25,16 +25,35 @@ public static class PlayerControllerPatches
                 return instructions;
             }
 
-            //InputSystem.actions.FindAction("Move").ReadValue<Vector2>()，stfld
+            //new CodeMatch(code => code.Calls(AccessTools.Method(typeof(IngamePlayerSettings), "get_Instance"))),
+            //    new CodeMatch(code => code.LoadsField(AccessTools.Field(typeof(IngamePlayerSettings), "playerInput"))),
+            
+            
+            
+            //this.moveInputVector = IngamePlayerSettings.Instance.playerInput.actions.FindAction("Move", false).ReadValue<Vector2>();
+            //and a bit of if (this.moveInputVector.magnitude > 0.2f)
             matcher.MatchForward(true,
-
-                new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(InputSystem), "get_actions")),
-                new CodeMatch(OpCodes.Ldstr, "Move"),
-                new CodeMatch(OpCodes.Ldc_I4_0),
-                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(InputActionAsset), "FindAction", [typeof(string), typeof(bool)])),
-                new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(InputAction), "ReadValue", [typeof(Vector2)])),
-                new CodeMatch(OpCodes.Stfld, moveInputField)
-
+                new CodeMatch(code => code.opcode == OpCodes.Ldarg_0),
+                new CodeMatch(code => code.opcode == OpCodes.Call),
+                new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                new CodeMatch(code => code.opcode == OpCodes.Ldstr),
+                new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                new CodeMatch(code => code.opcode == OpCodes.Stfld),
+                new CodeMatch(code => code.opcode == OpCodes.Ldarg_0)
+                
+                
+                //unknown what this was
+                // new CodeMatch(code => code.opcode == OpCodes.Call),
+                // new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+                // new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                // new CodeMatch(code => code.opcode == OpCodes.Ldstr),
+                // new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
+                // new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                // new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+                // new CodeMatch(code => code.opcode == OpCodes.Stloc_0)
             );
 
             if (!matcher.IsValid)
