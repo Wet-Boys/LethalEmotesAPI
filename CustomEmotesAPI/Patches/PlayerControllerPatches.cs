@@ -22,20 +22,32 @@ public static class PlayerControllerPatches
             //    new CodeMatch(code => code.LoadsField(AccessTools.Field(typeof(IngamePlayerSettings), "playerInput"))),
             
             
-            
-            //this.moveInputVector = IngamePlayerSettings.Instance.playerInput.actions.FindAction("Move", false).ReadValue<Vector2>();
-            //and a bit of if (this.moveInputVector.magnitude > 0.2f)
+            //this.moveInputVector = InputSystem.actions.FindAction("Move", false).ReadValue<Vector2>();
+            //and a little bit of if (IngamePlayerSettings.Instance.flipCamera)
             matcher.MatchForward(true,
                 new CodeMatch(code => code.opcode == OpCodes.Ldarg_0),
                 new CodeMatch(code => code.opcode == OpCodes.Call),
-                new CodeMatch(code => code.opcode == OpCodes.Ldfld),
-                new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                 new CodeMatch(code => code.opcode == OpCodes.Ldstr),
                 new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
                 new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                 new CodeMatch(code => code.opcode == OpCodes.Callvirt),
                 new CodeMatch(code => code.opcode == OpCodes.Stfld),
-                new CodeMatch(code => code.opcode == OpCodes.Ldarg_0)
+                new CodeMatch(code => code.opcode == OpCodes.Call)
+
+            //pre v80 or something
+            // //this.moveInputVector = IngamePlayerSettings.Instance.playerInput.actions.FindAction("Move", false).ReadValue<Vector2>();
+            // //and a bit of if (this.moveInputVector.magnitude > 0.2f)
+            // matcher.MatchForward(true,
+            //     new CodeMatch(code => code.opcode == OpCodes.Ldarg_0),
+            //     new CodeMatch(code => code.opcode == OpCodes.Call),
+            //     new CodeMatch(code => code.opcode == OpCodes.Ldfld),
+            //     new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+            //     new CodeMatch(code => code.opcode == OpCodes.Ldstr),
+            //     new CodeMatch(code => code.opcode == OpCodes.Ldc_I4_0),
+            //     new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+            //     new CodeMatch(code => code.opcode == OpCodes.Callvirt),
+            //     new CodeMatch(code => code.opcode == OpCodes.Stfld),
+            //     new CodeMatch(code => code.opcode == OpCodes.Ldarg_0)
                 
                 
                 //unknown what this was
